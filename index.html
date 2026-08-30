@@ -384,6 +384,8 @@
   .gskip{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);
     cursor:pointer;white-space:nowrap}
   .gskip input{accent-color:var(--accent);margin:0}
+  .gfoot{margin:20px 0 0;padding-top:12px;border-top:1px solid var(--line);
+    font-size:11px;color:var(--ink-soft);line-height:1.7}
   #guide .gbody{overflow:auto;padding:4px 18px 18px}
   #guide h3{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);
     margin:18px 0 8px;padding-bottom:3px;border-bottom:1px solid var(--line)}
@@ -754,6 +756,10 @@
             <rect class="gs" x="16" y="42" width="88" height="12" rx="3"/>
           </svg>
           <b>配置パターン</b><span>3つまで保存。JSONで渡せます</span></div>
+      </div>
+      <p class="gfoot">このツールは利用状況の集計に Google アナリティクスを使用しています。
+        投稿・コメント・リアクションは共有サーバーに保存され、他の人にも表示されます。</p>
+      <div style="display:none">
       </div>
     </div>
   </div>
@@ -3994,6 +4000,7 @@ function setWalk(on){
     zoomBar.classList.add('walk');
     setWalkFov(FOV_DEFAULT,true);
     if(IS_TOUCH){ dpadEl.hidden=false; setPanel(false); }
+    gaSend('walk');
     showWalkHelp();
   } else {
     dpadEl.hidden=true; keys.clear();
@@ -4126,10 +4133,56 @@ function maybeCoach(spec){
    保存は Gallery.read/write の2つだけを通す。ここを共有サービスに差し替えれば、
    UI をさわらずに全員で共有できるようになる（いまはこの端末のブラウザ内）。 */
 const GAL_KEY='shake3d-gallery-v1';
-const Gallery={
-  async read(){ try{ return JSON.parse(localStorage.getItem(GAL_KEY)||'[]'); }catch(_){ return []; } },
-  async write(list){ try{ localStorage.setItem(GAL_KEY,JSON.stringify(list)); return true; }catch(_){ return false; } }
+/* 全員で共有するための保存先（Firebase Realtime Database）。
+   つながらないときは、この端末のブラウザ内に保存して動き続ける。 */
+const FB_CONFIG={
+  apiKey:"AIzaSyDf875aX7YDqZaol-3tBscjNN-04wJ6hVY",
+  authDomain:"shake3d-fb765.firebaseapp.com",
+  databaseURL:"https://shake3d-fb765-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"shake3d-fb765",
+  storageBucket:"shake3d-fb765.firebasestorage.app",
+  messagingSenderId:"1049267416737",
+  appId:"1:1049267416737:web:f2e3d72c53d49ffaa14ae0",
+  measurementId:"G-V5ZQYSLZ2N"
 };
+const FB_URL=FB_CONFIG.databaseURL+'/proposals.json';
+let fbOK=null;                       // null=未確認 / true=つながる / false=端末内のみ
+function localRead(){ try{ return JSON.parse(localStorage.getItem(GAL_KEY)||'[]'); }catch(_){ return []; } }
+function localWrite(list){ try{ localStorage.setItem(GAL_KEY,JSON.stringify(list)); return true; }catch(_){ return false; } }
+const Gallery={
+  async read(){
+    try{
+      const r=await fetch(FB_URL+'?t='+Date.now(),{cache:'no-store'});
+      if(!r.ok) throw 0;
+      const j=await r.json();
+      fbOK=true;
+      const list=Array.isArray(j)? j.filter(Boolean) : (j? Object.values(j) : []);
+      list.sort((a,b)=> new Date(b.at)-new Date(a.at));   // 新しい提案が上
+      localWrite(list);                                   // 手元にも控える（圏外対策）
+      return list;
+    }catch(_){ fbOK=false; return localRead(); }
+  },
+  async write(list){
+    localWrite(list);
+    try{
+      const r=await fetch(FB_URL,{method:'PUT',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(list)});
+      fbOK=r.ok; return r.ok;
+    }catch(_){ fbOK=false; return false; }
+  }
+};
+/* Googleアナリティクス（Measurement Protocol は使わず、gtag.jsを読み込む） */
+let gaSend=()=>{};
+(function(){
+  const id=FB_CONFIG.measurementId; if(!id) return;
+  const s=document.createElement('script');
+  s.async=true; s.src='https://www.googletagmanager.com/gtag/js?id='+id;
+  document.head.appendChild(s);
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('js',new Date()); gtag('config',id);
+  gaSend=(name,params)=>{ try{ gtag('event',name,params||{}); }catch(_){} };
+})();
 // Facebookの並びから「怒り」を除いた5種。👍は一番右
 const REACTIONS=['❤️','😆','😮','😢','👍'];
 const ADMIN_PASS='shake-center';          // 社会連携センター用の合い言葉
@@ -4390,6 +4443,7 @@ galEl.addEventListener('click',async e=>{
     const arr=t.rx[rx.dataset.rx], i=arr.indexOf(n);
     if(i>=0) arr.splice(i,1); else arr.push(n);
     if(!arr.length) delete t.rx[rx.dataset.rx];
+    gaSend('reaction',{emoji:rx.dataset.rx, target:rx.dataset.kind==='p'?'proposal':'comment'});
     await galSave(); renderGallery(); return;
   }
   const b=e.target.closest('[data-act]'); if(!b) return;
@@ -4397,7 +4451,9 @@ galEl.addEventListener('click',async e=>{
   const act=b.dataset.act;
   if(act==='load'&&p){
     if(!confirm(`いまの配置を破棄して「${p.title}」を読み込みますか？`)) return;
-    restore(p.layout); closeGallery(); flash(`「${p.title}」を読み込みました`); return;
+    restore(p.layout); closeGallery();
+    gaSend('load_layout',{items:(p.layout||[]).length});
+    flash(`「${p.title}」を読み込みました`); return;
   }
   if(act==='pupdate'&&p){
     if(!furniture.length){ alert('先にフロアに什器を置いてください。'); return; }
@@ -4424,6 +4480,7 @@ galEl.addEventListener('click',async e=>{
     if(!tx) return;
     p.comments=p.comments||[];
     p.comments.push({id:uid(),name:n,org:myOrg(),text:tx,at:new Date().toISOString(),replies:[],rx:{}});
+    gaSend('comment',{kind:'comment'});
     await galSave(); renderGallery(); return;
   }
   if(act==='reply'){ replyTo=(replyTo===b.dataset.cid)?null:b.dataset.cid; renderDetail(); return; }
@@ -4435,6 +4492,7 @@ galEl.addEventListener('click',async e=>{
     const host=f.parent||f.c;                    // 返信は1段まで
     host.replies=host.replies||[];
     host.replies.push({id:uid(),name:n,org:myOrg(),text:tx,at:new Date().toISOString(),rx:{}});
+    gaSend('comment',{kind:'reply'});
     replyTo=null; await galSave(); renderGallery(); return;
   }
   if(act==='edit'&&p){
@@ -4504,6 +4562,7 @@ document.getElementById('ps-form').addEventListener('submit',async e=>{
   openId=proposals[0].id;
   postCover.hidden=true;
   await galSave(); renderGallery();
+  gaSend('propose',{items:src.data.length});
   flash(`「${t}」を提案しました`);
 });
 document.getElementById('gl-submit').addEventListener('click',()=>{
@@ -4511,9 +4570,11 @@ document.getElementById('gl-submit').addEventListener('click',()=>{
   openPostForm();
 });
 function renderAdmin(){
+  const conn = fbOK===false ? '⚠ ネットにつながっていないため、この端末にだけ保存しています。'
+             : fbOK===true  ? '✓ みんなと共有されています。'
+             : '';
   document.getElementById('gl-admin-state').textContent =
-    isAdmin? '社会連携センターとして操作中（どの投稿も削除できます）'
-           : 'コメントとリアクションは、この端末に保存されています。';
+    isAdmin? '社会連携センターとして操作中（どの投稿も削除できます）　'+conn : conn;
   document.getElementById('gl-admin').textContent = isAdmin? '通常の操作に戻る' : '社会連携センターとして操作';
 }
 document.getElementById('gl-admin').addEventListener('click',()=>{
