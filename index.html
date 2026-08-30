@@ -138,7 +138,9 @@
 
   /* 1人称の拡大率スライダー */
   /* 標準モードでは右上、1人称では右下（足元の操作に近い位置）に置く */
-  #zoombar{right:12px;top:calc(var(--topH,52px) + 22px);bottom:auto;width:max-content;
+  /* height:fit-content を付けておくと、top と bottom が同時に効いても縦に伸びない */
+  #zoombar{right:12px;top:calc(var(--topH,52px) + 22px);bottom:auto;
+    width:max-content;height:fit-content;
     display:flex;align-items:center;gap:8px;
     background:var(--panel);border:1px solid var(--line);border-radius:10px;
     padding:7px 11px;box-shadow:0 4px 16px rgba(0,0,0,.14)}
@@ -419,6 +421,9 @@
     #hint{display:none}                              /* キー操作の案内はしまう */
     #zoombar{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:12px;right:auto;
       padding:6px 9px;gap:6px}
+    /* 単独表示中も下に置く（PC用の指定に top を戻されないよう明示） */
+    body.solo #zoombar:not(.walk){top:auto;
+      bottom:calc(env(safe-area-inset-bottom,0px) + 58px)}
     #zoombar.walk{bottom:calc(env(safe-area-inset-bottom,0px) + 118px)}
     body.panel-open #zoombar{display:none}
     #zoombar input[type=range]{width:96px}
