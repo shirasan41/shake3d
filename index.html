@@ -23,8 +23,6 @@
        font-family:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN',sans-serif;font-size:13px}
   #stage{position:fixed;inset:0}
   canvas{display:block;touch-action:none}   /* 指でのドラッグをブラウザに奪われない */
-  #panel{display:none}
-  body.panel-open #panel{display:flex}
 
   .hud{position:fixed;z-index:10}
   /* 上部は1本のバーにまとめる。浮きパネルが2つあると狭い幅で重なるため */
@@ -55,74 +53,7 @@
   #topbar .btn.primary{margin-left:6px;box-shadow:0 2px 8px rgba(46,125,50,.28)}
   @media (max-width:1180px){ #topbar .sub{display:none} }
 
-  /* ===================== スマホ・タブレット ===================== */
-  @media (max-width:820px){
-    :root{ --sheet: 62vh; }
-    /* 上部バー：タイトル行と、横スクロールするビュー切替の2段に分ける */
-    #topbar{top:0;left:0;right:0;border-radius:0;border-width:0 0 1px;
-      padding:7px 10px;gap:6px;row-gap:6px}
-    #topbar h1{font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
-    #topbar .sp{display:none}
-    #topbar #views{order:3;width:100%;flex-wrap:nowrap;overflow-x:auto;gap:6px;
-      padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-    #topbar #views::-webkit-scrollbar{display:none}
-    #topbar #views .btn{flex:none}
-    #topbar .grp.sec{padding-left:0;margin-left:0;border-left:0}
-    #topbar .grp.sec #b-save{display:none}          /* ⌘Sはスマホでは使わない */
-    #topbar .btn.primary{margin-left:0}
-    /* 指で押しやすい大きさに */
-    .btn{padding:9px 13px;font-size:13px}
-    .btn.small{padding:8px 11px;font-size:12.5px}
-    /* 左パネルは下からのシートに */
-    #panel{top:auto;bottom:0;left:0;right:0;width:auto;max-height:var(--sheet);
-      border-radius:14px 14px 0 0;border-width:1px 0 0;padding:10px 12px 14px;
-      box-shadow:0 -6px 24px rgba(38,49,42,.18);z-index:30}
-    #panel::before{content:"";display:block;width:38px;height:4px;border-radius:99px;
-      background:var(--line);margin:0 auto 9px;flex:none}
-    #tabs{margin-top:8px}
-    .tab{padding:9px 11px;font-size:13px}
-    .pal-item{padding:9px 11px}
-    #hint{display:none}                              /* キー操作の案内はしまう */
-    #zoombar{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:12px;right:auto;
-      padding:6px 9px;gap:6px}
-    #zoombar.walk{bottom:calc(env(safe-area-inset-bottom,0px) + 118px)}
-    body.panel-open #zoombar{display:none}
-    #zoombar input[type=range]{width:96px}
-    #solobar{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);right:12px;
-      left:auto;font-size:12px;padding:6px 9px}
-    body.panel-open #solobar{display:none !important}
-    #walkhelp{padding-top:calc(var(--topH,86px) + 14px);padding-left:10px;padding-right:10px}
-    #walkhelp th,#walkhelp td{padding:6px 10px;font-size:11.5px}
-    #coach{top:calc(var(--topH,86px) + 8px)}
-    #coach .cbox{gap:9px;padding:9px 10px}
-    #coach .cfig{width:66px;height:36px}
-    /* モーダル類は画面いっぱいに */
-    #guide,#gallery{padding:0}
-    #guide .gbox,.glbox{max-width:none;width:100%;height:100%;max-height:none;border-radius:0}
-    #guide .gbody{padding:4px 14px 20px}
-    .gcards{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-    .glhead,.glfoot{flex-wrap:wrap;gap:7px;padding:9px 11px}
-    .glhead .who{width:100%;order:5}
-    .glbody{flex-direction:column}
-    .gllist{width:auto;max-height:none;border-right:0;border-bottom:1px solid var(--line);
-      display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:10px;flex:none}
-    .glcard{width:200px;flex:none;margin:0}
-    .glcard svg{height:66px}
-    .gldetail{padding:14px 14px 20px}
-    .gldetail h4{font-size:17px}
-    .glplan{height:150px}
-    .glcover{padding:16px}
-    .nmbox{margin-top:0}
-    .cmt.reply{margin-left:10px}
-    .cmform{flex-direction:column}
-    .cmform .btn{align-self:flex-end}
-    #palprev{display:none !important}                /* 指では出さない */
-  }
-  @media (max-width:420px){
-    #topbar h1{font-size:13px}
-    .glcard{width:170px}
-    .gcards{grid-template-columns:1fr 1fr}
-  }
+
   #solobar{top:calc(var(--topH,52px) + 22px);right:12px;background:var(--panel);border:1px solid var(--line);
     border-radius:9px;padding:7px 11px;box-shadow:0 4px 16px rgba(0,0,0,.12)}
   #solobar .nm{color:var(--accent)}
@@ -416,14 +347,18 @@
   .gt{fill:var(--ink-soft);font-size:9px;font-weight:700}
 
   #slots{display:flex;flex-direction:column;gap:6px}
-  .slot{display:flex;align-items:center;gap:6px;border:1px solid var(--line);
-    border-radius:8px;padding:6px 8px;background:var(--panel)}
-  .slot .lbl{flex:1;min-width:0}
-  .slot .nm{display:block;font-size:12px;font-weight:600;color:var(--ink);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .slot .ts{display:block;font-size:10px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  /* 名前とボタンを上下に分ける。横並びだと名前が途中で切れるため */
+  .slot{display:block;border:1px solid var(--line);
+    border-radius:9px;padding:8px 9px;background:var(--panel)}
+  .slot .lbl{min-width:0}
+  .slot .nm{display:block;font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.35;
+    overflow-wrap:anywhere}
+  .slot .ts{display:block;font-size:10px;color:var(--ink-soft);margin-top:1px;
+    font-variant-numeric:tabular-nums}
   .slot.empty .nm{color:var(--ink-soft);font-weight:400}
-  .slot .btn.small{padding:4px 7px;font-size:11px}
+  .slot .acts{display:flex;gap:5px;margin-top:7px}
+  .slot .acts .btn.small{padding:5px 8px;font-size:11px;flex:none}
+  .slot .acts .btn.danger{margin-left:auto;padding:5px 9px}
 
   /* 1人称に入った直後だけ画面上部に薄く出る操作ガイド。数秒でフェードアウトする */
   #walkhelp{top:0;left:0;right:0;display:flex;justify-content:center;
@@ -447,6 +382,81 @@
   .dimtable td:last-child{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
   .asm{color:var(--warn)}
   @media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+
+  /* ---- 左パネルの開閉（基本の #panel より後に置いて確実に効かせる） ---- */
+  #panel{display:none}
+  body.panel-open #panel{display:flex}
+
+  /* ===================== スマホ・タブレット ===================== */
+  @media (max-width:820px){
+    :root{ --sheet: 48vh; }
+    /* 上部バー：タイトル行と、横スクロールするビュー切替の2段に分ける */
+    #topbar{top:0;left:0;right:0;border-radius:0;border-width:0 0 1px;
+      padding:7px 10px;gap:6px;row-gap:6px}
+    #topbar h1{font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+    #topbar .sp{display:none}
+    #topbar #views{order:3;width:100%;flex-wrap:nowrap;overflow-x:auto;gap:6px;
+      padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    #topbar #views::-webkit-scrollbar{display:none}
+    #topbar #views .btn{flex:none}
+    #topbar .grp.sec{padding-left:0;margin-left:0;border-left:0}
+    #topbar .grp.sec #b-save{display:none}          /* ⌘Sはスマホでは使わない */
+    #topbar .btn.primary{margin-left:0}
+    /* 指で押しやすい大きさに */
+    .btn{padding:9px 13px;font-size:13px}
+    .btn.small{padding:8px 11px;font-size:12.5px}
+    /* 左パネルは下からのシートに */
+    #panel{top:auto !important;bottom:0;left:0;right:0;width:auto;
+      max-height:var(--sheet) !important;
+      border-radius:14px 14px 0 0;border-width:1px 0 0;
+      padding:10px 12px calc(env(safe-area-inset-bottom,0px) + 12px);
+      box-shadow:0 -6px 24px rgba(38,49,42,.18);z-index:30}
+    #panel::before{content:"";display:block;width:38px;height:4px;border-radius:99px;
+      background:var(--line);margin:0 auto 9px;flex:none}
+    #tabs{margin-top:8px}
+    .tab{padding:9px 11px;font-size:13px}
+    .pal-item{padding:9px 11px}
+    #hint{display:none}                              /* キー操作の案内はしまう */
+    #zoombar{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:12px;right:auto;
+      padding:6px 9px;gap:6px}
+    #zoombar.walk{bottom:calc(env(safe-area-inset-bottom,0px) + 118px)}
+    body.panel-open #zoombar{display:none}
+    #zoombar input[type=range]{width:96px}
+    #solobar{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);right:12px;
+      left:auto;font-size:12px;padding:6px 9px}
+    body.panel-open #solobar{display:none !important}
+    #walkhelp{padding-top:calc(var(--topH,86px) + 14px);padding-left:10px;padding-right:10px}
+    #walkhelp th,#walkhelp td{padding:6px 10px;font-size:11.5px}
+    #coach{top:calc(var(--topH,86px) + 8px)}
+    #coach .cbox{gap:9px;padding:9px 10px}
+    #coach .cfig{width:66px;height:36px}
+    /* モーダル類は画面いっぱいに */
+    #guide,#gallery{padding:0}
+    #guide .gbox,.glbox{max-width:none;width:100%;height:100%;max-height:none;border-radius:0}
+    #guide .gbody{padding:4px 14px 20px}
+    .gcards{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+    .glhead,.glfoot{flex-wrap:wrap;gap:7px;padding:9px 11px}
+    .glhead .who{width:100%;order:5}
+    .glbody{flex-direction:column}
+    .gllist{width:auto;max-height:none;border-right:0;border-bottom:1px solid var(--line);
+      display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:10px;flex:none}
+    .glcard{width:200px;flex:none;margin:0}
+    .glcard svg{height:66px}
+    .gldetail{padding:14px 14px 20px}
+    .gldetail h4{font-size:17px}
+    .glplan{height:150px}
+    .glcover{padding:16px}
+    .nmbox{margin-top:0}
+    .cmt.reply{margin-left:10px}
+    .cmform{flex-direction:column}
+    .cmform .btn{align-self:flex-end}
+    #palprev{display:none !important}                /* 指では出さない */
+  }
+  @media (max-width:420px){
+    #topbar h1{font-size:13px}
+    .glcard{width:170px}
+    .gcards{grid-template-columns:1fr 1fr}
+  }
 </style>
 
 <div id="stage"></div>
@@ -1964,6 +1974,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 /* 指で操作する端末か。UIの出し分けに使う */
 const IS_TOUCH = matchMedia('(hover:none) and (pointer:coarse)').matches;
 if(IS_TOUCH) document.body.classList.add('touch');
+const DBL = IS_TOUCH ? '長押し' : 'ダブルクリック';   // 端末に応じた言い方
 renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -2428,8 +2439,8 @@ const PALETTE=[
   {id:'alku',  name:'縦型ホワイトボード', w:94.3,d:57.3,h:180, color:0xFAFAF8, qty:12, alku:true, bw:87.6, bh:117.6},
   {id:'yoko',  name:'横型ホワイトボード', w:130.6,d:56.2,h:180.8, color:0xFAFAF8, qty:1, panelWB:true, bw:115.8, bh:85.8},
   {id:'gb803', name:'多目的ボード',      w:48.8,d:35,h:135, color:0xF6F6F4, qty:2, pinboard:true},
-  {id:'scrL',  name:'WBスクリーン2連(大)', w:168.5,d:60,h:180, color:0xFAFAF8, qty:2, screenWB:true},
-  {id:'scrS',  name:'WBスクリーン2連(小)', w:168.5,d:60,h:150, color:0xFAFAF8, qty:2, screenWB:true},
+  {id:'scrL',  name:'WBスクリーン2連(大)', w:168.5,d:60,h:180, color:0xFAFAF8, qty:4, screenWB:true},
+  {id:'scrS',  name:'WBスクリーン2連(小)', w:168.5,d:60,h:150, color:0xFAFAF8, qty:3, screenWB:true},
   {id:'wb120', name:'ホワイトボード(W120)', w:120,d:41,h:180, color:0xFAFAF8, qty:2, panelWB:true, bw:120, bh:171},
   {id:'eboard',name:'電子黒板65型',   w:155,d:60,h:180, color:0x22242A, qty:1, eboard:true},
   {id:'gshelf', name:'グレー棚（プロジェクトルーム3）',      w:100,d:40,h:110, color:0xB9BCB8, qty:2, gshelf:true},
@@ -3307,7 +3318,7 @@ function hoverCurtainBlock(e){
     hotRoom=null;
     renderer.domElement.style.cursor='pointer';
     const t=shelfTilts(host);
-    showTip(e, (t[rec.i]!==false?'斜め':'真横')+'の棚板 — ダブルクリックで切り替え');
+    showTip(e, (t[rec.i]!==false?'斜め':'真横')+'の棚板 — '+DBL+'で切り替え');
     return;
   }
   // 特別な操作ができる什器・扉には、その場で操作方法を出す
@@ -3322,7 +3333,7 @@ function hoverCurtainBlock(e){
                                       : '扉 — クリックで開閉';
     else if(host){
       const sp=host.userData.spec;
-      if(sp.screenWB) msg='WBスクリーン2連 — ダブルクリックで15度ずつ折りたたみ';
+      if(sp.screenWB) msg='WBスクリーン2連 — '+DBL+'で15度ずつ折りたたみ';
       else if(sp.foldrack) msg='折りたたみラック — 選んでもう一度クリックで畳む／展開';
       else if(sp.gshelf) msg='グレー棚 — 選んでから各段の前面をクリックで開閉';
     }
@@ -3332,7 +3343,7 @@ function hoverCurtainBlock(e){
   const k=(!soloRoom && ray.ray.intersectPlane(dragPlane,p)) ? roomAt(p.x,p.z) : null;
   hotRoom=k;
   renderer.domElement.style.cursor=k?'pointer':'';
-  if(k) showTip(e,`${ROOMNAME[k]} — ダブルクリックで単独表示`);
+  if(k) showTip(e,`${ROOMNAME[k]} — ${DBL}で単独表示`);
   else blockTip.style.display='none';
 }
 /* マウスの下にある棚板1枚だけを光らせる。棚全体の選択色（緑）と区別できるよう
@@ -3512,7 +3523,8 @@ addEventListener('pointerup',e=>{
   if(dragging){ dragging=null; controls.enabled=true; save(); }
 });
 /* WBスクリーン2連：ダブルクリックで中央ヒンジV折り */
-renderer.domElement.addEventListener('dblclick',e=>{
+/* ダブルクリック＝形を変える操作。スマホでは長押しでも同じことができる */
+function toggleShape(e){
   ptrPos(e); ray.setFromCamera(ptr,camera);
   const hits=ray.intersectObjects(furnGroup.children.filter(c=>c.visible),true);
   if(!hits.length){                      // 家具の外＝プロジェクトルーム1〜3の床なら、その部屋を単独表示
@@ -3545,7 +3557,27 @@ renderer.domElement.addEventListener('dblclick',e=>{
   const d=nextFold(g);
   applyFold(g); renderSel(); checkCollisions(); save();
   flash(d? `折りたたみ ${d}度` : '真っ直ぐに戻しました');
+}
+renderer.domElement.addEventListener('dblclick',toggleShape);
+/* 指の端末：500ms押し続けたらダブルクリックと同じ。指が動いたら取り消す（ドラッグ優先） */
+let holdT=null, holdAt=null;
+function cancelHold(){ if(holdT){ clearTimeout(holdT); holdT=null; } holdAt=null; }
+renderer.domElement.addEventListener('pointerdown',e=>{
+  if(!IS_TOUCH||e.button!==0||walkMode) return;
+  holdAt={x:e.clientX,y:e.clientY};
+  const ev={clientX:e.clientX,clientY:e.clientY};
+  holdT=setTimeout(()=>{
+    holdT=null;
+    dragging=null; controls.enabled=true;      // 長押し中の移動は取り消す
+    if(navigator.vibrate) try{ navigator.vibrate(12); }catch(_){}
+    toggleShape(ev);
+  },500);
 });
+addEventListener('pointermove',e=>{
+  if(holdAt && Math.hypot(e.clientX-holdAt.x,e.clientY-holdAt.y)>8) cancelHold();
+});
+addEventListener('pointerup',cancelHold);
+addEventListener('pointercancel',cancelHold);
 /* ---------- コピー＆ペースト ---------- */
 let clipboard=null;                 // 選択中の家具の複製元データ
 function copySelected(){
@@ -3707,9 +3739,11 @@ function renderSlots(){
         <span class="nm">${s? s.name.replace(/[<>&]/g,'') : 'パターン'+i+'（空き）'}</span>
         <span class="ts">${s? stamp(s.at)+' ・ '+s.data.length+'点' : '未保存'}</span>
       </div>
-      <button class="btn small" data-a="save" data-i="${i}">${s?'上書き':'保存'}</button>
-      <button class="btn small" data-a="load" data-i="${i}" ${s?'':'disabled'}>呼び出し</button>
-      <button class="btn small danger" data-a="del" data-i="${i}" ${s?'':'disabled'}>×</button>`;
+      <div class="acts">
+        <button class="btn small" data-a="save" data-i="${i}">${s?'上書き':'保存'}</button>
+        <button class="btn small" data-a="load" data-i="${i}" ${s?'':'disabled'}>呼び出し</button>
+        <button class="btn small danger" data-a="del" data-i="${i}" ${s?'':'disabled'} title="削除">×</button>
+      </div>`;
     slotsEl.appendChild(row);
   }
 }
@@ -4604,6 +4638,15 @@ addEventListener('keydown',e=>{ if(e.key!=='Escape'||galEl.hidden) return;
 
 /* ---------- 使い方パネル ---------- */
 const guideEl=document.getElementById('guide');
+// 指の端末では「ダブルクリック」の表記を「長押し」に置き換える
+if(IS_TOUCH){
+  guideEl.querySelectorAll('.gtag').forEach(t=>{
+    if(t.textContent.trim()==='ダブルクリック') t.textContent='長押し';
+  });
+  guideEl.querySelectorAll('.gcard > span').forEach(sp=>{
+    sp.innerHTML=sp.innerHTML.replace(/ダブルクリック/g,'長押し');
+  });
+}
 const gSkip=document.getElementById('g-skip');
 const guideSkipped=()=>{ try{ return localStorage.getItem('shake3d-guide-skip')==='1'; }catch(_){ return false; } };
 gSkip.checked=guideSkipped();
