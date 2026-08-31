@@ -101,6 +101,8 @@
   #selinfo.empty{background:var(--panel);color:var(--ink-soft)}
   #selinfo .nm{font-weight:700}
   #selinfo .pos{font-family:var(--mono);font-size:11px;margin-top:3px;color:var(--ink-soft)}
+  #selinfo.locked{background:#EDF1F3;border-color:#C3CFD5}
+  #selinfo .lk{margin-right:4px}
   #selbtns{display:flex;gap:5px;margin-top:7px}
   .note{font-size:11px;color:var(--ink-soft);line-height:1.55;margin-top:6px}
   .note b{color:var(--ink)}
@@ -394,6 +396,7 @@
   /* ---- 左パネルの開閉（基本の #panel より後に置いて確実に効かせる） ---- */
   #panel{display:none}
   body.panel-open #panel{display:flex}
+  #grab{display:none}
 
   /* ===================== スマホ・タブレット ===================== */
   @media (max-width:820px){
@@ -419,8 +422,12 @@
       border-radius:14px 14px 0 0;border-width:1px 0 0;
       padding:10px 12px calc(env(safe-area-inset-bottom,0px) + 12px);
       box-shadow:0 -6px 24px rgba(38,49,42,.18);z-index:30}
-    #panel::before{content:"";display:block;width:38px;height:4px;border-radius:99px;
-      background:var(--line);margin:0 auto 9px;flex:none}
+    /* つまみ。指で押しやすいよう、見た目より広い当たり判定にする */
+    #grab{display:block;flex:none;margin:-6px -12px 3px;padding:10px 0 9px;
+      touch-action:none;cursor:grab;-webkit-tap-highlight-color:transparent}
+    #grab i{display:block;width:38px;height:4px;border-radius:99px;
+      background:var(--line);margin:0 auto;transition:background .15s,width .15s}
+    #grab:active i{background:var(--ink-soft);width:46px}
     #tabs{margin-top:8px}
     .tab{padding:9px 11px;font-size:13px}
     .pal-item{padding:9px 11px}
@@ -797,6 +804,8 @@
 </div>
 
 <div class="hud" id="panel">
+  <!-- 下からのシートのつまみ。押しても、下へ引いても閉じる（スマホのみ表示） -->
+  <div id="grab" aria-label="メニューを閉じる" role="button" tabindex="0"><i></i></div>
   <!-- 選択中の情報はタブの外に固定。どのタブでも常に見えるようにする -->
   <div id="selinfo" class="empty">なし（家具をクリック）</div>
 
@@ -896,7 +905,7 @@
   <span id="z-val">1.0倍</span>
 </div>
 
-<div class="hud" id="hint">ドラッグ＝移動 ／ <kbd>R</kbd>＝回転 ／ <kbd>⌘C</kbd>／<kbd>⌘V</kbd>＝コピー・貼り付け ／ <kbd>Delete</kbd>＝削除 ／ 扉・間仕切り＝クリックで開閉 ／ 背景ドラッグ＝視点</div>
+<div class="hud" id="hint">ドラッグ＝移動 ／ <kbd>R</kbd>＝回転 ／ <kbd>L</kbd>＝ロック ／ <kbd>⌘C</kbd>／<kbd>⌘V</kbd>＝コピー・貼り付け ／ <kbd>Delete</kbd>＝削除 ／ 扉・間仕切り＝クリックで開閉 ／ 背景ドラッグ＝視点</div>
 
 <script>
 /**
@@ -3062,10 +3071,15 @@ function buildFurn(spec){
       const y=100-r*25, z=D/2-14-r*8;           // 最下段が床に沈まない高さから割り付ける
       for(let c=0;c<cols;c++){
         const x=-W/2+mg+pitch*(c+0.5);
+        /* 受けは上を奥へ倒す。下側が手前に出て、冊子が奥へもたれて立つ形。
+           受けと落下止めを1つにまとめて傾けるので、位置関係がずれない。 */
+        const box=new THREE.Group();
+        box.position.set(x,y,z); box.rotation.x=.12;
         const tray=new THREE.Mesh(new THREE.BoxGeometry(tw,30,4.5),trayM);
-        tray.position.set(x,y,z); tray.rotation.x=-.12; g.add(tray);
+        box.add(tray);
         const lip=new THREE.Mesh(new THREE.BoxGeometry(tw,3,1.2),lipM);  // 手前の落下止め
-        lip.position.set(x,y-14,z-2.8); g.add(lip);
+        lip.position.set(0,-14,-2.8); box.add(lip);
+        g.add(box);
       }
     }
     addCasters(g,spec.w,spec.d,4);
@@ -3442,24 +3456,30 @@ function select(g, add){
 /* 選択中の什器をまとめて回す。2点以上なら選択範囲の中心まわりに回転する */
 function rotateSelection(step){
   if(!selection.length) return;
+  if(selection.every(isLocked)){ flash('ロック中です。先にロックを解除してください'); return; }
   if(selection.length===1){
-    selection[0].rotation.y+=step; keepOutside(selection[0]);
+    if(!isLocked(selection[0])){ selection[0].rotation.y+=step; settle(selection[0],false); }
   } else {
     let cx=0,cz=0;
     selection.forEach(g=>{ cx+=g.position.x; cz+=g.position.z; });
     cx/=selection.length; cz/=selection.length;
     const c=Math.cos(step), s=Math.sin(step);
     selection.forEach(g=>{
+      if(isLocked(g)) return;
       const dx=g.position.x-cx, dz=g.position.z-cz;
       g.position.x=cx+dx*c+dz*s;
       g.position.z=cz-dx*s+dz*c;
       g.rotation.y+=step;
-      keepOutside(g);
+      settle(g,false);
     });
   }
   renderSel(); checkCollisions(); save();
 }
-function deleteSelection(){ selection.slice().forEach(removeFurn); }
+function deleteSelection(){
+  const keep=selection.filter(isLocked);
+  selection.slice().forEach(g=>{ if(!isLocked(g)) removeFurn(g); });
+  if(keep.length) flash(keep.length+'点はロック中のため残しました');
+}
 function highlight(g,hex){ g.traverse(o=>{ if(o.isMesh&&o.material.emissive){ o.material.emissive.setHex(hex); o.material.emissiveIntensity= hex?0.35:0; } }); }
 /* WBスクリーン2連の中央ヒンジ。ダブルクリックのたび15度ずつ折り、90度の次で真っ直ぐに戻る */
 const FOLD_STEP=15, FOLD_MAX=90;
@@ -3477,16 +3497,20 @@ function applyFold(g){
 }
 function renderSel(){
   const s=selected.userData.spec, multi=selection.length>1;
-  selEl.className='';
-  selEl.innerHTML=`<div class="nm">${multi? selection.length+'点を選択中' : s.name}</div>
+  const nLock=selection.filter(isLocked).length, allLock=nLock===selection.length;
+  selEl.className=allLock? 'locked' : '';
+  selEl.innerHTML=`<div class="nm">${allLock?'<span class="lk">🔒</span>':''}${multi? selection.length+'点を選択中' : s.name}</div>
     <div class="pos">${multi
       ? s.name+' ほか（Shift＋クリックで増減）'
-      : `x ${Math.round(selected.position.x)} / y ${Math.round(selected.position.z)}cm ・ ${Math.round(THREE.MathUtils.radToDeg(selected.rotation.y))%360}°`}</div>
+      : `x ${Math.round(selected.position.x)} / y ${Math.round(selected.position.z)}cm ・ ${Math.round(THREE.MathUtils.radToDeg(selected.rotation.y))%360}°`}${
+      allLock? '<br>ロック中：動かす・回す・消すはできません' : (nLock? `<br>うち ${nLock}点がロック中` : '')}</div>
     <div id="selbtns">
       <button class="btn small" id="sb-rot">回転</button>
       ${(!multi&&s.screenWB)?`<button class="btn small" id="sb-fold">折りたたみ ${foldDeg(selected)}°</button>`:''}
       ${(!multi&&s.foldrack)?`<button class="btn small" id="sb-fold">${selected.userData.folded?'展開':'折りたたみ'}</button>`:''}
       ${(!multi&&s.bookshelf)?`<button class="btn small" id="sb-tilt">棚板を全部 ${shelfTilts(selected).every(v=>v!==false)?'真横に':'斜めに'}</button>`:''}
+      <button class="btn small${allLock?' primary':''}" id="sb-lock"
+        title="ロック中は動かせません（L）">${allLock?'🔒 ロック解除':'ロック'}</button>
       <button class="btn small" id="sb-dup">複製</button>
       <button class="btn small danger" id="sb-del">削除</button>
     </div>`;
@@ -3503,9 +3527,19 @@ function renderSel(){
     t.fill(!t.every(v=>v!==false));
     applyShelfTilt(selected); renderSel(); save();
   };
+  document.getElementById('sb-lock').onclick=()=>toggleLock();
   document.getElementById('sb-rot').onclick=()=>rotateSelection(Math.PI/4);   // 45度ずつ
   document.getElementById('sb-dup').onclick=()=>{ if(copySelected()) pasteClipboard(); };
   document.getElementById('sb-del').onclick=()=>deleteSelection();
+}
+/* 選択中をまとめて切り替える。混ざっているときは、そろえてロックする */
+function toggleLock(){
+  if(!selection.length) return;
+  const on=!selection.every(isLocked);
+  selection.forEach(g=>setLock(g,on));
+  renderSel(); checkCollisions(); save();
+  flash(on? (selection.length>1? selection.length+'点をロックしました' : 'ロックしました')
+          : 'ロックを解除しました');
 }
 function renderSelEmpty(){ selEl.className='empty'; selEl.textContent='なし（家具をクリック）'; }
 function removeFurn(g){
@@ -3633,6 +3667,90 @@ function keepOutside(g){
   }
 }
 
+/* ---------- 棚どうし・椅子と棚は重ならない ----------
+   棚は前を空けて使うものなので、他の棚や椅子と場所を取り合うと使えなくなる。
+   重なったら、はみ出しの浅いほうへ滑らせて逃がす。
+   椅子どうしは積み重ねる使い方があるので、ここでは見ない。 */
+const SHELF_IDS=['bookW','gshelf','mlocker','traycab','slidecab','openshelf','pamp'];
+const SEAT_IDS =['stoolB','stoolW','cubeBg','cubeOr','cubeBl','btR','btB','btG',
+                 'chairY','chairK','chairB','chairW','chairWL'];
+const isShelfSpec=s=>!!s&&SHELF_IDS.indexOf(s.id)>=0;
+const isSeatSpec =s=>!!s&&SEAT_IDS.indexOf(s.id)>=0;
+function mustPart(a,b){                       // 場所を取り合う組み合わせか
+  if(isShelfSpec(a)&&isShelfSpec(b)) return true;
+  return (isShelfSpec(a)&&isSeatSpec(b))||(isSeatSpec(a)&&isShelfSpec(b));
+}
+/* ---------- 家具のロック ----------
+   位置を決めた家具を固定して、うっかり動かしたり消したりしないようにする。
+   ロック中でも選び直せる（解除するため）。ほかの家具はロック中の家具を避けて逃げる。 */
+const isLocked=g=>!!(g&&g.userData&&g.userData.lock);
+function setLock(g,on){ g.userData.lock=!!on; }
+function rectOf(g){
+  const [hx,hz]=halfExtent(g,g.userData.spec);
+  return {x0:g.position.x-hx,x1:g.position.x+hx,z0:g.position.z-hz,z1:g.position.z+hz};
+}
+function overlapsAny(g){
+  const s=g.userData.spec; if(!s||g.position.y>5) return false;
+  const r=rectOf(g);
+  for(const o of furniture){
+    if(o===g||!o.visible||o.position.y>5) continue;
+    if(!mustPart(s,o.userData.spec)) continue;
+    const q=rectOf(o);
+    if(r.x1>q.x0+0.05&&r.x0<q.x1-0.05&&r.z1>q.z0+0.05&&r.z0<q.z1-0.05) return true;
+  }
+  return false;
+}
+function keepApart(g){
+  const s=g.userData.spec; if(!s) return;
+  if(isLocked(g)) return;                     // ロック中は動かさない
+  if(g.position.y>5) return;                  // 積んである物は動かさない
+  const [hx,hz]=halfExtent(g,s);
+  for(let pass=0;pass<6;pass++){
+    let moved=false;
+    for(const o of furniture){
+      if(o===g||!o.visible||o.position.y>5) continue;
+      if(!mustPart(s,o.userData.spec)) continue;
+      const q=rectOf(o);
+      const px=Math.min(q.x1-(g.position.x-hx), (g.position.x+hx)-q.x0);
+      const pz=Math.min(q.z1-(g.position.z-hz), (g.position.z+hz)-q.z0);
+      if(px<=0||pz<=0) continue;              // 重なっていない
+      if(px<pz) g.position.x += (g.position.x<(q.x0+q.x1)/2)? -px : px;
+      else      g.position.z += (g.position.z<(q.z0+q.z1)/2)? -pz : pz;
+      moved=true;
+    }
+    if(!moved) break;
+  }
+}
+/* 近くで、他と重ならず壁にも入らない場所を渦巻き状に探す。
+   見つからなければ元の場所へ戻す。 */
+function findFree(g){
+  const sp=g.userData.spec, x0=g.position.x, z0=g.position.z;
+  const step=Math.max(20, Math.min(sp.w,sp.d)*0.5);
+  for(let n=1;n<140;n++){
+    const a=n*2.39996, r=step*Math.sqrt(n);
+    g.position.x=x0+Math.cos(a)*r;
+    g.position.z=z0+Math.sin(a)*r;
+    keepOutside(g);
+    if(!overlapsAny(g)) return true;
+  }
+  g.position.x=x0; g.position.z=z0; keepOutside(g);
+  return false;
+}
+/* 置き直したあとの後始末をひとまとめに。
+   逃がしても壁との間で行き場が無いときは、動かす前の位置へ戻す。 */
+function settle(g,useSnap){
+  if(isLocked(g)) return;
+  if(useSnap) applySnap(g);
+  keepApart(g);
+  keepOutside(g);
+  if(overlapsAny(g)){                        // 押し出す先が壁で塞がっていた
+    const ok=g.userData.freeAt;              // 直前に問題なく置けていた場所へ戻す
+    if(ok){ g.position.x=ok.x; g.position.z=ok.z; keepOutside(g); }
+  }
+  if(overlapsAny(g)) findFree(g);            // それでも駄目なら、本当に空いている所を探す
+  if(!overlapsAny(g)) g.userData.freeAt={x:g.position.x, z:g.position.z};
+}
+
 /* ---------- 配置チェック ----------
    什器どうしの接触は赤く出さない（寄せて置く・重ねて収納するのが普通のため）。
    赤く点灯するのは通路帯（配置不可エリア）に掛かったときだけ。 */
@@ -3645,7 +3763,7 @@ function checkCollisions(){
     }); });
   hotZones.forEach((h,i)=>h.visible=zoneHot[i]);
   furniture.forEach(g=>{ if(!isSel(g)) highlight(g, g.userData.hit?0xC62828:0x000000); });
-  selection.forEach(g=>highlight(g, g.userData.hit?0xC62828:0x2E7D32));
+  selection.forEach(g=>highlight(g, g.userData.hit?0xC62828:(isLocked(g)?0x4A6572:0x2E7D32)));
 }
 
 /* ---------- ドラッグ ---------- */
@@ -3797,8 +3915,10 @@ renderer.domElement.addEventListener('pointerdown',e=>{
     while(fo && !flap){ if(fo.userData) flap=fo.userData.gflap||null; fo=fo.parent; }
     if(flap && isSel(g)){ flap.target=flap.target?0:1; save(); return; }
     const wasSel=isSel(g);
-    select(g, e.shiftKey); dragging=g; controls.enabled=false;
+    select(g, e.shiftKey);
     dragClick={g:g, wasSel:wasSel, sx:e.clientX, sy:e.clientY};
+    if(isLocked(g)){ return; }                 // ロック中は選べるが動かせない
+    dragging=g; controls.enabled=false;
     const p=new THREE.Vector3(); ray.ray.intersectPlane(dragPlane,p);
     dragOff.subVectors(g.position,p);
   } else {
@@ -3857,10 +3977,11 @@ addEventListener('pointermove',e=>{
     if(selection.length>1 && isSel(dragging)){
       // 複数選択中はまとめて平行移動（吸着は使わない）
       const ddx=nx-dragging.position.x, ddz=nz-dragging.position.z;
-      selection.forEach(g=>{ g.position.x+=ddx; g.position.z+=ddz; keepOutside(g); });
+      selection.forEach(g=>{ if(isLocked(g)) return;
+        g.position.x+=ddx; g.position.z+=ddz; settle(g,false); });
     } else {
       dragging.position.set(nx,0,nz);
-      applySnap(dragging); keepOutside(dragging);
+      settle(dragging,true);
     }
     renderSel(); checkCollisions();
   }
@@ -4007,7 +4128,7 @@ function pasteClipboard(){
     if(it.folded||it.fd){ g.userData.folded=true; g.userData.foldDeg=it.fd;
       if(g.userData.spec.foldrack) applyRackFold(g); else applyFold(g); }
     if(it.tilts && g.userData.spec.bookshelf){ g.userData.tilts=it.tilts.slice(); applyShelfTilt(g); }
-    keepOutside(g);
+    settle(g,false);
     made.push(g);
   });
   if(!made.length){ flash('保有数の上限です'); return false; }
@@ -4054,6 +4175,7 @@ addEventListener('keydown',e=>{
   if(e.key==='Escape'&&selection.length){ select(null); return; }
   if(!selection.length||walkMode) return;   // 歩行中はキーを視点操作に使う
   if(e.key==='r'||e.key==='R') rotateSelection(Math.PI/4);   // 45度ずつ
+  if(e.key==='l'||e.key==='L') toggleLock();                 // 動かせないよう固定する
   if(e.key==='Delete'||e.key==='Backspace') deleteSelection();
 });
 
@@ -4064,6 +4186,7 @@ function snapshot(){        // 現在の配置を素の配列にする
     y:Math.round(g.position.y), f:g.userData.folded?1:0, fd:foldDeg(g)||undefined,
     // 白い棚は棚板6枚それぞれの斜め/真横を "101100" のように保存する
     tl:g.userData.spec.bookshelf? shelfTilts(g).map(v=>v!==false?1:0).join('') : undefined,
+    lk:g.userData.lock?1:undefined,
     sd:g.userData.spec.slidecab? (g.userData.slideAt||0) : undefined,
     pu:g.userData.spec.openshelf? (g.userData.pulls||[]).map(b=>b.userData.pull.on?1:0).join('') : undefined,
     r:Math.round(THREE.MathUtils.radToDeg(g.rotation.y))
@@ -4075,6 +4198,7 @@ function restore(d){        // 配列から配置を作り直す
   (d||[]).forEach(f=>{
     const g=addFurn(f.s,f.x,f.z,THREE.MathUtils.degToRad(f.r||0),true);
     if(!g) return;
+    if(f.lk) g.userData.lock=true;
     if(f.y) g.position.y=f.y;
     if(f.f||f.fd){ g.userData.folded=true;
       g.userData.foldDeg=(f.fd!=null)? f.fd : (g.userData.spec.screenWB? FOLD_MAX : 0);
@@ -4705,8 +4829,13 @@ function myKey(){ const s=mySid(); return s? hashKey(s) : ''; }
 // 所属と団体名をひとつの肩書きにまとめる（片方だけでもよい）
 function myOrg(){ return [myBelong(),myGroup()].filter(Boolean).join('・'); }
 function showMe(){
-  const n=myName(), o=myOrg();
-  document.getElementById('gl-me').textContent = n? (o? `${n}（${o}）` : n) : '名前未設定';
+  const n=myName(), o=myOrg(), joined=amJoined();
+  const el=document.getElementById('gl-me');
+  el.textContent = joined? (o? `${n}（${o}）` : n) : '見るだけモード';
+  el.classList.toggle('guest', !joined);
+  const b=document.getElementById('gl-rename');
+  b.textContent = joined? '名前を変える' : '参加する';
+  b.classList.toggle('primary', !joined);
 }
 function setMe(n,sid,belong,group){
   const before=myKey();
@@ -4727,13 +4856,15 @@ function setMe(n,sid,belong,group){
 }
 /* 名前フォーム。名前が未設定のまま操作しようとしたときもここへ戻す */
 const nameCover=document.getElementById('gl-name');
-function openNameForm(canCancel){
+function openNameForm(canCancel,why){
+  const w=document.getElementById('nm-why');
+  if(w){ w.textContent=why||''; w.hidden=!why; }
   document.getElementById('nm-name').value=myName();
   document.getElementById('nm-sid').value=mySid();
   document.getElementById('nm-belong').value=myBelong();
   document.getElementById('nm-group').value=myGroup();
   document.getElementById('nm-err').textContent='';
-  document.getElementById('nm-cancel').hidden=!canCancel;
+  document.getElementById('nm-cancel').hidden=false;   // いつでも見るだけに戻れる
   nameCover.hidden=false;
   setTimeout(()=>document.getElementById('nm-name').focus(),30);
 }
@@ -4755,11 +4886,13 @@ document.getElementById('nm-form').addEventListener('submit',e=>{
   setMe(n,sid,bl,gr); nameCover.hidden=true; renderGallery();
 });
 document.getElementById('nm-cancel').addEventListener('click',()=>{ nameCover.hidden=true; });
-/* 名前が要る操作の入口。未設定ならフォームを出して空を返す */
-function needName(){
-  const n=myName();
-  if(!n || !mySid()){ openNameForm(false); return ''; }   // 名前と学籍番号がそろって初めて通す
-  return n;
+/* 参加登録が済んでいるか。見るだけの人はこれが false */
+const amJoined=()=>!!(myName()&&mySid());
+/* 書き込む操作の入口。未登録ならフォームを出して空を返す。
+   見るだけに戻れるよう、このフォームは必ず閉じられるようにする。 */
+function needName(why){
+  if(!amJoined()){ openNameForm(true,why); return ''; }
+  return myName();
 }
 function canEdit(entry){ return isAdmin || isMine(entry); }
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
@@ -4888,7 +5021,7 @@ function cmtHTML(c,p,isReply){
     <div class="bd">${esc(c.text)}</div>
     ${rxBar(c,'c',p.id,c.id)}
     <div class="ac">
-      ${!isReply?`<button class="lnk" data-act="reply" data-pid="${p.id}" data-cid="${c.id}">返信</button>`:''}
+      ${(!isReply&&amJoined())?`<button class="lnk" data-act="reply" data-pid="${p.id}" data-cid="${c.id}">返信</button>`:''}
       ${own?`<button class="lnk" data-act="edit" data-pid="${p.id}" data-cid="${c.id}">編集</button>
              <button class="lnk" data-act="del" data-pid="${p.id}" data-cid="${c.id}">削除</button>`:''}
     </div>
@@ -4948,10 +5081,14 @@ function renderDetail(){
     <div class="cm">
       <h5>コメント ${(p.comments||[]).reduce((s,c)=>s+1+((c.replies||[]).length),0)}件</h5>
       ${(p.comments||[]).map(c=>cmtHTML(c,p,false)).join('')||'<div class="glempty" style="padding:0 0 10px">まだコメントはありません。最初のひとことをどうぞ。</div>'}
-      <div class="cmform">
-        <textarea id="gl-newc" placeholder="コメントを書く…"></textarea>
-        <button class="btn small" data-act="send" data-pid="${p.id}">投稿</button>
-      </div>
+      ${amJoined()
+        ? `<div class="cmform">
+             <textarea id="gl-newc" placeholder="コメントを書く…"></textarea>
+             <button class="btn small" data-act="send" data-pid="${p.id}">投稿</button>
+           </div>`
+        : `<div class="guestbar">見るだけモードです。読むこと・配置を読み込んで試すことは自由にできます。
+             コメントやリアクションをするときだけ、名前と学籍番号を登録してください。
+             <button class="btn small primary" data-act="join">参加する</button></div>`}
     </div>`;
 }
 function renderGallery(){ renderList(); renderDetail(); }
@@ -4981,6 +5118,7 @@ galEl.addEventListener('click',async e=>{
     await galSave(); renderGallery(); return;
   }
   const b=e.target.closest('[data-act]'); if(!b) return;
+  if(b.dataset.act==='join'){ openNameForm(true); return; }
   const p=proposals.find(x=>x.id===b.dataset.pid);
   const act=b.dataset.act;
   if(act==='load'&&p){
@@ -5124,7 +5262,7 @@ document.getElementById('b-gallery').addEventListener('click',async ()=>{
   unreadState=unread(proposals);                         // 開く前の未読を控える
   showMe(); renderAdmin(); renderGallery();
   markSeen(); refreshBadge();                            // 開いたら既読にする
-  if(!myName()||!mySid()) openNameForm(false); else nameCover.hidden=true;
+  nameCover.hidden=true;          // 見るだけの人もいるので、開いた時点では何も求めない
   galEl.hidden=false;
 });
 addEventListener('keydown',e=>{ if(e.key!=='Escape'||galEl.hidden) return;
@@ -5188,6 +5326,43 @@ document.getElementById('p-toggle').addEventListener('click',()=>{
 document.getElementById('panel').addEventListener('click',e=>{   // シートの外枠を押したら閉じる
   if(e.target.id==='panel'&&IS_TOUCH) setPanel(false);
 });
+/* シート上端のつまみ。軽く押すだけでも、下へ引いても閉じる。
+   引いている間はシートが指についてくるので、閉じられることが手で分かる。 */
+(function(){
+  const grab=document.getElementById('grab'), panel=document.getElementById('panel');
+  let y0=null, moved=0, id=null;
+  const setDrag=d=>{ panel.style.transform = d? `translateY(${d}px)` : ''; };
+  const end=close=>{
+    if(id!==null){ try{ grab.releasePointerCapture(id); }catch(_){} }
+    panel.style.transition='transform .18s ease-out';
+    setDrag(0);
+    setTimeout(()=>{ panel.style.transition=''; },200);
+    if(close) setPanel(false);
+    y0=null; id=null;
+  };
+  grab.addEventListener('pointerdown',e=>{
+    y0=e.clientY; moved=0; id=e.pointerId;
+    try{ grab.setPointerCapture(id); }catch(_){}
+    panel.style.transition='';
+    e.preventDefault();
+  });
+  grab.addEventListener('pointermove',e=>{
+    if(y0===null) return;
+    moved=e.clientY-y0;
+    setDrag(Math.max(0,moved));          // 上へは動かさない
+    e.preventDefault();
+  });
+  grab.addEventListener('pointerup',e=>{
+    if(y0===null) return;
+    end(moved>40);                        // 40px以上引いたら閉じる。軽く押しただけでも閉じる
+    if(moved<=40 && Math.abs(moved)<8) setPanel(false);
+    e.preventDefault();
+  });
+  grab.addEventListener('pointercancel',()=>{ if(y0!==null) end(false); });
+  grab.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setPanel(false); }
+  });
+})();
 setPanel(!IS_TOUCH);   // 指で操作する端末では、まず3Dを広く見せる
 
 /* ---------- トグル ---------- */
