@@ -205,6 +205,9 @@
     margin-left:5px;vertical-align:1px}
   .nmbox .req{background:#FBE9E9;color:#B3352F}
   .nmbox .opt{background:var(--paper);color:var(--ink-soft)}
+  /* 入力欄の下に出す小さな補足。バッジではないので背景も余白も持たせない */
+  .nmbox .hint{display:block;margin:5px 0 0;padding:0;background:none;font-size:11px;
+    font-weight:400;line-height:1.5;color:var(--ink-soft)}
   /* 文字入力欄だけに効かせる（ラジオボタンに幅100%が当たらないように） */
   .nmbox input:not([type=radio]):not([type=checkbox]){display:block;width:100%;margin-top:5px;
     font:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:9px 11px;
@@ -349,6 +352,9 @@
   .gt{fill:var(--ink-soft);font-size:9px;font-weight:700}
 
   #slots{display:flex;flex-direction:column;gap:6px}
+  .slothead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .slothead .btn{flex:1}
+  .slothead .cnt{font-size:11px;color:var(--ink-soft);font-variant-numeric:tabular-nums;flex:none}
   /* 名前とボタンを上下に分ける。横並びだと名前が途中で切れるため */
   .slot{display:block;border:1px solid var(--line);
     border-radius:9px;padding:8px 9px;background:var(--panel)}
@@ -509,6 +515,10 @@
           <label>お名前 <em class="req">必須</em>
             <input id="nm-name" maxlength="24" autocomplete="name" placeholder="例：名城　太郎">
           </label>
+          <label>学籍番号 <em class="req">必須</em>
+            <input id="nm-sid" maxlength="16" autocomplete="off" placeholder="例：213456789">
+            <em class="hint">同じ名前の人がいても保存が混ざらないよう、あなたを見分けるために使います。番号そのものは公開されず、この端末の外へ出るのは番号から作った符号だけです。</em>
+          </label>
           <label>所属 <em class="opt">任意</em>
             <input id="nm-belong" maxlength="32" placeholder="例：経済学部3年">
           </label>
@@ -554,7 +564,7 @@
                 <path class="gs" d="M42 46a18 18 0 0 1 36 0"/>
                 <path class="gs-a" d="M86 20h20M86 28h14"/>
               </svg>
-              <b>名前を決める</b><span>名前は必須、団体名は任意。投稿の名札になります</span></div>
+              <b>名前を決める</b><span>名前と学籍番号は必須、所属・団体名は任意。学籍番号は同姓同名の人と区別するためだけに使い、公開されません</span></div>
 
             <div class="gcard"><span class="gtag">ボタン</span>
               <svg viewBox="0 0 120 56" aria-hidden="true">
@@ -818,8 +828,7 @@
   <div class="pane" id="p-save">
     <div class="note" style="margin:0 0 8px"><b>⌘S</b>（Windows は <b>Ctrl+S</b>）でこのタブを開けます。</div>
     <div id="slots"></div>
-    <div class="note">この端末のブラウザに保存されます。他の人と共有したり別のPCで開くときは、
-      「ファイルに書き出し」で保存したJSONを渡してください。</div>
+    <div class="note">最大20件まで。「ファイルに書き出し」で他の人に渡すこともできます。</div>
     <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap">
       <button class="btn small" id="b-export">ファイルに書き出し</button>
       <button class="btn small" id="b-import">ファイルから読み込み</button>
@@ -2096,6 +2105,63 @@ function box(x0,y0,z0,x1,y1,z1,mat,grp){
   m.position.set((x0+x1)/2,(y0+y1)/2,(z0+z1)/2);
   m.castShadow=m.receiveShadow=true;(grp||structure).add(m);return m;
 }
+/* メッシュ生地。細かい織り目を描いたテクスチャを作り、
+   凹凸（bumpMap）にも同じ絵を使って布らしく見せる。一度作ったら使い回す。 */
+let _meshMat=null;
+function meshMaterial(){
+  if(_meshMat) return _meshMat;
+  const c=document.createElement('canvas'); c.width=c.height=64;
+  const x=c.getContext('2d');
+  x.fillStyle='#2C2F36'; x.fillRect(0,0,64,64);
+  x.strokeStyle='rgba(150,158,172,.55)'; x.lineWidth=1;   // 縦糸
+  for(let i=1;i<64;i+=2){ x.beginPath(); x.moveTo(i+.5,0); x.lineTo(i+.5,64); x.stroke(); }
+  x.strokeStyle='rgba(10,11,14,.55)';  x.lineWidth=1;     // 横糸
+  for(let i=0;i<64;i+=2){ x.beginPath(); x.moveTo(0,i+.5); x.lineTo(64,i+.5); x.stroke(); }
+  const t=new THREE.CanvasTexture(c);
+  t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(9,9); t.anisotropy=4;
+  _meshMat=new THREE.MeshStandardMaterial({color:0xFFFFFF,map:t,bumpMap:t,bumpScale:.35,
+    roughness:.95,metalness:0});
+  return _meshMat;
+}
+/* なめらかな一枚もののシェル（成形板）を作る。
+   profile(v) が高さ v(0〜1) での {y, z, w} を返す。表裏2枚と側面を張って厚みを持たせる。 */
+function shellMesh(profile, mat, opt){
+  opt=opt||{};
+  const N=opt.cols||28, M=opt.rows||20, TH=opt.thick||1.8;
+  const rows=M+1, cols=N+1, per=rows*cols;
+  const pos=[], idx=[];
+  for(let layer=0; layer<2; layer++){
+    for(let j=0;j<rows;j++){
+      const p=profile(j/M);
+      for(let i=0;i<cols;i++){
+        const u=i/N-0.5;
+        pos.push(u*p.w, p.y, p.z + (layer? -TH : 0));
+      }
+    }
+  }
+  for(let layer=0; layer<2; layer++){
+    const b=layer*per;
+    for(let j=0;j<M;j++) for(let i=0;i<N;i++){
+      const a=b+j*cols+i, c=a+1, d=a+cols, e=d+1;
+      if(!layer) idx.push(a,d,c, c,d,e); else idx.push(a,c,d, c,e,d);
+    }
+  }
+  const rim=(a,b,c,d)=>idx.push(a,b,c, b,d,c);          // 小口を塞ぐ
+  for(let j=0;j<M;j++){                                  // 左右の縁
+    rim(j*cols, (j+1)*cols, per+j*cols, per+(j+1)*cols);
+    rim(per+j*cols+N, per+(j+1)*cols+N, j*cols+N, (j+1)*cols+N);
+  }
+  for(let i=0;i<N;i++){                                  // 上下の縁
+    rim(per+i, per+i+1, i, i+1);
+    rim(M*cols+i, M*cols+i+1, per+M*cols+i, per+M*cols+i+1);
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos,3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();                            // なめらかに陰影をつける
+  const m=new THREE.Mesh(geo,mat); m.castShadow=true;
+  return m;
+}
 // 2点間に丸パイプを渡す（斜めの脚などに使う）
 function tube(a,b,r,mat,grp){
   const dir=new THREE.Vector3().subVectors(b,a), len=dir.length();
@@ -2452,6 +2518,27 @@ const PALETTE=[
   {id:'mlocker',name:'ロッカーボックス（プロジェクトルーム3）', w:90, d:45,h:112, color:0xB9BCB8, qty:2, mlocker:true},
   {id:'traycab',name:'トレー棚（プロジェクトルーム3）',      w:90, d:45,h:112, color:0xB9BCB8, qty:1, traycab:true},
   {id:'pamp',  name:'パンフレットスタンド', w:69.5,d:46,h:121, color:0xC7C9CC, qty:2, pamp:true},
+  /* ---- 他キャンパスから持ち込めるもの（いまshakeには無い） ---- */
+  // 座面40四方・脚40／背もたれは後ろへ倒れ、頂点まで80・全体の奥行50
+  {id:'chairY', name:'背もたれ付き椅子（黄）', w:44, d:50, h:80, color:0xE8992A, qty:2,
+   chairY:true, seat:40, legH:40, backLean:10},
+  // 引き違い戸の書庫。2枚の戸が前後にずれて重なり、片側ずつ開く
+  {id:'slidecab', name:'引き違い書庫', w:90, d:45, h:110, color:0xEDEBE5, qty:2, slidecab:true},
+  // 木の棚板4枚が前へ引き出せる／高さも変えられるオープン棚
+  {id:'openshelf', name:'可動棚（オープン）', w:48, d:35, h:90, color:0xF2F1EC, qty:4,
+   openshelf:true, boards:4},
+  // ループ脚のメッシュチェアー。座面45四方・脚40・背もたれ38（全高78）
+  {id:'chairK', name:'メッシュチェアー（黒）', w:49, d:53, h:78, color:0x24262B, qty:4,
+   chairK:true, seat:45, legH:40, backH:38, stackH:9},   // 積むと1脚あたり9cm増える
+  // 丸い座面＋青いシェル背もたれ。座面径39・脚45・背もたれ33.5（背もたれ幅42）
+  {id:'chairB', name:'丸座チェアー（青）', w:46, d:50, h:79, color:0x2E4C8C, qty:2,
+   chairB:true, seatD:39, legH:45, backH:33.5, backW:42, stackH:11},
+  // 成形合板のハイチェアー。表は白、裏と小口は木。背もたれに角丸の横長の穴
+  {id:'chairW', name:'木製ハイチェアー（白）', w:40, d:46, h:93, color:0xF2F0EA, qty:20,
+   chairW:true, seatW:37, seatD:38, legH:70, backH:23, stackH:12},
+  // 同じシリーズの座り高タイプ。座面40四方・脚45・背もたれ35
+  {id:'chairWL', name:'木製チェアー（白・背高）', w:42, d:48, h:80, color:0xF2F0EA, qty:43,
+   chairW:true, seatW:40, seatD:40, legH:45, backH:35, stackH:10},
   {id:'poster',name:'ポスタースタンド', w:60,d:80,h:115, color:0xC7C9CC, qty:1, poster:true},
   {id:'counter',name:'中央カウンター', w:260,d:260,h:100, color:0xF6F6F3, qty:1, counter:true},
   {id:'rack',  name:'折りたたみラック(RAKU3段)', w:72,d:36.5,h:86, color:0xF4F4F2, qty:1, foldrack:true, foldD:8},
@@ -2691,6 +2778,271 @@ function buildFurn(spec){
         if(r%5===2){ const tg=new THREE.Mesh(new THREE.BoxGeometry(tw*0.5,1.6,0.6),tagM); // 見出しラベル
           tg.position.set(cx,y,D/2-T-0.2); g.add(tg); }
       }
+    }
+  } else if(spec.chairY){
+    /* 背もたれ付き椅子（黄）：木の脚＋オレンジの張り座面。背もたれは上端が後ろへ倒れる。
+       横から見ると 前脚0 → 座面奥端40 → 背もたれ頂点50（後ろへ10倒れる）、高さ80。 */
+    const woodM=new THREE.MeshStandardMaterial({color:0xDDB170,roughness:.62});
+    const fabM =new THREE.MeshStandardMaterial({color:spec.color,roughness:.92});
+    const SEAT=spec.seat||40, LEG=spec.legH||40, LEAN=spec.backLean||10;
+    const zF=-spec.d/2, zB=zF+SEAT;          // 前端 → 座面の奥端
+    const zTop=spec.d/2;                     // 背もたれ頂点の位置（＝いちばん後ろ）
+    const lx=SEAT/2-2, ls=3.4;               // 脚の位置と太さ
+    // 前脚2本（垂直）
+    [-1,1].forEach(s=>{
+      const l=new THREE.Mesh(new THREE.BoxGeometry(ls,LEG,ls),woodM);
+      l.position.set(s*lx, LEG/2, zF+2.5); g.add(l); });
+    // 後脚2本＝背もたれの支柱。座面までは垂直、そこから後ろへ倒れて頂点へ
+    [-1,1].forEach(s=>{
+      const l=new THREE.Mesh(new THREE.BoxGeometry(ls,LEG,ls),woodM);
+      l.position.set(s*lx, LEG/2, zB-2.5); g.add(l);
+      const bh=Math.hypot(spec.h-LEG, LEAN);              // 倒れた支柱の長さ
+      const p=new THREE.Mesh(new THREE.BoxGeometry(ls,bh,ls),woodM);
+      p.position.set(s*lx, LEG+(spec.h-LEG)/2, zB-2.5+LEAN/2);
+      p.rotation.x=Math.atan2(LEAN, spec.h-LEG); g.add(p); });
+    // 座面まわりの幕板
+    [[0,zF+2],[0,zB-2]].forEach(([x,z])=>{
+      const r=new THREE.Mesh(new THREE.BoxGeometry(SEAT,5,3),woodM);
+      r.position.set(x,LEG-3.5,z); g.add(r); });
+    [-1,1].forEach(s=>{
+      const r=new THREE.Mesh(new THREE.BoxGeometry(3,5,SEAT-6),woodM);
+      r.position.set(s*lx,LEG-3.5,(zF+zB)/2); g.add(r); });
+    // 座面クッション（40四方）
+    const seat=new THREE.Mesh(new THREE.BoxGeometry(SEAT,5.5,SEAT-2),fabM);
+    seat.position.set(0, LEG+2.8, (zF+zB)/2+0.5); g.add(seat);
+    // 背もたれのクッション（支柱と同じ角度で倒す）
+    const bh2=spec.h-LEG-6;
+    const back=new THREE.Mesh(new THREE.BoxGeometry(SEAT-5,bh2,5),fabM);
+    back.position.set(0, LEG+4+bh2/2, zB-4.5+LEAN*(bh2/2+4)/(spec.h-LEG));
+    back.rotation.x=Math.atan2(LEAN, spec.h-LEG); g.add(back);
+    // 背もたれ上端の笠木
+    const cap=new THREE.Mesh(new THREE.BoxGeometry(SEAT,4,5),woodM);
+    cap.position.set(0, spec.h-2, zTop-3);
+    cap.rotation.x=Math.atan2(LEAN, spec.h-LEG); g.add(cap);
+  } else if(spec.chairW){
+    /* 木製ハイチェアー（白）：クロームの細脚に、座面から背もたれまで一枚に曲がった成形合板。
+       上面は白、裏面と小口は木。背もたれには角丸の横長の穴。 */
+    const legM =new THREE.MeshStandardMaterial({color:0xC9CCCE,roughness:.28,metalness:.72});
+    const topM =new THREE.MeshStandardMaterial({color:spec.color,roughness:.5});   // 白い面
+    const woodM=new THREE.MeshStandardMaterial({color:0xC79A5E,roughness:.75});    // 裏・小口の木
+    const SW=spec.seatW||37, SD=spec.seatD||38, LEG=spec.legH||70, BH=spec.backH||23;
+    const lx=SW/2-2, zC=0, PLY=1.6, EDGE=0.9;      // 合板の厚みと小口
+    // 4本脚（下へ少し開く）＋足掛けの輪
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{
+      tube(new THREE.Vector3(p[0]*lx, LEG-1, zC+p[1]*(SD/2-3)),
+           new THREE.Vector3(p[0]*(lx+3.5), 0.5, zC+p[1]*(SD/2+1)), 0.95, legM, g); });
+    (LEG>60? [22,40] : [14]).forEach((y,i)=>{      // 足掛け。座り高タイプは1本だけ
+      const k=(LEG-y)/LEG, ex=lx+3.5*k, ez=SD/2+1-4*(1-k);
+      [-1,1].forEach(s=>tube(new THREE.Vector3(s*ex,y,zC-ez), new THREE.Vector3(s*ex,y,zC+ez),0.8,legM,g));
+      if(i===0) [-1,1].forEach(f=>tube(new THREE.Vector3(-ex,y,zC+f*ez), new THREE.Vector3(ex,y,zC+f*ez),0.8,legM,g));
+      else tube(new THREE.Vector3(-ex,y,zC-ez), new THREE.Vector3(ex,y,zC-ez),0.8,legM,g);
+    });
+    // 座面：白い上面／木の裏面／木の小口
+    const seatTop=new THREE.Mesh(new THREE.BoxGeometry(SW,PLY,SD),topM);
+    seatTop.position.set(0,LEG+PLY/2,zC); seatTop.castShadow=true; g.add(seatTop);
+    const seatBot=new THREE.Mesh(new THREE.BoxGeometry(SW+EDGE,1.1,SD+EDGE),woodM);
+    seatBot.position.set(0,LEG-0.4,zC); g.add(seatBot);
+    /* 背もたれ。座面と同じで「前が白・後ろが木」。
+       角丸の横長の穴は本当にくり抜く（Shape に穴を空けて押し出す）。 */
+    const zB=zC+SD/2-1, lean=3.2, lang=Math.atan2(lean,BH);
+    const hw=SW*0.62, hh=BH*0.22, hy=BH*0.42, rr=Math.min(hh/2, 1.6);
+    function backShape(w,h){
+      const sh=new THREE.Shape();
+      const x=w/2, r=2.0;                                  // 板の角も少し丸める
+      sh.moveTo(-x+r,0); sh.lineTo(x-r,0); sh.quadraticCurveTo(x,0,x,r);
+      sh.lineTo(x,h-r);  sh.quadraticCurveTo(x,h,x-r,h);
+      sh.lineTo(-x+r,h); sh.quadraticCurveTo(-x,h,-x,h-r);
+      sh.lineTo(-x,r);   sh.quadraticCurveTo(-x,0,-x+r,0);
+      const ho=new THREE.Path();                           // 角丸の横長の穴
+      const a=hw/2, b0=hy, b1=hy+hh;
+      ho.moveTo(-a+rr,b0); ho.lineTo(a-rr,b0); ho.quadraticCurveTo(a,b0,a,b0+rr);
+      ho.lineTo(a,b1-rr);  ho.quadraticCurveTo(a,b1,a-rr,b1);
+      ho.lineTo(-a+rr,b1); ho.quadraticCurveTo(-a,b1,-a,b1-rr);
+      ho.lineTo(-a,b0+rr); ho.quadraticCurveTo(-a,b0,-a+rr,b0);
+      sh.holes.push(ho);
+      return sh;
+    }
+    function backPanel(w,th,mat,dz){
+      const geo=new THREE.ExtrudeGeometry(backShape(w,BH),{depth:th,bevelEnabled:false});
+      const m=new THREE.Mesh(geo,mat);
+      m.position.set(0, LEG+2, zB+dz); m.rotation.x=lang;
+      m.castShadow=true; g.add(m); return m;
+    }
+    // +z が椅子の後ろ側。座る人に接する面（z が小さいほう）が白、外に見える面が木。
+    backPanel(SW,       0.9, topM, -0.75);                 // 手前＝白
+    backPanel(SW+EDGE,  0.9, woodM, 0.55);                 // 後ろ＝木
+    backPanel(SW+EDGE*0.6, 1.3, woodM, 0.05);              // 小口の木
+  } else if(spec.chairB){
+    /* 丸座チェアー（青）：銀の丸パイプ4本脚に、丸い座面と一枚もののシェル背もたれ。
+       背もたれは上へいくほど広がり、後ろへ少し反る。 */
+    const legM =new THREE.MeshStandardMaterial({color:0xB9BCBE,roughness:.42,metalness:.55});
+    const shelM=new THREE.MeshStandardMaterial({color:spec.color,roughness:.35,metalness:.05});
+    const R=(spec.seatD||39)/2, LEG=spec.legH||45, BH=spec.backH||33.5, BW=spec.backW||42;
+    const zC=-2;                                   // 座面の中心（背もたれは後ろ）
+    // 4本脚。上は座面の下、下はやや外へ開く
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{
+      const tx=p[0]*(R-3), tz=zC+p[1]*(R-3);
+      const bx=p[0]*(R+2), bz=zC+p[1]*(R+3);
+      tube(new THREE.Vector3(tx,LEG-2,tz), new THREE.Vector3(bx,0.6,bz), 1.15, legM, g);
+    });
+    // 座面（丸・厚み4）
+    const seat=new THREE.Mesh(new THREE.CylinderGeometry(R,R,4,36),shelM);
+    seat.position.set(0,LEG,zC); seat.castShadow=true; g.add(seat);
+    // 背もたれ：一枚もののシェル。下は幅広→中ほどで細く→上でいちばん広がり、後ろへ反る
+    const zBack=zC+R-4;
+    const ease=t=>t*t*(3-2*t);
+    g.add(shellMesh(v=>{
+      // 下0.72 → 腰0.58 → 上1.00（いちばん広いところが指定の背もたれ幅）
+      const w = v<0.40 ? BW*(0.72+(0.58-0.72)*ease(v/0.40))
+                       : BW*(0.58+(1.00-0.58)*ease((v-0.40)/0.60));
+      return { y: LEG+1+BH*v, z: zBack+4.2*Math.pow(v,1.7), w: w };
+    }, shelM, {cols:30, rows:22, thick:2.0}));
+  } else if(spec.chairK){
+    /* メッシュチェアー（黒）：前後をつなぐループ状の細い黒パイプ脚に、
+       黒フレーム＋メッシュの座面と背もたれ。背もたれは少しだけ後ろへ反る。 */
+    const pipeM=new THREE.MeshStandardMaterial({color:0x1A1C20,roughness:.35,metalness:.45});
+    const frmM =new THREE.MeshStandardMaterial({color:0x2A2C31,roughness:.55});
+    const capM =new THREE.MeshStandardMaterial({color:0xA8ACB0,roughness:.6});
+    const meshM=meshMaterial();               // 織り目のあるメッシュ
+    const SEAT=spec.seat||45, LEG=spec.legH||40, BACK=spec.backH||38;
+    const zF=-spec.d/2+2, zB=zF+SEAT;         // 座面の前端・奥端
+    const lx=SEAT/2-1.5, r=1.1;
+    [-1,1].forEach(s=>{
+      // ループ脚：床の前後を一本の線でつなぎ、前後で立ち上がる
+      tube(new THREE.Vector3(s*lx,1.2,zF+1), new THREE.Vector3(s*lx,LEG,zF+3), r, pipeM, g);
+      tube(new THREE.Vector3(s*lx,1.2,zB-1), new THREE.Vector3(s*lx,LEG,zB-3), r, pipeM, g);
+      tube(new THREE.Vector3(s*lx,1.2,zF+1), new THREE.Vector3(s*lx,1.2,zB-1), r, pipeM, g);
+      // 中ほどの補強
+      tube(new THREE.Vector3(s*lx,LEG-13,zF+2), new THREE.Vector3(s*lx,LEG-13,zB-2), r*0.8, pipeM, g);
+      [zF+1.5, zB-1.5].forEach(z=>{           // 床のキャップ
+        const c=new THREE.Mesh(new THREE.BoxGeometry(3.4,2.4,4.5),capM);
+        c.position.set(s*lx,1.2,z); g.add(c); });
+      // 背もたれの支柱（奥へ少し反る）
+      tube(new THREE.Vector3(s*lx,LEG,zB-3),
+           new THREE.Vector3(s*lx,LEG+BACK,zB+2.5), r*1.05, pipeM, g);
+    });
+    // 座面：黒フレーム＋メッシュ
+    const sf=new THREE.Mesh(new THREE.BoxGeometry(SEAT+4,3.2,SEAT+2),frmM);
+    sf.position.set(0,LEG+1.6,(zF+zB)/2); g.add(sf);
+    const sm=new THREE.Mesh(new THREE.BoxGeometry(SEAT-4,1.4,SEAT-6),meshM);
+    sm.position.set(0,LEG+3,(zF+zB)/2); g.add(sm);
+    // 背もたれ：フレームとメッシュ。上へいくほど少し後ろへ
+    const bk=new THREE.Group();
+    bk.position.set(0,LEG+6,zB-3);
+    bk.rotation.x=Math.atan2(5.5,BACK);
+    const bf=new THREE.Mesh(new THREE.BoxGeometry(SEAT+2,BACK-8,3),frmM);
+    bf.position.y=(BACK-8)/2; bk.add(bf);
+    const bm=new THREE.Mesh(new THREE.BoxGeometry(SEAT-6,BACK-16,1.4),meshM);
+    bm.position.set(0,(BACK-8)/2,1.2); bk.add(bm);
+    g.add(bk);
+  } else if(spec.slidecab){
+    /* 引き違い書庫：白い箱に2枚の引き戸。手前の戸と奥の戸が少しずれて重なる。
+       ダブルクリックで、右→左→閉じる、と開く側が切り替わる。 */
+    const bodyM=new THREE.MeshStandardMaterial({color:spec.color,roughness:.55});
+    const inM  =new THREE.MeshStandardMaterial({color:0xE3E1DA,roughness:.75});
+    const doorM=new THREE.MeshStandardMaterial({color:0xF4F2ED,roughness:.5});
+    const railM=new THREE.MeshStandardMaterial({color:0xB6B9B4,roughness:.45,metalness:.35});
+    const handM=new THREE.MeshStandardMaterial({color:0xDCDAD3,roughness:.5});
+    const W=spec.w, D=spec.d, H=spec.h, T=2, PL=8;
+    [-1,1].forEach(s=>{                                   // 側板
+      const p=new THREE.Mesh(new THREE.BoxGeometry(T,H-PL,D),bodyM);
+      p.position.set(s*(W/2-T/2),PL+(H-PL)/2,0); g.add(p); });
+    const bk=new THREE.Mesh(new THREE.BoxGeometry(W,H-PL,T),inM);  // 背板
+    bk.position.set(0,PL+(H-PL)/2,-D/2+T/2); g.add(bk);
+    const tp=new THREE.Mesh(new THREE.BoxGeometry(W,2.5,D),bodyM); // 天板
+    tp.position.set(0,H-1.25,0); g.add(tp);
+    const bt=new THREE.Mesh(new THREE.BoxGeometry(W-T*2,2,D-4),inM);
+    bt.position.set(0,PL+1,0); g.add(bt);
+    const pl=new THREE.Mesh(new THREE.BoxGeometry(W-4,PL,D-4),bodyM); // 底の幅木
+    pl.position.set(0,PL/2,0); g.add(pl);
+    for(let i=1;i<=2;i++){                                // 中の棚板2枚（3段）
+      const sh=new THREE.Mesh(new THREE.BoxGeometry(W-T*2-1,2,D-6),inM);
+      sh.position.set(0, PL+2+i*((H-PL-6)/3), 1); g.add(sh); }
+    [-1,1].forEach(f=>{                                   // 上下のレール
+      const r=new THREE.Mesh(new THREE.BoxGeometry(W-T*2,2.4,3),railM);
+      r.position.set(0, f<0? PL+2.5 : H-4, D/2-4.5); g.add(r); });
+    /* 引き戸2枚。写真の閉じた状態に合わせる：
+       ・2枚で開口をちょうど覆い、外側の端は枠の内側にぴったり収まる（はみ出さない）
+       ・中央で2cmだけ重なり、手前の戸が奥の戸に少しかぶる（段差は1.2cmだけ）
+       ・引き手は外側の端に1枚1本。縦長で中ほどがふくらんだ弓なりの形
+       ・鍵は手前の戸の、合わせ目のすぐ横に1つ */
+    const OW=W-T*2;                                       // 開口の幅
+    const OVL=2;                                          // 中央の重なり
+    const dw=OW/2+OVL/2, dh=H-PL-6;
+    const dyc=PL+3+dh/2;
+    const handleGeo=(()=>{                                // 弓なりの引き手（縦13cm）
+      const hw=1.7, hh=6.5, s=new THREE.Shape();
+      s.moveTo(0,-hh);
+      s.bezierCurveTo( hw*1.15,-hh*0.45,  hw*1.15, hh*0.45, 0, hh);
+      s.bezierCurveTo(-hw*1.15, hh*0.45, -hw*1.15,-hh*0.45, 0,-hh);
+      return new THREE.ExtrudeGeometry(s,{depth:0.5,bevelEnabled:true,
+        bevelThickness:0.55,bevelSize:0.45,bevelSegments:3,curveSegments:14});
+    })();
+    [0,1].forEach(i=>{
+      const sgn=(i===0? -1:1);                            // 0=左(奥)　1=右(手前)
+      const grp=new THREE.Group();
+      const dz=D/2-(i===0? 3.3 : 2.1);                    // 前後のずれは1.2cm
+      const leaf=new THREE.Mesh(new THREE.BoxGeometry(dw,dh,1.5),
+        new THREE.MeshStandardMaterial({color:i===0?0xEBE9E2:0xF7F5F0,roughness:.52}));
+      leaf.castShadow=true; grp.add(leaf);
+      const hd=new THREE.Mesh(handleGeo,handM);           // 引き手は外側の端寄り
+      hd.position.set(sgn*(dw/2-3.4), dh*0.06, 0.75); grp.add(hd);
+      if(i===1){                                          // 鍵は手前の戸の合わせ目側
+        const lk=new THREE.Mesh(new THREE.CylinderGeometry(1.9,1.9,1.0,18),railM);
+        lk.rotation.x=Math.PI/2; lk.position.set(-dw/2+4.5, dh*0.06, 1.0); grp.add(lk);
+      }
+      const home=sgn*(OW/2-dw/2);                         // 外端が開口にぴったり
+      grp.position.set(home, dyc, dz);
+      grp.userData.slide={i:i, home:home, span:OW-dw};
+      g.add(grp);
+      (g.userData.slides=g.userData.slides||[]).push(grp);
+    });
+    /* 戸の上を横切る枠。左右は側板がそのまま枠に見えるので足さない。
+       天板と面が重ならないよう、ほんの少し奥に置く。 */
+    const frM=new THREE.MeshStandardMaterial({color:0xE8E6DF,roughness:.6});
+    const trH=H-2.5-(dyc+dh/2-1.2);
+    const topR=new THREE.Mesh(new THREE.BoxGeometry(W-T*2,trH,3.6),frM);
+    topR.position.set(0,(dyc+dh/2-1.2)+trH/2,D/2-2.2); g.add(topR);
+  } else if(spec.openshelf){
+    /* 可動棚（オープン）：白い箱に、木の棚板が4枚。棚板は前へ引き出せる。
+       側板にはダボ穴が並び、高さを変えられることが分かるようにする。 */
+    const bodyM=new THREE.MeshStandardMaterial({color:spec.color,roughness:.55});
+    const inM  =new THREE.MeshStandardMaterial({color:0xEDEAE2,roughness:.8});
+    const woodM=new THREE.MeshStandardMaterial({color:0xD9A55C,roughness:.85});
+    const railM=new THREE.MeshStandardMaterial({color:0xB9BCB8,roughness:.45,metalness:.3});
+    const capM =new THREE.MeshStandardMaterial({color:0xF6F4EE,roughness:.5});
+    const dotM =new THREE.MeshStandardMaterial({color:0x8A8880,roughness:.9});
+    const W=spec.w, D=spec.d, H=spec.h, T=2, PL=7, N=spec.boards||4;
+    [-1,1].forEach(s=>{
+      const p=new THREE.Mesh(new THREE.BoxGeometry(T,H,D),bodyM);
+      p.position.set(s*(W/2-T/2),H/2,0); g.add(p);
+      for(let y=PL+10;y<H-8;y+=6){                        // 高さを変えるためのダボ穴
+        [-1,1].forEach(f=>{
+          const d=new THREE.Mesh(new THREE.BoxGeometry(0.8,1.8,1.2),dotM);
+          d.position.set(s*(W/2-T-0.3), y, f*(D/2-7)); g.add(d); });
+      }
+    });
+    const bk=new THREE.Mesh(new THREE.BoxGeometry(W,H,T),inM);
+    bk.position.set(0,H/2,-D/2+T/2); g.add(bk);
+    const tp=new THREE.Mesh(new THREE.BoxGeometry(W,2.2,D),bodyM);
+    tp.position.set(0,H-1.1,0); g.add(tp);
+    const pl=new THREE.Mesh(new THREE.BoxGeometry(W-3,PL,D-3),bodyM);
+    pl.position.set(0,PL/2,0); g.add(pl);
+    const bw=W-T*2-1, bd=D-5, step=(H-PL-14)/N;
+    for(let i=0;i<N;i++){
+      const y=PL+8+i*step;
+      [-1,1].forEach(s=>{                                 // 棚板を受けるレール
+        const r=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.4,bd-4),railM);
+        r.position.set(s*(W/2-T-1), y+1.6, 1); g.add(r); });
+      const b=new THREE.Group();
+      const board=new THREE.Mesh(new THREE.BoxGeometry(bw,1.8,bd),woodM);
+      b.add(board);
+      const cap=new THREE.Mesh(new THREE.BoxGeometry(bw*0.42,2.6,2),capM);  // 前縁の白い引き手
+      cap.position.set(-bw*0.22,0.6,bd/2-1); b.add(cap);
+      b.position.set(0,y,0.5);
+      b.userData.pull={home:0.5, out:bd*0.62};
+      g.add(b);
+      (g.userData.pulls=g.userData.pulls||[]).push(b);
     }
   } else if(spec.pamp){ // パンフレットスタンド ZR-PS63NN：透明トレー3列4段が階段状に並ぶ
     const frameM=new THREE.MeshStandardMaterial({color:0xB9BCC0,roughness:.4,metalness:.45});
@@ -2932,6 +3284,11 @@ function addFurn(specId, x, z, rot, silent){
     const fs=[]; g.traverse(o=>{ const f=o.userData&&o.userData.gflap; if(f&&f.grp===o) fs.push(f); });
     g.userData.flaps=fs;
   }
+  // userData を作り直したので、引き戸・棚板の参照を拾い直す
+  if(spec.slidecab){ const a=[]; g.traverse(o=>{ if(o.userData&&o.userData.slide) a.push(o); });
+    a.sort((x,y)=>x.userData.slide.i-y.userData.slide.i); g.userData.slides=a; }
+  if(spec.openshelf){ const a=[]; g.traverse(o=>{ if(o.userData&&o.userData.pull) a.push(o); });
+    a.sort((x,y)=>x.position.y-y.position.y); g.userData.pulls=a; }
   furnGroup.add(g); furniture.push(g);
   refreshPalette();
   if(!silent){ select(g); save(); maybeCoach(spec); }
@@ -2947,9 +3304,13 @@ const CATMAP={
   bookW:'棚・収納', gshelf:'棚・収納', mlocker:'棚・収納', traycab:'棚・収納', rack:'棚・収納',
   alku:'ボード類', yoko:'ボード類', wb120:'ボード類', gb803:'ボード類',
   scrL:'ボード類', scrS:'ボード類', eboard:'ボード類',
-  pamp:'スタンド', poster:'スタンド'
+  pamp:'スタンド', poster:'スタンド',
+  chairY:'他キャンパスから持ち込める家具', chairK:'他キャンパスから持ち込める家具',
+  chairB:'他キャンパスから持ち込める家具', chairW:'他キャンパスから持ち込める家具', chairWL:'他キャンパスから持ち込める家具',
+  slidecab:'他キャンパスから持ち込める家具', openshelf:'他キャンパスから持ち込める家具'
 };
-const CATS=['机・カウンター','チェア・スツール','棚・収納','ボード類','スタンド'];
+const CATS=['机・カウンター','チェア・スツール','棚・収納','ボード類','スタンド',
+            '他キャンパスから持ち込める家具'];
 CATS.forEach(cat=>{
   const items=PALETTE.filter(p=>(CATMAP[p.id]||'スタンド')===cat);
   if(!items.length) return;
@@ -3201,6 +3562,13 @@ function applySnap(g){
     }
     if(spec.hidesk&&os.hidesk) edgeSnap(g,o,spec.w+0.5,spec.d+0.5);   // ハイデスク同士
     if(spec.bookshelf&&os.bookshelf) edgeSnap(g,o,spec.w,spec.d);     // 白い棚同士（側板どうしが接する）
+    if(spec.stackH&&os.id===spec.id){           // 積み重ねられる椅子（メッシュチェアーなど）
+      if(adx<20&&adz<20){
+        g.position.x=o.position.x; g.position.z=o.position.z;
+        g.rotation.y=o.rotation.y;              // 向きも揃えて重ねる
+        y=Math.max(y,o.position.y+spec.stackH);
+      }
+    }
     if(spec.stool&&os.stool&&os.id===spec.id){  // 同色ハイチェアーをスタッキング
       if(adx<16&&adz<16){
         g.position.x=o.position.x; g.position.z=o.position.z;
@@ -3341,6 +3709,8 @@ function hoverCurtainBlock(e){
       if(sp.screenWB) msg='WBスクリーン2連 — '+DBL+'で15度ずつ折りたたみ';
       else if(sp.foldrack) msg='折りたたみラック — 選んでもう一度クリックで畳む／展開';
       else if(sp.gshelf) msg='グレー棚 — 選んでから各段の前面をクリックで開閉';
+      else if(sp.slidecab) msg='引き違い書庫 — '+DBL+'で引き戸の開く側が変わります';
+      else if(sp.stackH) msg='メッシュチェアー — 重ねると積み上がります';
     }
     if(msg){ hotRoom=null; renderer.domElement.style.cursor='pointer'; showTip(e,msg); return; }
   }
@@ -3557,11 +3927,36 @@ function toggleShape(e){
     applyShelfTilt(g); renderSel(); save();
     return;
   }
+  if(sp.slidecab){                      // 引き違い書庫：右を開く→左を開く→閉じる
+    select(g);
+    g.userData.slideAt=((g.userData.slideAt||0)+1)%3;
+    applySlide(g); renderSel(); save();
+    flash(['引き戸を閉じました','右side を開けました','左side を開けました'][g.userData.slideAt]);
+    return;
+  }
   if(!sp.screenWB) return;
   select(g);
   const d=nextFold(g);
   applyFold(g); renderSel(); checkCollisions(); save();
   flash(d? `折りたたみ ${d}度` : '真っ直ぐに戻しました');
+}
+/* 引き違い戸：0=閉じる／1=右を開ける／2=左を開ける */
+function applySlide(g){
+  const at=g.userData.slideAt||0;
+  (g.userData.slides||[]).forEach(grp=>{
+    const s=grp.userData.slide;
+    let x=s.home;
+    if(at===1 && s.i===1) x=s.home-s.span;   // 手前の戸を左へ寄せて右を開ける
+    if(at===2 && s.i===0) x=s.home+s.span;   // 奥の戸を右へ寄せて左を開ける
+    grp.position.x=x;
+  });
+}
+/* 可動棚の棚板を前へ引き出す */
+function applyPulls(g){
+  (g.userData.pulls||[]).forEach(b=>{
+    const p=b.userData.pull;
+    b.position.z=p.on? p.home+p.out : p.home;
+  });
 }
 renderer.domElement.addEventListener('dblclick',toggleShape);
 /* 指の端末：500ms押し続けたらダブルクリックと同じ。指が動いたら取り消す（ドラッグ優先） */
@@ -3669,6 +4064,8 @@ function snapshot(){        // 現在の配置を素の配列にする
     y:Math.round(g.position.y), f:g.userData.folded?1:0, fd:foldDeg(g)||undefined,
     // 白い棚は棚板6枚それぞれの斜め/真横を "101100" のように保存する
     tl:g.userData.spec.bookshelf? shelfTilts(g).map(v=>v!==false?1:0).join('') : undefined,
+    sd:g.userData.spec.slidecab? (g.userData.slideAt||0) : undefined,
+    pu:g.userData.spec.openshelf? (g.userData.pulls||[]).map(b=>b.userData.pull.on?1:0).join('') : undefined,
     r:Math.round(THREE.MathUtils.radToDeg(g.rotation.y))
   }));
 }
@@ -3686,6 +4083,11 @@ function restore(d){        // 配列から配置を作り直す
       if(typeof f.tl==='string') g.userData.tilts=f.tl.split('').map(c=>c==='1');
       else if(f.t===0) g.userData.tilts=new Array(SHELF_BOARDS).fill(false); // 旧形式
       if(g.userData.tilts) applyShelfTilt(g);
+    }
+    if(g.userData.spec.slidecab && f.sd){ g.userData.slideAt=f.sd; applySlide(g); }
+    if(g.userData.spec.openshelf && typeof f.pu==='string'){
+      (g.userData.pulls||[]).forEach((b,i)=>{ b.userData.pull.on=(f.pu[i]==='1'); });
+      applyPulls(g);
     }
   });
   refreshPalette(); checkCollisions(); save();
@@ -3710,24 +4112,50 @@ function load(){
         if(typeof f.tl==='string') g.userData.tilts=f.tl.split('').map(c=>c==='1');
         else if(f.t===0) g.userData.tilts=new Array(SHELF_BOARDS).fill(false);
         if(g.userData.tilts) applyShelfTilt(g);
+      }
+      if(g&&g.userData.spec.slidecab&&f.sd){ g.userData.slideAt=f.sd; applySlide(g); }
+      if(g&&g.userData.spec.openshelf&&typeof f.pu==='string'){
+        (g.userData.pulls||[]).forEach((b,i)=>{ b.userData.pull.on=(f.pu[i]==='1'); });
+        applyPulls(g);
       } });
   } else defaultLayout();
   checkCollisions();
 }
-/* ---------- 配置パターン（3枠） ----------
-   保存先は Store 経由。いまは端末内(localStorage)だが、
-   共有バックエンドに差し替えるときはこの Store だけを置き換えればよい。 */
-const SLOT_KEY='shake3d-slots-v1', SLOT_N=3;
+/* ---------- 保存した配置（最大20件・人ごとにネット保存） ----------
+   学籍番号から作った符号をキーにして Firebase に置く。
+   同姓同名でも別のキーになるので、保存分が混ざることがない。
+   キーは符号なので、学籍番号そのものがネットに出ることはない。
+   つながらないときは端末内に保存して動き続ける。 */
+const SLOT_KEY='shake3d-slots-v1', SLOT_MAX=20;
+// Firebaseのキーに使えない文字を避ける。encodeURIComponent が逃がさない「.」だけ追加で置換。
+const safeKey=n=>(encodeURIComponent(n||'').replace(/\./g,'%2E')) || '_';
+const slotURL=()=>FB_CONFIG.databaseURL+'/slots/u_'+safeKey(myKey())+'.json';
+function localSlots(){ try{ return JSON.parse(localStorage.getItem(SLOT_KEY)||'[]'); }catch(_){ return []; } }
+function localSlotsSet(v){ try{ localStorage.setItem(SLOT_KEY,JSON.stringify(v)); }catch(_){} }
 const Store={
   async readAll(){
-    try{ return JSON.parse(localStorage.getItem(SLOT_KEY)||'{}'); }catch(_){ return {}; }
+    if(!myKey()) return localSlots();           // 学籍番号が未設定なら端末内だけ
+    try{
+      const r=await fetch(slotURL()+'?t='+Date.now(),{cache:'no-store'});
+      if(!r.ok) throw 0;
+      const j=await r.json();
+      const list=Array.isArray(j)? j.filter(Boolean) : (j? Object.values(j) : []);
+      list.sort((a,b)=> new Date(b.at)-new Date(a.at));
+      localSlotsSet(list);
+      return list;
+    }catch(_){ return localSlots(); }
   },
-  async writeAll(obj){
-    try{ localStorage.setItem(SLOT_KEY, JSON.stringify(obj)); return true; }
-    catch(_){ return false; }
+  async writeAll(list){
+    localSlotsSet(list);
+    if(!myKey()) return true;
+    try{
+      const r=await fetch(slotURL(),{method:'PUT',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(list)});
+      return r.ok;
+    }catch(_){ return false; }
   }
 };
-let slotCache={};
+let slotCache=[];
 const slotsEl=document.getElementById('slots');
 function stamp(iso){
   const d=new Date(iso);
@@ -3735,40 +4163,59 @@ function stamp(iso){
   return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 function renderSlots(){
-  slotsEl.innerHTML='';
-  for(let i=1;i<=SLOT_N;i++){
-    const s=slotCache['s'+i];
-    const row=document.createElement('div');
-    row.className='slot'+(s?'':' empty');
-    row.innerHTML=`<div class="lbl">
-        <span class="nm">${s? s.name.replace(/[<>&]/g,'') : 'パターン'+i+'（空き）'}</span>
-        <span class="ts">${s? stamp(s.at)+' ・ '+s.data.length+'点' : '未保存'}</span>
+  const who=myName(), linked=!!myKey();
+  const head=`<div class="slothead">
+      <button class="btn small primary" data-a="new">＋ いまの配置を保存</button>
+      <span class="cnt">${slotCache.length}/${SLOT_MAX}</span>
+    </div>
+    <div class="note" style="margin:0 0 8px">${linked
+      ? `<b>${esc(who)}</b> さんの保存分です。学籍番号で見分けているので、同じ名前の人がいても混ざりません。同じ学籍番号で開けば、別の端末でも同じ一覧が出ます。`
+      : '名前と学籍番号を設定すると、別の端末とも共有されます（「みんなの配置案」から設定）。いまはこの端末だけに保存されます。'}</div>`;
+  const rows=slotCache.length? slotCache.map((s,i)=>`
+    <div class="slot">
+      <div class="lbl">
+        <span class="nm">${esc(s.name)}</span>
+        <span class="ts">${stamp(s.at)} ・ 什器${(s.data||[]).length}点</span>
       </div>
       <div class="acts">
-        <button class="btn small" data-a="save" data-i="${i}">${s?'上書き':'保存'}</button>
-        <button class="btn small" data-a="load" data-i="${i}" ${s?'':'disabled'}>呼び出し</button>
-        <button class="btn small danger" data-a="del" data-i="${i}" ${s?'':'disabled'} title="削除">×</button>
-      </div>`;
-    slotsEl.appendChild(row);
-  }
+        <button class="btn small" data-a="load" data-i="${i}">呼び出し</button>
+        <button class="btn small" data-a="over" data-i="${i}">上書き</button>
+        <button class="btn small" data-a="ren" data-i="${i}">名前</button>
+        <button class="btn small danger" data-a="del" data-i="${i}" title="削除">×</button>
+      </div>
+    </div>`).join('')
+    : '<div class="note" style="text-align:center;padding:14px 0">まだ保存した配置はありません。</div>';
+  slotsEl.innerHTML=head+rows;
 }
 slotsEl.addEventListener('click',async e=>{
   const b=e.target.closest('button[data-a]'); if(!b) return;
-  const i=b.dataset.i, key='s'+i, cur=slotCache[key];
-  if(b.dataset.a==='save'){
-    const name=prompt('このパターンの名前', cur? cur.name : 'パターン'+i);
+  const a=b.dataset.a, i=+b.dataset.i, cur=slotCache[i];
+  if(a==='new'){
+    if(!furniture.length){ alert('先にフロアに什器を置いてください。'); return; }
+    if(slotCache.length>=SLOT_MAX){ alert(`保存できるのは${SLOT_MAX}件までです。いらないものを消してください。`); return; }
+    const name=prompt('この配置の名前', `配置${slotCache.length+1}`);
     if(name===null) return;
-    slotCache[key]={name:name.trim()||('パターン'+i), at:new Date().toISOString(), data:snapshot()};
-    if(await Store.writeAll(slotCache)){ renderSlots(); flash(`「${slotCache[key].name}」に保存しました`); }
-    else flash('保存できませんでした');
-  } else if(b.dataset.a==='load'){
-    if(!cur) return;
+    slotCache.unshift({id:uid(), name:(name.trim()||`配置${slotCache.length+1}`).slice(0,40),
+                       at:new Date().toISOString(), data:snapshot()});
+    await Store.writeAll(slotCache); renderSlots();
+    flash(`「${slotCache[0].name}」を保存しました`);
+  } else if(a==='over'&&cur){
+    if(!confirm(`「${cur.name}」を、いまの配置（${furniture.length}点）で上書きしますか？`)) return;
+    cur.data=snapshot(); cur.at=new Date().toISOString();
+    slotCache.sort((x,y)=> new Date(y.at)-new Date(x.at));
+    await Store.writeAll(slotCache); renderSlots();
+    flash(`「${cur.name}」を上書きしました`);
+  } else if(a==='ren'&&cur){
+    const name=prompt('名前を変える', cur.name); if(name===null) return;
+    cur.name=(name.trim()||cur.name).slice(0,40);
+    await Store.writeAll(slotCache); renderSlots();
+  } else if(a==='load'&&cur){
     if(!confirm(`いまの配置を破棄して「${cur.name}」を読み込みますか？`)) return;
     restore(cur.data); flash(`「${cur.name}」を読み込みました`);
-  } else if(b.dataset.a==='del'){
-    if(!cur) return;
+  } else if(a==='del'&&cur){
     if(!confirm(`「${cur.name}」を削除しますか？`)) return;
-    delete slotCache[key]; await Store.writeAll(slotCache); renderSlots();
+    slotCache.splice(i,1);
+    await Store.writeAll(slotCache); renderSlots();
   }
 });
 /* 端末をまたいで渡すためのファイル書き出し／読み込み */
@@ -3786,8 +4233,10 @@ document.getElementById('f-import').addEventListener('change',async e=>{
   const file=e.target.files&&e.target.files[0]; if(!file) return;
   try{
     const j=JSON.parse(await file.text());
-    if(j.slots && confirm('保存済みのパターン3枠を、このファイルの内容で置き換えますか？')){
-      slotCache=j.slots; await Store.writeAll(slotCache); renderSlots();
+    if(j.slots && confirm('保存した配置の一覧を、このファイルの内容で置き換えますか？')){
+      const list=Array.isArray(j.slots)? j.slots : Object.values(j.slots||{});   // 旧形式にも対応
+      slotCache=list.filter(Boolean).slice(0,SLOT_MAX);
+      await Store.writeAll(slotCache); renderSlots();
     }
     if(Array.isArray(j.current) && confirm('いまの配置を、このファイルの配置に置き換えますか？')){
       restore(j.current);
@@ -4233,24 +4682,54 @@ let isAdmin=false;
 try{ isAdmin=localStorage.getItem('shake3d-admin')==='1'; }catch(_){}
 
 function myName(){ try{ return localStorage.getItem('shake3d-name')||''; }catch(_){ return ''; } }
+function mySid(){ try{ return localStorage.getItem('shake3d-sid')||''; }catch(_){ return ''; } }
 function myBelong(){ try{ return localStorage.getItem('shake3d-belong')||''; }catch(_){ return ''; } }
 function myGroup(){ try{ return localStorage.getItem('shake3d-group')||''; }catch(_){ return ''; } }
+/* 学籍番号から作る、その人だけの符号。
+   同姓同名でも別人として扱えるようにするのが目的。
+   学籍番号そのものはこの端末から出さず、ネットに置くのはこの符号だけにする。 */
+function hashKey(s){
+  const t='shake3d/'+String(s||'').trim().toLowerCase();
+  let a=0x811c9dc5, b=0x9e3779b9;
+  for(let i=0;i<t.length;i++){
+    const c=t.charCodeAt(i);
+    a=Math.imul(a^c, 16777619)>>>0;
+    b=Math.imul(b^(c+i*131+1), 2246822519)>>>0;
+    b=((b<<13)|(b>>>19))>>>0;
+  }
+  const p=n=>n.toString(36).padStart(7,'0').slice(-7);
+  return p(a)+p(b);
+}
+// 保存や編集権限の判定に使う鍵。学籍番号が未設定なら空
+function myKey(){ const s=mySid(); return s? hashKey(s) : ''; }
 // 所属と団体名をひとつの肩書きにまとめる（片方だけでもよい）
 function myOrg(){ return [myBelong(),myGroup()].filter(Boolean).join('・'); }
 function showMe(){
   const n=myName(), o=myOrg();
   document.getElementById('gl-me').textContent = n? (o? `${n}（${o}）` : n) : '名前未設定';
 }
-function setMe(n,belong,group){
+function setMe(n,sid,belong,group){
+  const before=myKey();
   try{ localStorage.setItem('shake3d-name',n);
+       localStorage.setItem('shake3d-sid',sid||'');
        localStorage.setItem('shake3d-belong',belong||'');
        localStorage.setItem('shake3d-group',group||''); }catch(_){}
   showMe();
+  // 学籍番号を変えた（＝別人になった）ときは、手元の保存分を新しい側へ引き継ぐ
+  if(before!==myKey() && slotCache.length){
+    Store.readAll().then(async cur=>{
+      if(cur&&cur.length) { slotCache=cur; renderSlots(); return; }   // 新しい側に既にある
+      await Store.writeAll(slotCache); renderSlots();
+    });
+  } else {
+    Store.readAll().then(o=>{ slotCache=Array.isArray(o)?o:[]; renderSlots(); });
+  }
 }
 /* 名前フォーム。名前が未設定のまま操作しようとしたときもここへ戻す */
 const nameCover=document.getElementById('gl-name');
 function openNameForm(canCancel){
   document.getElementById('nm-name').value=myName();
+  document.getElementById('nm-sid').value=mySid();
   document.getElementById('nm-belong').value=myBelong();
   document.getElementById('nm-group').value=myGroup();
   document.getElementById('nm-err').textContent='';
@@ -4261,19 +4740,28 @@ function openNameForm(canCancel){
 document.getElementById('nm-form').addEventListener('submit',e=>{
   e.preventDefault();
   const n=document.getElementById('nm-name').value.trim().slice(0,24);
+  // 全角の数字・英字は半角へ直してから見る。ハイフンや空白は無視する
+  const sid=document.getElementById('nm-sid').value
+    .replace(/[０-９Ａ-Ｚａ-ｚ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0))
+    .replace(/[\s\-‐－]/g,'').trim().slice(0,16);
   const bl=document.getElementById('nm-belong').value.trim().slice(0,32);
   const gr=document.getElementById('nm-group').value.trim().slice(0,32);
-  if(!n){ document.getElementById('nm-err').textContent='お名前を入力してください。'; return; }
-  setMe(n,bl,gr); nameCover.hidden=true; renderGallery();
+  const err=document.getElementById('nm-err');
+  if(!n){ err.textContent='お名前を入力してください。'; return; }
+  if(!sid){ err.textContent='学籍番号を入力してください。'; return; }
+  if(!/^[0-9A-Za-z]{4,16}$/.test(sid)){
+    err.textContent='学籍番号は英数字4〜16文字で入力してください。'; return; }
+  err.textContent='';
+  setMe(n,sid,bl,gr); nameCover.hidden=true; renderGallery();
 });
 document.getElementById('nm-cancel').addEventListener('click',()=>{ nameCover.hidden=true; });
 /* 名前が要る操作の入口。未設定ならフォームを出して空を返す */
 function needName(){
   const n=myName();
-  if(!n){ openNameForm(false); return ''; }
+  if(!n || !mySid()){ openNameForm(false); return ''; }   // 名前と学籍番号がそろって初めて通す
   return n;
 }
-function canEdit(entry){ return isAdmin || (entry.name && entry.name===myName()); }
+function canEdit(entry){ return isAdmin || isMine(entry); }
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function when(iso){
@@ -4288,25 +4776,32 @@ async function galSave(){ await Gallery.write(proposals); markSeen(); }
    ・自分あて：自分の提案についたコメント／返信／リアクションの数 */
 function seenAt(){ try{ return +localStorage.getItem('shake3d-seen')||0; }catch(_){ return 0; } }
 function markSeen(){ try{ localStorage.setItem('shake3d-seen', Date.now()); }catch(_){} }
+/* 投稿・コメントが自分のものか。学籍番号の符号で見分け、
+   符号を持たない古いものだけ名前で見分ける（canEditから管理者判定を外したもの） */
+function isMine(entry){
+  if(!entry) return false;
+  if(entry.key) return !!myKey() && entry.key===myKey();
+  return !!(entry.name && entry.name===myName());
+}
 function eventsOf(list){
   const out=[];
   (list||[]).forEach(p=>{
-    out.push({t:+new Date(p.at), who:p.name, mine:false, kind:'提案', pid:p.id, owner:p.name});
+    out.push({t:+new Date(p.at), by:p, kind:'提案', pid:p.id, owner:p});
     const rxOf=(target,kind,pid,owner)=>{
       Object.keys(target.rx||{}).forEach(em=>{
         (target.rx[em]||[]).forEach(nm=>{
           // リアクションは押した時刻を持たないので、投稿より後＝未読扱いにはしない
-          out.push({t:+new Date(target.at||p.at), who:nm, kind:kind, pid:pid, owner:owner, rx:true});
+          out.push({t:+new Date(target.at||p.at), by:{name:nm}, kind:kind, pid:pid, owner:owner, rx:true});
         });
       });
     };
-    rxOf(p,'リアクション',p.id,p.name);
+    rxOf(p,'リアクション',p.id,p);
     (p.comments||[]).forEach(c=>{
-      out.push({t:+new Date(c.at), who:c.name, kind:'コメント', pid:p.id, owner:p.name});
-      rxOf(c,'リアクション',p.id,p.name);
+      out.push({t:+new Date(c.at), by:c, kind:'コメント', pid:p.id, owner:p});
+      rxOf(c,'リアクション',p.id,p);
       (c.replies||[]).forEach(rp=>{
-        out.push({t:+new Date(rp.at), who:rp.name, kind:'返信', pid:p.id, owner:c.name});
-        rxOf(rp,'リアクション',p.id,c.name);
+        out.push({t:+new Date(rp.at), by:rp, kind:'返信', pid:p.id, owner:c});
+        rxOf(rp,'リアクション',p.id,c);
       });
     });
   });
@@ -4318,19 +4813,19 @@ function unread(list){
   const perP={};
   eventsOf(list).forEach(e=>{
     if(e.rx) return;                       // リアクションは時刻を持たないので件数のみ別集計
-    if(e.who===me) return;                 // 自分の投稿は未読にしない
+    if(isMine(e.by)) return;               // 自分の投稿は未読にしない
     if(e.t<=since) return;
     all++; perP[e.pid]=(perP[e.pid]||0)+1;
-    if(e.owner===me) mine++;
+    if(isMine(e.owner)) mine++;
   });
   // 自分の投稿・コメントについたリアクション（自分以外が押したもの）
   let myRx=0;
   (list||[]).forEach(p=>{
     const count=t=>Object.keys(t.rx||{}).reduce((s,em)=>s+(t.rx[em]||[]).filter(n=>n!==me).length,0);
-    if(p.name===me) myRx+=count(p);
+    if(isMine(p)) myRx+=count(p);
     (p.comments||[]).forEach(c=>{
-      if(c.name===me) myRx+=count(c);
-      (c.replies||[]).forEach(r=>{ if(r.name===me) myRx+=count(r); });
+      if(isMine(c)) myRx+=count(c);
+      (c.replies||[]).forEach(r=>{ if(isMine(r)) myRx+=count(r); });
     });
   });
   return {all:all, mine:mine, myRx:myRx, perP:perP};
@@ -4416,12 +4911,12 @@ function renderList(){
     const nRx=REACTIONS.reduce((s,e)=>s+(((p.rx||{})[e]||[]).length),0);
     const nCm=(p.comments||[]).reduce((s,c)=>s+1+((c.replies||[]).length),0);
     const nNew=unreadState.perP[p.id]||0;
-    const isMine=(p.name===myName());
+    const own=isMine(p);
     const chips=REACTIONS.filter(em=>((p.rx||{})[em]||[]).length)
       .map(em=>`<span class="chip">${em}<b>${p.rx[em].length}</b></span>`).join('');
     return `<button class="glcard${p.id===openId?' is-on':''}" data-open="${p.id}">
       ${planSVG(p.layout,254,84)}
-      <span class="t">${esc(p.title)}${nNew?`<span class="badge${isMine?' mine':''}">${nNew}</span>`:''}</span>
+      <span class="t">${esc(p.title)}${nNew?`<span class="badge${own?' mine':''}">${nNew}</span>`:''}</span>
       <span class="m">${esc(p.name||'名無し')}${p.org?'（'+esc(p.org)+'）':''}・${when(p.at)}</span>
       <span class="foot">${chips||'<span class="chip none">リアクションはまだ</span>'}
         <span class="grow"></span><span class="cnt">💬 ${nCm}</span>
@@ -4518,7 +5013,7 @@ galEl.addEventListener('click',async e=>{
     const ta=document.getElementById('gl-newc'), tx=ta.value.trim();
     if(!tx) return;
     p.comments=p.comments||[];
-    p.comments.push({id:uid(),name:n,org:myOrg(),text:tx,at:new Date().toISOString(),replies:[],rx:{}});
+    p.comments.push({id:uid(),name:n,key:myKey(),org:myOrg(),text:tx,at:new Date().toISOString(),replies:[],rx:{}});
     gaSend('comment',{kind:'comment'});
     await galSave(); renderGallery(); return;
   }
@@ -4530,7 +5025,7 @@ galEl.addEventListener('click',async e=>{
     const f=findC(p,b.dataset.cid); if(!f) return;
     const host=f.parent||f.c;                    // 返信は1段まで
     host.replies=host.replies||[];
-    host.replies.push({id:uid(),name:n,org:myOrg(),text:tx,at:new Date().toISOString(),rx:{}});
+    host.replies.push({id:uid(),name:n,key:myKey(),org:myOrg(),text:tx,at:new Date().toISOString(),rx:{}});
     gaSend('comment',{kind:'reply'});
     replyTo=null; await galSave(); renderGallery(); return;
   }
@@ -4560,11 +5055,7 @@ document.getElementById('gl-rename').addEventListener('click',()=>openNameForm(t
 const postCover=document.getElementById('gl-post');
 function postSources(){
   const list=[{key:'now', label:'いま編集中の配置', data:snapshot()}];
-  for(let i=1;i<=SLOT_N;i++){
-    const s=slotCache['s'+i];
-    list.push({key:'s'+i, label:s? `パターン${i}「${s.name}」` : `パターン${i}（未保存）`,
-               data:s? s.data : null});
-  }
+  slotCache.forEach((s,i)=>list.push({key:'s'+i, label:'保存：'+s.name, data:s.data}));
   return list;
 }
 function openPostForm(){
@@ -4587,7 +5078,7 @@ function openPostForm(){
 document.getElementById('ps-cancel').addEventListener('click',()=>{ postCover.hidden=true; });
 document.getElementById('ps-form').addEventListener('submit',async e=>{
   e.preventDefault();
-  const n=myName(); if(!n){ postCover.hidden=true; openNameForm(false); return; }
+  const n=myName(); if(!n||!mySid()){ postCover.hidden=true; openNameForm(false); return; }
   const pick=document.querySelector('.src input:checked');
   const err=document.getElementById('ps-err');
   if(!pick){ err.textContent='提案する配置を選んでください。'; return; }
@@ -4595,7 +5086,7 @@ document.getElementById('ps-form').addEventListener('submit',async e=>{
   if(!src||!src.data||!src.data.length){ err.textContent='その配置には什器がありません。'; return; }
   const t=document.getElementById('ps-title').value.trim().slice(0,40);
   if(!t){ err.textContent='タイトルを入力してください。'; return; }
-  proposals.unshift({id:uid(),name:n,org:myOrg(),title:t,
+  proposals.unshift({id:uid(),name:n,key:myKey(),org:myOrg(),title:t,
     note:document.getElementById('ps-note').value.trim().slice(0,400),
     at:new Date().toISOString(),layout:src.data,comments:[],rx:{}});
   openId=proposals[0].id;
@@ -4633,7 +5124,7 @@ document.getElementById('b-gallery').addEventListener('click',async ()=>{
   unreadState=unread(proposals);                         // 開く前の未読を控える
   showMe(); renderAdmin(); renderGallery();
   markSeen(); refreshBadge();                            // 開いたら既読にする
-  if(!myName()) openNameForm(false); else nameCover.hidden=true;
+  if(!myName()||!mySid()) openNameForm(false); else nameCover.hidden=true;
   galEl.hidden=false;
 });
 addEventListener('keydown',e=>{ if(e.key!=='Escape'||galEl.hidden) return;
@@ -4721,7 +5212,7 @@ flyTo([-1550,1950,3600],[CFG.W/2,40,1350]);
 syncZoomUI(true);
 load();
 refreshPalette();
-Store.readAll().then(o=>{ slotCache=o||{}; renderSlots(); });
+Store.readAll().then(o=>{ slotCache=Array.isArray(o)?o:[]; renderSlots(); });
 refreshBadge();
 setInterval(refreshBadge, 20000);   // 他の人の書き込みに気づけるよう定期的に見にいく
 addEventListener('resize',()=>{
