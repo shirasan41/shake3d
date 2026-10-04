@@ -2551,6 +2551,36 @@ const PALETTE=[
   {id:'poster',name:'ポスタースタンド', w:60,d:80,h:115, color:0xC7C9CC, qty:1, poster:true},
   {id:'counter',name:'中央カウンター', w:260,d:260,h:100, color:0xF6F6F3, qty:1, counter:true},
   {id:'rack',  name:'折りたたみラック(RAKU3段)', w:72,d:36.5,h:86, color:0xF4F4F2, qty:1, foldrack:true, foldD:8},
+  {id:'anytable', name:'【新】Any Table台形', w:146, d:65, h:72, color:0x5E7A4A, qty:99, hidesk:true, isNew:true},
+  {id:'anywall', name:'【新】Any Wall', w:160, d:45, h:180, color:0xFAFAF8, qty:99, isNew:true},
+  {id:'ap01', name:'【新】AP-01', w:48, d:49, h:78, color:0xC9A97A, qty:99, chairW:true, seatW:44, seatD:44, legH:43, backH:35, stackH:10, isNew:true},
+  {id:'battery', name:'【新】キャリータップ', w:47, d:60, h:90, color:0x3B3B3B, qty:99, isNew:true},
+  {id:'bigmon', name:'【新】大型モニター', w:180, d:30, h:190, color:0x22242A, qty:9, isNew:true},
+  {id:'copto', name:'【新】コプト', w:65, d:45, h:72, color:0xF4F4F2, qty:99, hidesk:true, isNew:true},
+  {id:'corocoro', name:'【新】corocoro', w:120, d:50, h:180, color:0xFAFAF8, qty:99, isNew:true},
+  {id:'dt_half', name:'【新】DT-15R半円', w:150, d:75, h:70, color:0xD9C3A5, qty:99, hidesk:true, isNew:true},
+  {id:'dt_sq', name:'【新】DT-15R 850角', w:85, d:85, h:70, color:0xD9C3A5, qty:99, hidesk:true, isNew:true},
+  {id:'hazel', name:'【新】Hazel', w:48, d:52, h:74, color:0xC9A97A, qty:99, chairW:true, seatW:44, seatD:44, legH:43, backH:31, stackH:10, isNew:true},
+  {id:'hemming', name:'【新】Hemming', w:52, d:54, h:77, color:0x7A9E5B, qty:99, chairW:true, seatW:46, seatD:44, legH:43, backH:34, stackH:10, isNew:true},
+  {id:'insail', name:'【新】インセイル', w:92, d:72, h:139, color:0x5E7A4A, qty:99, isNew:true},
+  {id:'kitchen', name:'【新】可動キッチンカウンター', w:180, d:70, h:90, color:0xD9C3A5, qty:9, isNew:true},
+  {id:'mlounge', name:'【新】ミートラウンジ', w:68, d:64, h:70, color:0xB58B5A, qty:99, isNew:true},
+  {id:'pbench', name:'【新】Pullerベンチ', w:120, d:40, h:47, color:0xD9C3A5, qty:99, isNew:true},
+  {id:'planter', name:'【新】プランター', w:90, d:45, h:66, color:0xD9C3A5, qty:99, isNew:true},
+  {id:'printer', name:'【新】印刷機キャビネット', w:70, d:60, h:95, color:0xB9BBB8, qty:9, isNew:true},
+  {id:'quie', name:'【新】Quie S', w:120, d:120, h:200, color:0xD9C3A5, qty:99, isNew:true},
+  {id:'region', name:'【新】Region円形', w:90, d:90, h:45, color:0xD9C3A5, qty:99, hidesk:true, isNew:true},
+  {id:'screen', name:'【新】スクリーンパネルAC', w:90, d:4, h:156, color:0xEFE9DC, qty:99, isNew:true},
+  {id:'shelfm', name:'【新】Any Wall棚', w:110, d:45, h:100, color:0xEDEBE5, qty:99, isNew:true},
+  {id:'signlow', name:'【新】低いサイン台', w:90, d:35, h:75, color:0xD9C3A5, qty:9, isNew:true},
+  {id:'sm107', name:'【新】SM-107ベンチ', w:135, d:45, h:40, color:0xB58B5A, qty:99, isNew:true},
+  {id:'sofa_b', name:'【新】Any Sofa背あり', w:65, d:68, h:77, color:0xB58B5A, qty:99, isNew:true},
+  {id:'sofa_n', name:'【新】Any Sofa背なし', w:65, d:68, h:45, color:0xB58B5A, qty:99, isNew:true},
+  {id:'soleil', name:'【新】ソレイユ雲型', w:92, d:92, h:72, color:0xF4F4F2, qty:99, hidesk:true, isNew:true},
+  {id:'tatami', name:'【新】畳ユニット', w:82, d:82, h:31, color:0xC7C19A, qty:99, isNew:true},
+  {id:'wallbook', name:'【新】壁面本棚', w:200, d:30, h:180, color:0xC9A97A, qty:9, isNew:true},
+  {id:'wan', name:'【新】ワンチェア', w:52, d:54, h:77, color:0xD9C3A5, qty:99, chairW:true, seatW:46, seatD:44, legH:42, backH:35, stackH:10, isNew:true},
+  {id:'xstadium', name:'【新】X-STADIUM', w:300, d:235, h:105, color:0xD9C3A5, qty:99, isNew:true},
 ];
 function addCasters(g,w,d,inset){
   const cm=new THREE.MeshStandardMaterial({color:0x9A9A9A,roughness:.5});
@@ -3286,6 +3316,12 @@ function addFurn(specId, x, z, rot, silent){
   const spec=PALETTE.find(p=>p.id===specId); if(!spec) return;
   if(spec.qty!=null && furniture.filter(g=>g.userData.spec.id===specId).length>=spec.qty) return; // 保有数の上限
   const g=buildFurn(spec);
+  if(spec.isNew){ // 提案の新規品：足元にオレンジの輪
+    const r=Math.max(spec.w,spec.d)/2+6;
+    const ring=new THREE.Mesh(new THREE.RingGeometry(r-4,r,40),
+      new THREE.MeshBasicMaterial({color:0xE8912D,transparent:true,opacity:.8,side:THREE.DoubleSide,depthWrite:false}));
+    ring.rotation.x=-Math.PI/2; ring.position.y=0.8; ring.userData.newMark=true; g.add(ring);
+  }
   let px=x??CFG.W/2, pz=z??1100;
   if(soloRoom && x==null){                    // 単独表示中はその部屋の中央に出す
     const r=ROOMS[soloRoom]; px=(r.x0+r.x1)/2; pz=(r.z0+r.z1)/2;
@@ -3321,10 +3357,40 @@ const CATMAP={
   pamp:'スタンド', poster:'スタンド',
   chairY:'他キャンパスから持ち込める家具', chairK:'他キャンパスから持ち込める家具',
   chairB:'他キャンパスから持ち込める家具', chairW:'他キャンパスから持ち込める家具', chairWL:'他キャンパスから持ち込める家具',
-  slidecab:'他キャンパスから持ち込める家具', openshelf:'他キャンパスから持ち込める家具'
+  slidecab:'他キャンパスから持ち込める家具', openshelf:'他キャンパスから持ち込める家具',
+  anytable:'新規購入（提案）',
+  anywall:'新規購入（提案）',
+  ap01:'新規購入（提案）',
+  battery:'新規購入（提案）',
+  bigmon:'新規購入（提案）',
+  copto:'新規購入（提案）',
+  corocoro:'新規購入（提案）',
+  dt_half:'新規購入（提案）',
+  dt_sq:'新規購入（提案）',
+  hazel:'新規購入（提案）',
+  hemming:'新規購入（提案）',
+  insail:'新規購入（提案）',
+  kitchen:'新規購入（提案）',
+  mlounge:'新規購入（提案）',
+  pbench:'新規購入（提案）',
+  planter:'新規購入（提案）',
+  printer:'新規購入（提案）',
+  quie:'新規購入（提案）',
+  region:'新規購入（提案）',
+  screen:'新規購入（提案）',
+  shelfm:'新規購入（提案）',
+  signlow:'新規購入（提案）',
+  sm107:'新規購入（提案）',
+  sofa_b:'新規購入（提案）',
+  sofa_n:'新規購入（提案）',
+  soleil:'新規購入（提案）',
+  tatami:'新規購入（提案）',
+  wallbook:'新規購入（提案）',
+  wan:'新規購入（提案）',
+  xstadium:'新規購入（提案）'
 };
 const CATS=['机・カウンター','チェア・スツール','棚・収納','ボード類','スタンド',
-            '他キャンパスから持ち込める家具'];
+            '他キャンパスから持ち込める家具','新規購入（提案）'];
 CATS.forEach(cat=>{
   const items=PALETTE.filter(p=>(CATMAP[p.id]||'スタンド')===cat);
   if(!items.length) return;
