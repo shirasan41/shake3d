@@ -2552,7 +2552,7 @@ const PALETTE=[
   {id:'counter',name:'中央カウンター', w:260,d:260,h:100, color:0xF6F6F3, qty:1, counter:true},
   {id:'rack',  name:'折りたたみラック(RAKU3段)', w:72,d:36.5,h:86, color:0xF4F4F2, qty:1, foldrack:true, foldD:8},
   {id:'anytable', name:'【新】Any Table台形', w:146, d:65, h:72, color:0x5E7A4A, qty:99, isNew:true, nb:'anytable', modes:['天板 使用','天板 跳ね上げ'], nb:'anytable', modes:['天板 使用','天板 跳ね上げ']},
-  {id:'anywall', name:'【新】Any Wall', w:160, d:45, h:180, color:0xFAFAF8, qty:99, isNew:true, nb:'anywall', nb:'anywall'},
+  {id:'anywall', name:'【新】Any Wall', w:160, d:45, h:180, color:0xFAFAF8, qty:99, isNew:true, nb:'anywall', nb:'anywall', modes:['書ける面','企画展示（月替わり）']},
   {id:'ap01', name:'【新】AP-01', w:48, d:49, h:78, color:0xC9A97A, qty:99, chairW:true, seatW:44, seatD:44, legH:43, backH:35, stackH:10, isNew:true, nb:'ap01', nb:'ap01'},
   {id:'battery', name:'【新】キャリータップ', w:47, d:60, h:90, color:0x3B3B3B, qty:99, isNew:true, nb:'battery', nb:'battery'},
   {id:'bigmon', name:'【新】大型モニター', w:180, d:30, h:190, color:0x22242A, qty:9, isNew:true, nb:'bigmon', nb:'bigmon'},
@@ -2582,6 +2582,18 @@ const PALETTE=[
   {id:'wan', name:'【新】ワンチェア', w:52, d:54, h:77, color:0xD9C3A5, qty:99, chairW:true, seatW:46, seatD:44, legH:42, backH:35, stackH:10, isNew:true, nb:'wan', nb:'wan'},
   {id:'xstadium', name:'【新】X-STADIUM', w:300, d:235, h:105, color:0xD9C3A5, qty:99, isNew:true, nb:'xstadium', modes:['STADIUM 展開','SOFA 半分','+SPACE 収納'], nb:'xstadium', modes:['STADIUM 展開','SOFA 半分','+SPACE 収納']},
   {id:'magwall', name:'【新】掲示壁（カウンター裏の磁石面・4段の帯）', w:250, d:4, h:150, color:0xF4EEDC, qty:1, isNew:true, nb:'magwall', nb:'magwall'},
+  {id:'rug', name:'◇ラグ（広場の中心）', w:320, d:320, h:2, color:0xB58B5A, qty:9, isIdea:true, nb:'rug'},
+  {id:'lamp', name:'◇フロアランプ', w:40, d:40, h:180, color:0xF2E6C9, qty:9, isIdea:true, nb:'lamp'},
+  {id:'pendant', name:'◇ペンダントライト（島の上）', w:50, d:50, h:200, color:0x3D7A46, qty:9, isIdea:true, nb:'pendant'},
+  {id:'wbwall', name:'◇書ける壁（ホワイトボードシート）', w:160, d:3, h:120, y0:80, color:0xFAFAF8, qty:9, isIdea:true, nb:'wbwall'},
+  {id:'wallcal', name:'◇大判の月間カレンダー（壁）', w:90, d:3, h:110, y0:95, color:0xF6F6F4, qty:9, isIdea:true, nb:'wallcal'},
+  {id:'infoboard', name:'◇募集・掲示ボード（壁掛けA4×8）', w:120, d:3, h:90, y0:110, color:0xE7DDC6, qty:9, isIdea:true, nb:'infoboard'},
+  {id:'showcase', name:'◇見せる収納（成果物・ZINEの展示棚）', w:90, d:35, h:150, color:0xD8B98C, qty:9, isIdea:true, nb:'showcase'},
+  {id:'speaker', name:'◇スピーカー（ラジオ・BGM）', w:24, d:20, h:150, color:0x3A3D42, qty:9, isIdea:true, nb:'speaker'},
+  {id:'onair', name:'◇ON AIRサイン（ラジオ収録中）', w:40, d:4, h:16, y0:205, color:0x15171B, qty:9, isIdea:true, nb:'onair'},
+  {id:'tape', name:'◇床の定位置テープ', w:60, d:130, h:1, color:0xE8912D, qty:30, isIdea:true, nb:'tape'},
+  {id:'photowall', name:'◇写真の壁（活動の記録・通路から見える）', w:200, d:3, h:100, y0:110, color:0xF4EEDC, qty:9, isIdea:true, nb:'photowall'},
+  {id:'banner', name:'◇入口のバナー', w:60, d:4, h:180, color:0x3D7A46, qty:9, isIdea:true, nb:'banner'},
   {id:'magwall', name:'【新】掲示壁（カウンター裏の磁石面・4段の帯）', w:250, d:4, h:150, color:0xF4EEDC, qty:1, isNew:true, nb:'magwall'},
 ];
 function addCasters(g,w,d,inset){
@@ -2620,6 +2632,43 @@ const NB=(()=>{
       cyl(g,2.2,2.2,h-6,x,(h-6)/2+4,0,m,12); box(g,5,3,d*0.8,x,3.5,0,m); });
     casters(g,[[-(w/2-14),-d*0.4+4],[-(w/2-14),d*0.4-4],[w/2-14,-d*0.4+4],[w/2-14,d*0.4-4]],2.6); }
   return {
+    rug(g,s){ // ラグ（広場の中心を床で示す）
+      cyl(g,s.w/2,s.w/2,1.6,0,0.8,0,M(s.color,.95),48); cyl(g,s.w/2-22,s.w/2-22,0.4,0,1.9,0,M(0xEDE3CF,.95),48); },
+    lamp(g,s){ // フロアランプ H180：灯りで「居場所」を作る
+      const m=M(0x2B2B2B,.5); cyl(g,14,14,2,0,1,0,m,20); cyl(g,1.4,1.4,s.h-30,0,(s.h-30)/2+2,0,m,10);
+      const sh=new THREE.Mesh(new THREE.CylinderGeometry(16,20,26,24,1,true),M(0xF2E6C9,.9,{side:THREE.DoubleSide})); sh.position.y=s.h-15; g.add(sh);
+      const b=new THREE.Mesh(new THREE.SphereGeometry(6,10,8),new THREE.MeshStandardMaterial({color:0xFFF1C8,emissive:0xFFD27A,emissiveIntensity:.9})); b.position.y=s.h-16; g.add(b); },
+    pendant(g,s){ // ペンダントライト（天井から吊る）：島の上に灯りを落とす
+      const m=M(0x2B2B2B,.5); cyl(g,0.4,0.4,303-s.h,0,s.h+(303-s.h)/2,0,m,6);
+      const sh=new THREE.Mesh(new THREE.CylinderGeometry(9,s.w/2,18,28,1,true),M(s.color,.7,{side:THREE.DoubleSide})); sh.position.y=s.h; g.add(sh);
+      const b=new THREE.Mesh(new THREE.SphereGeometry(5,10,8),new THREE.MeshStandardMaterial({color:0xFFF1C8,emissive:0xFFD27A,emissiveIntensity:1})); b.position.y=s.h-4; g.add(b); },
+    wbwall(g,s){ // 書ける壁：ホワイトボードシート（壁に貼る）
+      box(g,s.w,s.h,1.2,0,s.y0+s.h/2,0,M(0xFAFAF8,.35)); box(g,s.w,2,2.5,0,s.y0+2,1,M(0xC9CBC8,.5));
+      [[0x3B5B8C,-s.w*0.3,0.55],[0xC96A3A,-s.w*0.05,0.5],[0x3D7A46,s.w*0.25,0.6]].forEach(([c,x,f])=>box(g,s.w*0.18,s.h*0.08,0.4,x,s.y0+s.h*f,0.8,M(c,.8))); },
+    wallcal(g,s){ // 月間カレンダー（大判・壁）
+      box(g,s.w,s.h,1.2,0,s.y0+s.h/2,0,M(0xF6F6F4,.6)); const m=M(0xC9CBC8,.6);
+      for(let i=1;i<7;i++) box(g,0.6,s.h*0.85,0.6,-s.w/2+i*s.w/7,s.y0+s.h*0.45,0.8,m);
+      for(let j=1;j<6;j++) box(g,s.w*0.96,0.6,0.6,0,s.y0+s.h*0.03+j*s.h*0.85/5,0.8,m);
+      [[1,2,0x3B5B8C],[3,1,0xC96A3A],[5,3,0x3D7A46],[2,4,0xE8C170]].forEach(([c,r,col])=>box(g,s.w/7-3,s.h*0.85/5-3,0.8,-s.w/2+(c+0.5)*s.w/7,s.y0+s.h*0.03+(r+0.5)*s.h*0.85/5,0.9,M(col,.8))); },
+    infoboard(g,s){ // 募集・掲示ボード（A4×8、壁掛け）
+      box(g,s.w,s.h,1.2,0,s.y0+s.h/2,0,M(0xE7DDC6,.9)); const pal=[0xFAFAF8,0xE8C170,0xFAFAF8,0x9BAE6F,0xFAFAF8,0xFAFAF8,0xC96A3A,0xFAFAF8];
+      for(let i=0;i<8;i++) box(g,21,29.7,0.6,-s.w/2+14+(i%4)*(s.w-28)/3,s.y0+s.h-22-(Math.floor(i/4))*36,0.9,M(pal[i],.85)); },
+    showcase(g,s){ // 見せる収納：成果物・ZINE・道具の展示棚
+      const m=M(0xD8B98C,.7); [-1,1].forEach(x=>box(g,2.5,s.h,s.d,x*(s.w/2-1.25),s.h/2,0,m)); box(g,s.w,2,s.d,0,s.h-1,0,m);
+      for(let i=0;i<4;i++) box(g,s.w-5,2,s.d,0,4+i*(s.h-8)/4,0,m);
+      const objs=[[0xC96A3A,16,22,10],[0x3B5B8C,10,14,10],[0xEDEBE5,12,12,12],[0x3D7A46,8,18,8],[0xE8C170,20,3,14],[0x8A6A4A,9,9,9],[0xFAFAF8,14,20,2]];
+      for(let i=0;i<3;i++) for(let k=0;k<3;k++){ const o=objs[(i*3+k)%objs.length]; box(g,o[1],o[2],o[3],-s.w/2+14+k*(s.w-28)/2,5+i*(s.h-8)/4+o[2]/2,(k%2?1:-1)*4,M(o[0],.8)); } },
+    speaker(g,s){ // スピーカー（音環境：ラジオ・BGM）
+      const m=M(0x2B2B2B,.5); cyl(g,12,12,2,0,1,0,m,20); cyl(g,1.6,1.6,s.h-30,0,(s.h-30)/2+2,0,m,10); box(g,s.w,30,s.d,0,s.h-15,0,M(0x3A3D42,.7)); cyl(g,6,6,1,0,s.h-15,s.d/2+0.5,M(0x15171B,.4),16).rotation.x=Math.PI/2; },
+    onair(g,s){ // ON AIR サイン（ラジオ収録中）
+      box(g,s.w,s.h,4,0,s.y0+s.h/2,0,M(0x15171B,.5)); box(g,s.w-6,s.h-6,1,0,s.y0+s.h/2,2.3,new THREE.MeshStandardMaterial({color:0xC62828,emissive:0xC62828,emissiveIntensity:.8})); },
+    tape(g,s){ // 床の定位置テープ（ボード類の帰る場所）
+      const m=M(s.color,.8); [[0,-s.d/2],[0,s.d/2]].forEach(([x,z])=>box(g,s.w,0.4,2.2,x,0.3,z,m)); [[-s.w/2,0],[s.w/2,0]].forEach(([x,z])=>box(g,2.2,0.4,s.d,x,0.3,z,m)); },
+    photowall(g,s){ // 写真の壁：shakeの人たち・活動の記録（通路から見える面に）
+      box(g,s.w,s.h,1.2,0,s.y0+s.h/2,0,M(0xF4EEDC,.9)); const pal=[0xC96A3A,0x3B5B8C,0x7A9E5B,0xE8C170,0x8A6A4A,0x9BAE6F,0x2F3B57,0xD9C3A5];
+      let k=0; for(let r=0;r<3;r++) for(let c=0;c<Math.floor(s.w/26);c++){ box(g,20,15,0.6,-s.w/2+14+c*26,s.y0+s.h-14-r*22,0.9,M(pal[(k++)%8],.8)); } },
+    banner(g,s){ // のぼり／バナー（入口で「ここがshake」と告げる）
+      const m=M(0x2B2B2B,.5); cyl(g,16,16,2,0,1,0,m,20); cyl(g,1.2,1.2,s.h,0,s.h/2,0,m,8); box(g,s.w,s.h*0.72,0.8,s.w/2+1,s.h*0.6,0,M(s.color,.85)); box(g,s.w*0.5,10,1,s.w/2+1,s.h*0.78,0.6,M(0xFAFAF8,.8)); },
     xstadium(g,s){ // KOKUYO X-STADIUM W300×D235(展開)×H105：本体D100＋引き出し2段。モードで収納
       const wood=OAK(), woodD=M(0xC4A273,.75), line=M(0x8E7452,.8);
       const cush=[0xC96A3A,0x4F7A5A,0x9BAE6F,0x3D5A80].map(c=>M(c,.95));
@@ -2687,7 +2736,12 @@ const NB=(()=>{
     anywall(g,s){ // KOKUYO Any Wall W1600 H1800：両面ボード、脚＋大径キャスター
       const fr=M(0xD8D8D4,.5); box(g,s.w-6,s.h-30,5,0,(s.h-30)/2+22,0,M(s.color,.5)); box(g,s.w,3,6,0,s.h-6,0,fr);
       [-1,1].forEach(x=>{ box(g,4,s.h-8,4,x*(s.w/2-2),(s.h-8)/2+6,0,fr); box(g,5,4,s.d,x*(s.w/2-2),6,0,fr); });
-      casters(g,[[-s.w/2+2,-s.d/2+6],[s.w/2-2,-s.d/2+6],[-s.w/2+2,s.d/2-6],[s.w/2-2,s.d/2-6]],4.5); },
+      casters(g,[[-s.w/2+2,-s.d/2+6],[s.w/2-2,-s.d/2+6],[-s.w/2+2,s.d/2-6],[s.w/2-2,s.d/2-6]],4.5);
+      // 企画展示モード：片面に月替わりの展示（ポスター・写真・キャプション）を貼る
+      const ex=new THREE.Group(); g.add(ex); const pal=[0xC96A3A,0x3B5B8C,0x9BAE6F,0xE8C170,0x2F3B57];
+      box(ex,s.w*0.5,12,0.6,-s.w*0.18,s.h-40,3.6,M(0x2B2B2B,.8));                                 // タイトル帯
+      [[-s.w*0.3,120,42,59],[-s.w*0.02,118,59,42],[s.w*0.28,122,42,59],[-s.w*0.25,55,36,26],[s.w*0.05,50,59,42],[s.w*0.3,60,26,36]].forEach((p,i)=>box(ex,p[2],p[3],0.6,p[0],p[1],3.6,M(pal[i%5],.8)));
+      ex.visible=false; g.userData.setMode=k=>{ ex.visible=k===1; }; },
     corocoro(g,s){ // 内田洋行 corocoro 1200×500×1800：細いフレームにピンナップ板（紺）を差し込む、キャスター
       const fr=M(0x2B2B2B,.5); [-1,1].forEach(x=>{ cyl(g,1.6,1.6,s.h-8,x*(s.w/2-3),(s.h-8)/2+6,0,fr,10); box(g,4,3,s.d,x*(s.w/2-3),4.5,0,fr); });
       box(g,s.w-6,2,2,0,s.h-5,0,fr); const pm=[M(0x2F3B57,.9),M(0xFAFAF8,.4),M(0x15171B,.4)]; const panel=box(g,s.w-14,s.h*0.62,2.4,0,s.h*0.62/2+28,0,pm[0]); box(g,s.w-20,3,8,0,26,4,WOOD());
@@ -2736,11 +2790,16 @@ const NB=(()=>{
       box(g,150,35,1.6,10,55+17.5,0.8,M(0xC9CBC8,.85));                   // スタッフ帯（天板の陰）
       box(g,28,36,22,s.w/2-16,118,12,M(0x8A6A4A,.8)); },                   // 手紙ポスト
   };
-  function sofa(g,s,withBack){ // KOKUYO Any Sofa 650×682 SH450、片脚キャスター
-    s=Object.assign({sh:45},s); const f=M(s.color,.95); box(g,s.w-6,16,s.d-8,0,s.sh-8,2,f); box(g,s.w,s.sh-16,s.d,0,(s.sh-16)/2,0,M(0x9A7A50,.9));
-    if(withBack) box(g,s.w,s.h-s.sh,16,0,s.sh+(s.h-s.sh)/2,-s.d/2+8,f,-0.08);
-    [-1,1].forEach(x=>box(g,7,16,s.d-8,x*(s.w/2-3.5),s.sh+8,2,f));
-    casters(g,[[-s.w/2+6,-s.d/2+6],[s.w/2-6,-s.d/2+6]],2.2); }
+  function sofa(g,s,withBack){ // KOKUYO Any Sofa：四角い箱型、厚い座と背、背の上にアーチ状の持ち手フレーム、片側だけキャスター
+    s=Object.assign({sh:45},s); const f=M(s.color,.95), f2=M(0x9A7A50,.95), tm=M(0x6B6F66,.4,{metalness:.5});
+    box(g,s.w,22,s.d,0,19,0,f2);                                  // 台（床から8cm浮く）
+    box(g,s.w-2,16,s.d-2,0,38,0,f);                               // 座クッション（上面45）
+    const hb=withBack? 86 : 58, zb=-s.d/2+5;
+    if(withBack) box(g,s.w-2,30,16,0,61,-s.d/2+9,f);              // 背クッション
+    [-1,1].forEach(x=>tube(new THREE.Vector3(x*(s.w/2-6),withBack?44:40,zb),new THREE.Vector3(x*(s.w/2-6),hb,zb-6),1.1,tm,g));
+    tube(new THREE.Vector3(-(s.w/2-6),hb,zb-6),new THREE.Vector3((s.w/2-6),hb,zb-6),1.1,tm,g);   // 持ち手のアーチ（後ろへ傾く）
+    [[-1,1],[1,1]].forEach(p=>box(g,4,8,4,p[0]*(s.w/2-6),4,p[1]*(s.d/2-6),M(0x2B2B2B,.5)));      // 前はグライド
+    casters(g,[[-s.w/2+6,-s.d/2+6],[s.w/2-6,-s.d/2+6]],2.6); }
 })();
 
 function buildFurn(spec){
@@ -3382,6 +3441,19 @@ function buildShelfBody(g, spec, tilt){
       b.add(board); b.add(lip);
       const on = Array.isArray(tilt) ? (tilt[idx]!==false) : (tilt!==false);
       if(on) b.rotation.x = f*ang;
+      if(!spec.noBooks){ // 本を詰めた状態で見せる：真横＝背表紙の列、斜め＝面置きの表紙
+        const bz=board.position.z, pal=[0xC96A3A,0x3B5B8C,0x7A9E5B,0xE8C170,0xEDEBE5,0x8A6A4A,0x2F3B57,0xD9C3A5];
+        let seed=idx*7919+13; const rnd=()=>{ seed=(seed*9301+49297)%233280; return seed/233280; };
+        if(on){ const n=Math.floor(bw/19);
+          for(let k=0;k<n;k++){ const c=new THREE.Mesh(new THREE.BoxGeometry(14.8,1.6,20.5),new THREE.MeshStandardMaterial({color:pal[(idx*3+k)%8],roughness:.8}));
+            c.position.set(-bw/2+9.5+k*19+(rnd()-0.5)*2, BT/2+0.8, bz); b.add(c); }
+        } else { let x=-bw/2+1.5;
+          while(x<bw/2-3){ if(rnd()<0.1){ x+=4; continue; } const w=2+rnd()*1.8, h=15+rnd()*7;
+            const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,14),new THREE.MeshStandardMaterial({color:pal[Math.floor(rnd()*8)],roughness:.85}));
+            m.position.set(x+w/2, BT/2+h/2, bz); b.add(m); x+=w+0.3; }
+          if(rnd()<0.7){ const c=new THREE.Mesh(new THREE.BoxGeometry(14.8,20.5,1.6),new THREE.MeshStandardMaterial({color:pal[(idx*5)%8],roughness:.8})); c.position.set(bw/2-9,BT/2+10.5,bz+f*4.5); c.rotation.x=f*0.15; b.add(c); }
+        }
+      }
       const rec={i:idx};                    // どの棚板をクリックしたか判別するための印
       b.userData.board=rec;
       g.add(b);
@@ -3470,10 +3542,10 @@ function addFurn(specId, x, z, rot, silent){
   const spec=PALETTE.find(p=>p.id===specId); if(!spec) return;
   if(spec.qty!=null && furniture.filter(g=>g.userData.spec.id===specId).length>=spec.qty) return; // 保有数の上限
   const g=buildFurn(spec);
-  if(spec.isNew){ // 提案の新規品：足元にオレンジの輪
+  if(spec.isNew||spec.isIdea){ // 提案の新規品：足元にオレンジの輪／什器以外の仕掛け：青の輪
     const r=Math.max(spec.w,spec.d)/2+6;
     const ring=new THREE.Mesh(new THREE.RingGeometry(r-4,r,40),
-      new THREE.MeshBasicMaterial({color:0xE8912D,transparent:true,opacity:.8,side:THREE.DoubleSide,depthWrite:false}));
+      new THREE.MeshBasicMaterial({color:spec.isIdea?0x3B5B8C:0xE8912D,transparent:true,opacity:.8,side:THREE.DoubleSide,depthWrite:false}));
     ring.rotation.x=-Math.PI/2; ring.position.y=0.8; ring.userData.newMark=true; g.add(ring);
   }
   let px=x??CFG.W/2, pz=z??1100;
@@ -3543,10 +3615,22 @@ const CATMAP={
   wan:'新規購入（提案）',
   xstadium:'新規購入（提案）',
   magwall:'新規購入（提案）',
+  rug:'仕掛け（什器以外・理想像）',
+  lamp:'仕掛け（什器以外・理想像）',
+  pendant:'仕掛け（什器以外・理想像）',
+  wbwall:'仕掛け（什器以外・理想像）',
+  wallcal:'仕掛け（什器以外・理想像）',
+  infoboard:'仕掛け（什器以外・理想像）',
+  showcase:'仕掛け（什器以外・理想像）',
+  speaker:'仕掛け（什器以外・理想像）',
+  onair:'仕掛け（什器以外・理想像）',
+  tape:'仕掛け（什器以外・理想像）',
+  photowall:'仕掛け（什器以外・理想像）',
+  banner:'仕掛け（什器以外・理想像）',
   magwall:'新規購入（提案）'
 };
 const CATS=['机・カウンター','チェア・スツール','棚・収納','ボード類','スタンド',
-            '他キャンパスから持ち込める家具','新規購入（提案）'];
+            '他キャンパスから持ち込める家具','新規購入（提案）','仕掛け（什器以外・理想像）'];
 CATS.forEach(cat=>{
   const items=PALETTE.filter(p=>(CATMAP[p.id]||'スタンド')===cat);
   if(!items.length) return;
