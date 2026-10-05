@@ -4182,6 +4182,20 @@ function setHotBoard(host,rec){
 const ray=new THREE.Raycaster(), ptr=new THREE.Vector2();
 const dragPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0);
 let dragging=null, dragOff=new THREE.Vector3(), curtainDrag=null, dragClick=null, roomClick=null;
+let blockClick=null;
+function curtainBlockAction(){
+  const Aout=CURT.A.target>2, Afull=CURT.A.target>=CURT.total-1, Bout=CURT.B.target>2;
+  if(!Aout){
+    if(confirm('カーテンを出しますか？')) CURT.A.target=45;          // 頭だけ出す
+  } else if(Afull && !Bout){
+    if(confirm('2枚目のカーテンを出しますか？')) CURT.B.target=45;
+  } else {
+    if(confirm('カーテンをすべて収納しますか？')){
+      CURT.A.target=0; CURT.B.target=0;
+      movables.forEach(d=>{ if(d.isCurtainDoor) d.target=0; });
+    }
+  }
+}
 function ptrPos(e){ const r=renderer.domElement.getBoundingClientRect();
   ptr.x=((e.clientX-r.left)/r.width)*2-1; ptr.y=-((e.clientY-r.top)/r.height)*2+1; }
 renderer.domElement.addEventListener('pointerdown',e=>{
@@ -4194,20 +4208,7 @@ renderer.domElement.addEventListener('pointerdown',e=>{
     const hc=ray.intersectObjects([curtain,rail],true);
     if(hc.length && hc[0].distance<hitsB[0].distance) hitsB=[];
   }
-  if(hitsB.length){
-    const Aout=CURT.A.target>2, Afull=CURT.A.target>=CURT.total-1, Bout=CURT.B.target>2;
-    if(!Aout){
-      if(confirm('カーテンを出しますか？')) CURT.A.target=45;          // 頭だけ出す
-    } else if(Afull && !Bout){
-      if(confirm('2枚目のカーテンを出しますか？')) CURT.B.target=45;
-    } else {
-      if(confirm('カーテンをすべて収納しますか？')){
-        CURT.A.target=0; CURT.B.target=0;
-        movables.forEach(d=>{ if(d.isCurtainDoor) d.target=0; });
-      }
-    }
-    return;
-  }
+  if(hitsB.length){ blockClick={sx:e.clientX, sy:e.clientY}; return; }
   // 扉・間仕切り・レールの判定（家具より優先）
   const doorTargets=[doorGroup,curtain,rail];
   if(soloGroup) doorTargets.push(soloGroup);      // 単独表示中のプロジェクトルーム3の扉もクリックできるように
@@ -4307,6 +4308,9 @@ addEventListener('pointermove',e=>{
 });
 addEventListener('pointerup',e=>{
   if(lookDrag){ lookDrag=null; return; }
+  if(blockClick){ const bc=blockClick; blockClick=null;
+    if(Math.hypot((e.clientX||0)-bc.sx,(e.clientY||0)-bc.sy)<6) setTimeout(curtainBlockAction,0);   // 視点操作が離れてから確認を出す
+    return; }
   roomClick=null;   // 単独表示はダブルクリック（または右上のプロジェクトルーム1〜3ボタン）で行う
   // 選択済みの折りたたみラックを（動かさずに）クリック → 展開/折りたたみ
   if(dragClick && dragging===dragClick.g && dragClick.wasSel
