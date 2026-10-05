@@ -4189,7 +4189,11 @@ renderer.domElement.addEventListener('pointerdown',e=>{
   ptrPos(e); ray.setFromCamera(ptr,camera);
   // カーテン格納部（白い躯体ブロック）のクリック → 確認して出し入れ
   // 単独表示中は本体モデルを見ていないので受け付けない
-  const hitsB=soloRoom? [] : ray.intersectObject(curtainBlock);
+  let hitsB=soloRoom? [] : ray.intersectObject(curtainBlock);
+  if(hitsB.length){                                              // 手前にカーテン（頭・引き手）があれば、そちらを優先してドラッグにする
+    const hc=ray.intersectObjects([curtain,rail],true);
+    if(hc.length && hc[0].distance<hitsB[0].distance) hitsB=[];
+  }
   if(hitsB.length){
     const Aout=CURT.A.target>2, Afull=CURT.A.target>=CURT.total-1, Bout=CURT.B.target>2;
     if(!Aout){
