@@ -2505,6 +2505,7 @@ const furniture=[]; const furnGroup=new THREE.Group(); scene.add(furnGroup);
 const PALETTE=[
   {id:'hidesk', name:'ハイデスク',    w:90, d:90, h:94,  color:0xF2F1ED, qty:16, hidesk:true},
   {id:'roundT', name:'丸テーブル（余剰・φ90）', w:90, d:90, h:70, color:0xD1A160, qty:2, nb:'roundT'},
+  {id:'spklocker', name:'スピーカーマイク用ロッカー（天白から・暗証番号錠）', w:40, d:40, h:90, color:0xB8BCBF, qty:1, nb:'spklocker'},
   {id:'stoolB', name:'ハイチェアー(黒)', w:40, d:40, h:65.5, color:0x24211F, qty:28, stool:true},
   {id:'stoolW', name:'ハイチェアー(白)', w:40, d:40, h:65.5, color:0xF4F2EC, qty:30, stool:true},
   // 実測：内寸 幅86／高さ110、段は下から32・32・37cm。外寸は側板2＋土台10＋天板3
@@ -2552,42 +2553,39 @@ const PALETTE=[
   {id:'poster',name:'ポスタースタンド', w:60,d:80,h:115, color:0xC7C9CC, qty:1, poster:true},
   {id:'counter',name:'中央カウンター', w:260,d:260,h:100, color:0xF6F6F3, qty:1, counter:true},
   {id:'rack',  name:'折りたたみラック(RAKU3段)', w:72,d:36.5,h:86, color:0xF4F4F2, qty:1, foldrack:true, foldD:8},
-  {id:'anytable', name:'【新】KOKUYO Any Table 台形（工房）', w:146, d:65, h:72, color:0x5E7A4A, qty:99, isNew:true, nb:'anytable', modes:['天板 使用','天板 跳ね上げ'], nb:'anytable', modes:['天板 使用','天板 跳ね上げ']},
+  {id:'anytable', name:'【新】KOKUYO Any Table 台形', w:146, d:65, h:72, color:0xEFEDE7, qty:99, isNew:true, nb:'anytable', nb:'anytable'},
   {id:'anywall', name:'【新】KOKUYO Any Wall（企画展示・書ける面）', w:160, d:45, h:180, color:0xFAFAF8, qty:99, isNew:true, nb:'anywall', nb:'anywall', modes:['書ける面','企画展示（月替わり）']},
   {id:'ap01', name:'【新】axona AICHI AP-01（チェア）', w:48, d:49, h:78, color:0xC9A97A, qty:99, chairW:true, seatW:44, seatD:44, legH:43, backH:35, stackH:10, isNew:true, nb:'ap01', nb:'ap01'},
-  {id:'battery', name:'【新】ITOKI キャリータップ（可動電源）', w:47, d:60, h:90, color:0x3B3B3B, qty:99, isNew:true, nb:'battery', nb:'battery'},
-  {id:'bigmon', name:'【新】ITOKI アクティクト ディスプレイスタンド＋65型モニター', w:180, d:30, h:190, color:0x22242A, qty:9, isNew:true, nb:'bigmon', nb:'bigmon'},
-  {id:'copto', name:'【新】ITOKI コプト WB天板（1人用）', w:65, d:45, h:72, color:0xF4F4F2, qty:99, isNew:true, nb:'copto', nb:'copto'},
+  {id:'battery', name:'【新】内田洋行 Puller 止まり木ワイヤリングタワー（電源）', w:30, d:30, h:105, color:0xF1F1EE, qty:99, isNew:true, nb:'battery', nb:'battery'},
   {id:'corocoro', name:'【新】内田洋行 corocoro（可動壁）', w:120, d:50, h:180, color:0xFAFAF8, qty:99, isNew:true, nb:'corocoro', modes:['ピンナップ','ホワイトボード','モニター'], nb:'corocoro', modes:['ピンナップ','ホワイトボード','モニター']},
   {id:'dt_half', name:'【新】axona AICHI DT-15R 多目的テーブル 半円', w:150, d:75, h:70, color:0xD9C3A5, qty:99, isNew:true, nb:'dt_half', nb:'dt_half'},
   {id:'dt_sq', name:'【新】axona AICHI DT-15R 多目的テーブル 850角', w:85, d:85, h:70, color:0xD9C3A5, qty:99, isNew:true, nb:'dt_sq', nb:'dt_sq'},
-  {id:'hazel', name:'【新】内田洋行 Hazel 4本脚キャスター', w:48, d:52, h:74, color:0xC9A97A, qty:99, chairW:true, seatW:44, seatD:44, legH:43, backH:31, stackH:10, isNew:true, nb:'hazel', nb:'hazel'},
+  {id:'hazel', name:'【新】内田洋行 Hazel 4本脚', w:48, d:52, h:74, color:0xC9A97A, qty:99, chairW:true, seatW:44, seatD:44, legH:43, backH:31, stackH:10, isNew:true, nb:'hazel', nb:'hazel'},
   {id:'hemming', name:'【新】KOKUYO Hemming スタック脚', w:52, d:54, h:77, color:0x7A9E5B, qty:99, chairW:true, seatW:46, seatD:44, legH:43, backH:34, stackH:10, isNew:true, nb:'hemming', nb:'hemming'},
-  {id:'insail', name:'【新】ITOKI インセイル', w:92, d:72, h:139, color:0x5E7A4A, qty:99, isNew:true, nb:'insail', nb:'insail'},
-  {id:'kitchen', name:'【新】KOKUYO Any Table ハイカウンター（可動コーヒー台）', w:180, d:70, h:90, color:0xD9C3A5, qty:9, isNew:true, nb:'kitchen', nb:'kitchen'},
-  {id:'mlounge', name:'【新】ITOKI ミートラウンジ 1人用', w:68, d:64, h:70, color:0xB58B5A, qty:99, isNew:true, nb:'mlounge', nb:'mlounge'},
-  {id:'pbench', name:'【新】内田洋行 Puller ベンチ', w:120, d:40, h:47, color:0xD9C3A5, qty:99, isNew:true, nb:'pbench', nb:'pbench'},
-  {id:'planter', name:'【新】無印良品 スタッキングシェルフ 2段×2列 オーク材＋キャスター（上に植物は後から）', w:82, d:28.5, h:87.5, color:0xD9C3A5, qty:99, isNew:true, nb:'planter', nb:'planter'},
+  {id:'kitchen', name:'【新】KOKUYO Any Table ハイカウンター W1200×D600×H1000（コーヒー台）', w:120, d:60, h:100, color:0xD9C3A5, qty:9, isNew:true, nb:'kitchen', nb:'kitchen'},
+  {id:'pbench', name:'【新】内田洋行 Puller ベンチ', w:120, d:40, h:47, color:0xB9862E, qty:99, isNew:true, nb:'pbench', nb:'pbench'},
+  {id:'planter', name:'【新】KOKUYO Any Wagon 2段（上に植物を後から）', w:44, d:30, h:72, color:0xEFEDE7, qty:99, isNew:true, nb:'planter', nb:'planter'},
   {id:'printer', name:'印刷機（既存の複合機）', w:70, d:60, h:95, color:0xB9BBB8, qty:9, isNew:true, nb:'printer', nb:'printer'},
   {id:'quie', name:'【新】内田洋行 Quie S（1人用ブース）', w:120, d:120, h:200, color:0xD9C3A5, qty:99, isNew:true, nb:'quie', nb:'quie'},
-  {id:'region', name:'【新】KOKUYO Region 円形ローテーブル φ900', w:90, d:90, h:45, color:0xD9C3A5, qty:99, isNew:true, nb:'region', nb:'region'},
-  {id:'screen', name:'【新】ITOKI スクリーンパネルAC', w:90, d:4, h:156, color:0xEFE9DC, qty:99, isNew:true, nb:'screen', nb:'screen'},
-  {id:'shelfm', name:'【新】KOKUYO Any Wall 棚仕様（可動本棚）', w:110, d:45, h:100, color:0xEDEBE5, qty:99, isNew:true, nb:'shelfm', nb:'shelfm'},
+  {id:'region', name:'【新】KOKUYO Region 円形ローテーブル φ900', w:90, d:90, h:45, color:0xD2B48A, qty:99, isNew:true, nb:'region', nb:'region'},
+  {id:'shelfm', name:'【新】KOKUYO Any Wall 棚仕様（可動本棚）', w:110, d:45, h:100, color:0xEFEDE7, qty:99, isNew:true, nb:'shelfm', nb:'shelfm'},
   {id:'signlow', name:'【新】低いサイン台（製品未定）', w:90, d:35, h:75, color:0xD9C3A5, qty:9, isNew:true, nb:'signlow', nb:'signlow'},
   {id:'sm107', name:'【新】オリバー S・SM-107 組み合わせベンチ', w:135, d:45, h:40, color:0xB58B5A, qty:99, isNew:true, nb:'sm107', nb:'sm107'},
-  {id:'sofa_b', name:'【新】KOKUYO Any Sofa 背あり', w:65, d:68, h:77, color:0xB58B5A, qty:99, isNew:true, nb:'sofa_b', nb:'sofa_b'},
-  {id:'sofa_n', name:'【新】KOKUYO Any Sofa 背なし', w:65, d:68, h:45, color:0xB58B5A, qty:99, isNew:true, nb:'sofa_n', nb:'sofa_n'},
-  {id:'soleil', name:'【新】ITOKI ソレイユ 雲型 WB天板', w:92, d:92, h:72, color:0xF4F4F2, qty:99, isNew:true, nb:'soleil', modes:['天板 使用','天板 跳ね上げ'], nb:'soleil', modes:['天板 使用','天板 跳ね上げ']},
+  {id:'sofa_b', name:'【新】KOKUYO Any Sofa 背あり', w:65, d:68, h:77, color:0xCDBFAA, qty:99, isNew:true, nb:'sofa_b', nb:'sofa_b'},
+  {id:'sofa_n', name:'【新】KOKUYO Any Sofa 背なし', w:65, d:68, h:52, color:0xC0643E, qty:99, isNew:true, nb:'sofa_n', nb:'sofa_n'},
+  {id:'soleil', name:'【新】KOKUYO Any Table 角形 W1500×D750（ラボ）', w:150, d:75, h:72, color:0xF4F4F2, qty:99, isNew:true, nb:'soleil', nb:'soleil'},
   {id:'tatami', name:'【新】オリバー S・SW-842A 収納付畳システム', w:82, d:82, h:31, color:0xC7C19A, qty:99, isNew:true, nb:'tatami', nb:'tatami'},
   {id:'wallbook', name:'【新】壁面本棚（製品未定）', w:200, d:30, h:180, color:0xC9A97A, qty:9, isNew:true, nb:'wallbook', nb:'wallbook'},
   {id:'wan', name:'【新】ITOKI ワンチェア 木脚', w:52, d:54, h:77, color:0xD9C3A5, qty:99, chairW:true, seatW:46, seatD:44, legH:42, backH:35, stackH:10, isNew:true, nb:'wan', nb:'wan'},
   {id:'xstadium', name:'【新】KOKUYO X-STADIUM', w:300, d:235, h:105, color:0xD9C3A5, qty:99, isNew:true, nb:'xstadium', modes:['STADIUM 展開','SOFA 半分','+SPACE 収納'], nb:'xstadium', modes:['STADIUM 展開','SOFA 半分','+SPACE 収納']},
   {id:'magwall', name:'【新】掲示壁（カウンター裏の磁石面・4段の帯）', w:250, d:4, h:150, color:0xF4EEDC, qty:1, isNew:true, nb:'magwall', nb:'magwall'},
-  {id:'rug', name:'◇ラグ（広場の中心）', w:320, d:320, h:2, color:0xB58B5A, qty:9, isIdea:true, nb:'rug'},
+  {id:'scrLf', name:'WBスクリーン2連(大)・たたんだ状態', w:86, d:60, h:180, color:0xFAFAF8, qty:4, nb:'scrfold', nb:'scrLf'},
+  {id:'scrSf', name:'WBスクリーン2連(小)・たたんだ状態', w:86, d:60, h:150, color:0xFAFAF8, qty:3, nb:'scrfold', nb:'scrSf'},
+  {id:'rug', name:'◇ラグ（広場の中心）', w:320, d:320, h:2, color:0xC0643E, qty:9, isIdea:true, nb:'rug'},
   {id:'lamp', name:'◇フロアランプ', w:40, d:40, h:180, color:0xF2E6C9, qty:9, isIdea:true, nb:'lamp'},
   {id:'pendant', name:'◇ペンダントライト（島の上）', w:50, d:50, h:200, color:0x3D7A46, qty:9, isIdea:true, nb:'pendant'},
   {id:'wbwall', name:'◇書ける壁（ホワイトボードシート）', w:160, d:3, h:120, y0:80, color:0xFAFAF8, qty:9, isIdea:true, nb:'wbwall'},
-  {id:'wallcal', name:'◇大判の月間カレンダー（壁）', w:90, d:3, h:110, y0:95, color:0xF6F6F4, qty:9, isIdea:true, nb:'wallcal'},
+  {id:'wallcal', name:'◇大判の月間カレンダー（壁）', w:90, d:3, h:110, y0:125, color:0xF6F6F4, qty:9, isIdea:true, nb:'wallcal'},
   {id:'infoboard', name:'◇募集・掲示ボード（壁掛けA4×8）', w:120, d:3, h:90, y0:110, color:0xE7DDC6, qty:9, isIdea:true, nb:'infoboard'},
   {id:'showcase', name:'◇見せる収納（成果物・ZINEの展示棚）', w:90, d:35, h:150, color:0xD8B98C, qty:9, isIdea:true, nb:'showcase'},
   {id:'speaker', name:'◇スピーカー（ラジオ・BGM）', w:24, d:20, h:150, color:0x3A3D42, qty:9, isIdea:true, nb:'speaker'},
@@ -2626,6 +2624,18 @@ const NB=(()=>{
     if(o.leg==='wood'){ legs4(g,sw,sd,sh-2,5,1.9,WOOD(),2); }
     else if(o.leg==='chrome'){ legs4(g,sw,sd,sh-2,5,1.1,CHROME(),2); }
     else { legs4(g,sw,sd,sh-2,5,1.2,BLACK(),2); }
+    if(o.caster) casters(g,[[-sw/2+3,-sd/2+3],[sw/2-3,-sd/2+3],[-sw/2+3,sd/2-3],[sw/2-3,sd/2-3]],2);
+  }
+  /* シェルチェア：座と背が一枚につながる（前縁は丸め、背は少し湾曲して後ろへ倒れる） */
+  function shellChair(g,o){
+    const sw=o.sw, sd=o.sd, sh=o.sh, bh=o.bh, t=o.thin||1.5, m=o.shellM;
+    const seat=new THREE.Mesh(new THREE.CylinderGeometry(sd*1.6,sd*1.6,sw,24,1,true,Math.PI*0.5-0.32,0.64),m); // 座：ごくゆるい湾曲
+    seat.material=m.clone(); seat.material.side=THREE.DoubleSide; seat.rotation.z=Math.PI/2; seat.position.set(0,sh-sd*1.6+t+1,1); g.add(seat);
+    const back=new THREE.Mesh(new THREE.CylinderGeometry(sw*0.62,sw*0.62,bh,24,1,true,Math.PI*0.66,Math.PI*0.68),seat.material);  // 背：横方向に包むように湾曲
+    back.position.set(0,sh+bh/2+3,-sd/2+sw*0.62-1); back.rotation.x=-0.12; g.add(back);
+    const bend=new THREE.Mesh(new THREE.TorusGeometry(5,t/2+0.4,6,10,Math.PI/2),m); bend.rotation.y=Math.PI/2; bend.scale.set(1,1,sw*0.17); bend.position.set(0,sh+5,-sd/2+6); g.add(bend);
+    if(o.wrap){ const lip=new THREE.Mesh(new THREE.TorusGeometry(sw*0.62,1.4,6,24,Math.PI*0.68),m); lip.rotation.x=Math.PI/2; lip.rotation.z=Math.PI*0.66; lip.position.set(0,sh+bh+3,-sd/2+sw*0.62-1); g.add(lip); }
+    legs4(g,sw-4,sd-4,sh-1,4,o.legR||1.1,o.legM,2.5);
     if(o.caster) casters(g,[[-sw/2+3,-sd/2+3],[sw/2-3,-sd/2+3],[-sw/2+3,sd/2-3],[sw/2-3,sd/2-3]],2);
   }
   /* 跳ね上げ式テーブルのT脚（左右2本）＋キャスター */
@@ -2672,7 +2682,7 @@ const NB=(()=>{
       const m=M(0x2B2B2B,.5); cyl(g,16,16,2,0,1,0,m,20); cyl(g,1.2,1.2,s.h,0,s.h/2,0,m,8); box(g,s.w,s.h*0.72,0.8,s.w/2+1,s.h*0.6,0,M(s.color,.85)); box(g,s.w*0.5,10,1,s.w/2+1,s.h*0.78,0.6,M(0xFAFAF8,.8)); },
     xstadium(g,s){ // KOKUYO X-STADIUM W300×D235(展開)×H105：本体D100＋引き出し2段。モードで収納
       const wood=OAK(), woodD=M(0xC4A273,.75), line=M(0x8E7452,.8);
-      const cush=[0xC96A3A,0x4F7A5A,0x9BAE6F,0x3D5A80].map(c=>M(c,.95));
+      const cush=[0xC0643E,0xB9862E,0x35606B,0xCDBFAA].map(c=>M(c,.95));   // shakeの家具色：テラコッタ・マスタード・ティール・ベージュ
       const W=s.w, zB=-s.d/2;
       box(g,W,75,70, 0,37.5, zB+65, wood); box(g,W,105,30, 0,52.5, zB+15, woodD); box(g,W,1.2,0.6, 0,75.6, zB+100.3, line);
       for(let i=0;i<3;i++) box(g,92,6,52, -W/2+50+i*100, 78, zB+65, cush[i%4]);
@@ -2704,25 +2714,21 @@ const NB=(()=>{
       g.userData.setMode=k=>{ // 0=STADIUM展開 1=SOFA（中段だけ） 2=+SPACE（全部収納）
         st1.visible=k<2; st2.visible=k<1; st1.position.z=zB+133.5; st2.position.z=zB+201; };
       g.userData.setMode(0); },
-    soleil(g,s){ // ITOKI ソレイユ 雲型WB天板 925角 H720 跳ね上げ・キャスター
-      const top=M(0xF6F6F4,.4), edge=M(0xB9BBBA,.6); const sh=new THREE.Shape(); const R=s.w/2;
-      const lobes=[[0,0.28],[0.28,0],[0,-0.28],[-0.28,0]];
-      sh.absarc(0,0,R*0.62,0,Math.PI*2,false);
-      const tg=new THREE.Group(); tg.position.y=s.h-3; g.add(tg);
-      shapeTop(tg,sh,2.6,0,top); lobes.forEach(([lx,lz])=>cyl(tg,R*0.42,R*0.42,2.6,lx*R,1.3,lz*R,top,28)); cyl(tg,R*0.64,R*0.64,1,0,-0.6,0,edge,32);
-      tLegs(g,s.w,s.d,s.h-3,CHROME());
-      g.userData.setMode=k=>{ tg.rotation.x=k? -Math.PI*0.47 : 0; }; },
+    soleil(g,s){ // KOKUYO Any Table 角形（ラボ）W1500×D750 H720：薄い天板、細い丸パイプの脚4本、2本キャスター
+      const tg=new THREE.Group(); tg.position.y=s.h-2.4; g.add(tg); box(tg,s.w,2.4,s.d,0,1.2,0,M(0xF2F1EC,.45)); box(tg,s.w+0.2,0.8,s.d+0.2,0,0.4,0,M(0xD9D6CC,.5));
+      const m=M(0xC9CBC9,.45,{metalness:.3}); [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>tube(new THREE.Vector3(p[0]*(s.w/2-4),s.h-2.4,p[1]*(s.d/2-4)),new THREE.Vector3(p[0]*(s.w/2-4),3,p[1]*(s.d/2-4)),1.3,m,g));
+      casters(g,[[-s.w/2+4,s.d/2-4],[s.w/2-4,s.d/2-4]],2.4); },
     copto(g,s){ // ITOKI コプト WB天板 650×450 H720：片持ちのC脚
       box(g,s.w,2.4,s.d,0,s.h-1.2,0,M(0xF6F6F4,.4));
       const m=BLACK(); cyl(g,2.4,2.4,s.h-6,0,(s.h-6)/2+3,-s.d/2+8,m,12);
       box(g,s.w*0.8,2.5,s.d*0.75,0,1.6,s.d*0.05,m); casters(g,[[-s.w*0.35,s.d*0.3],[s.w*0.35,s.d*0.3],[0,-s.d/2+8]],2); },
-    anytable(g,s){ // KOKUYO Any Table 台形 1460×650 H720：長辺146／短辺71、脚4本キャスター
+    anytable(g,s){ // KOKUYO Any Table 台形 1460×650 H720：薄い天板（長辺146／短辺71）、細い丸パイプの脚4本、長辺側2本キャスター
       const sh=new THREE.Shape(); const L=s.w/2, S_=36, D=s.d/2;
       sh.moveTo(-L,D); sh.lineTo(L,D); sh.lineTo(S_,-D); sh.lineTo(-S_,-D); sh.closePath();
-      const tg=new THREE.Group(); tg.position.y=s.h-3; g.add(tg); shapeTop(tg,sh,2.8,0,M(s.color,.55));
-      g.userData.setMode=k=>{ tg.rotation.x=k? -Math.PI*0.47 : 0; };
-      const m=BLACK(); [[-L+14,D-10],[L-14,D-10],[S_-10,-D+10],[-S_+10,-D+10]].forEach(p=>{ tube(new THREE.Vector3(p[0],s.h-3,p[1]),new THREE.Vector3(p[0],2,p[1]),1.4,m,g); });
-      casters(g,[[-L+14,D-10],[L-14,D-10],[S_-10,-D+10],[-S_+10,-D+10]],2.2); },
+      const tg=new THREE.Group(); tg.position.y=s.h-2.4; g.add(tg); shapeTop(tg,sh,2.4,0,M(s.color,.5));
+      const m=M(0xC9CBC9,.45,{metalness:.3}); const P=[[-L+8,D-4],[L-8,D-4],[S_-4,-D+4],[-S_+4,-D+4]];
+      P.forEach(p=>tube(new THREE.Vector3(p[0],s.h-2.4,p[1]),new THREE.Vector3(p[0],3,p[1]),1.3,m,g));
+      casters(g,[P[0],P[1]],2.4); },
     dt_half(g,s){ // axona AICHI DT-15R 半円 1500×750 H700
       const sh=new THREE.Shape(); sh.absarc(0,-s.d/2,s.w/2,0,Math.PI,true); sh.closePath(); // 直線の辺が-z側、弧が+z側
       shapeTop(g,sh,2.8,s.h-2.8,M(s.color,.6));
@@ -2731,10 +2737,16 @@ const NB=(()=>{
     roundT(g,s){ // 余っている丸テーブル：木天板 φ900 H700、黒い柱脚、段々のベース
       cyl(g,s.w/2,s.w/2,3,0,s.h-1.5,0,M(0xD1A160,.55),40); cyl(g,4,4,s.h-10,0,(s.h-10)/2+3,0,M(0x1E1E1E,.5),16);
       [[28,1.2],[23,2.6],[18,4],[13,5.4]].forEach(([r,y])=>cyl(g,r,r,1.4,0,y,0,M(0x1A1A1A,.6),32)); },
-    region(g,s){ // KOKUYO Region 円形 φ900 H450
-      cyl(g,s.w/2,s.w/2,2.8,0,s.h-1.4,0,M(s.color,.55),40); legs4(g,s.w*0.62,s.d*0.62,s.h-3,0,1.8,WOOD(),2); },
-    hazel(g,s){ chair(g,{sw:46,sd:46,sh:43,bh:32,seatM:M(0xC9A97A,.9),leg:'chrome',caster:true,shell:true}); },
-    hemming(g,s){ chair(g,{sw:46,sd:44,sh:43,bh:34,seatM:M(0x7A9E5B,.85),leg:'black',shell:true}); },
+    region(g,s){ // KOKUYO Region 円形（ロー）φ900 H450：天板の下に、下へすぼまる白い多角形フレーム、床に平たいベース
+      cyl(g,s.w/2,s.w/2,2.4,0,s.h-1.2,0,M(s.color,.55),48); cyl(g,s.w/2+0.2,s.w/2+0.2,0.6,0,s.h-2.6,0,M(0xD2C2A2,.6),48);
+      const fr=M(0xF4F4F2,.45); const n=5, rT=s.w*0.26, rB=s.w*0.17, top=[], bot=[];
+      for(let i=0;i<n;i++){ const a=i/n*Math.PI*2+0.3; top.push(new THREE.Vector3(Math.cos(a)*rT,s.h-2.6,Math.sin(a)*rT)); bot.push(new THREE.Vector3(Math.cos(a)*rB,2.2,Math.sin(a)*rB)); }
+      for(let i=0;i<n;i++){ tube(top[i],bot[i],1.4,fr,g); tube(top[i],top[(i+1)%n],1.1,fr,g); }
+      const bs=new THREE.Shape(); bot.forEach((v,i)=>{ const x=v.x*1.18, z=v.z*1.18; i?bs.lineTo(x,-z):bs.moveTo(x,-z); }); bs.closePath(); shapeTop(g,bs,2,0.2,fr); },
+    hazel(g,s){ // 内田洋行 Hazel：一枚の成形合板を曲げた座と背、細いスチール脚4本（白）
+      shellChair(g,{sw:44,sd:44,sh:44,bh:36,shellM:M(0xD9B48A,.6),legM:M(0xEDEDEA,.4),legR:1.0,thin:1.2}); },
+    hemming(g,s){ // KOKUYO Hemming：座と背が一体の樹脂シェル（縁がくるりと巻く）、細い黒脚4本
+      shellChair(g,{sw:47,sd:46,sh:44,bh:35,shellM:M(0x35606B,.7),legM:M(0x2A2A2A,.45),legR:1.0,thin:2.2}); },
     wan(g,s){ chair(g,{sw:46,sd:44,sh:42,bh:35,seatM:M(0xD9C3A5,.9),leg:'wood',shell:true}); },
     ap01(g,s){ chair(g,{sw:44,sd:44,sh:43,bh:35,seatM:M(0xC79A5E,.7),leg:'wood'}); },
     sofa_b(g,s){ sofa(g,s,true); }, sofa_n(g,s){ sofa(g,s,false); },
@@ -2744,36 +2756,39 @@ const NB=(()=>{
       back.position.set(0,s.sh+(s.h-s.sh)/2-4,4); g.add(back); },
     sm107(g,s){ // オリバー SM-107 ベンチ W1350×D450：木座＋スチール脚
       box(g,s.w,4,s.d,0,s.h-2,0,M(s.color,.7)); legs4(g,s.w,s.d,s.h-4,10,1.6,M(0x4A4A4A,.5)); box(g,s.w-24,2,2,0,s.h/2,0,M(0x4A4A4A,.5)); },
-    pbench(g,s){ // 内田洋行 Puller ベンチ 1200×403×470：座の下に棚、片側キャスター
-      box(g,s.w,4,s.d,0,s.h-2,0,M(s.color,.7)); const m=M(0xEDEBE5,.6);
-      [-1,1].forEach(x=>box(g,3,s.h-4,s.d-6,x*(s.w/2-6),(s.h-4)/2,0,m)); box(g,s.w-12,2,s.d-10,0,14,0,m);
-      casters(g,[[s.w/2-8,-s.d/2+6],[s.w/2-8,s.d/2-6]],2.4); },
-    planter(g,s){ // 無印良品 スタッキングシェルフ 2段×2列 オーク材 W82×D28.5×H81.5＋キャスター。天板は後から植物を置く場所
-      const wd=OAK(), cH=6, H=s.h-cH;
-      [-1,0,1].forEach(x=>box(g,1.8,H,s.d,x*(s.w/2-0.9),cH+H/2,0,wd));
-      [0,1,2].forEach(i=>box(g,s.w,1.8,s.d,0,cH+0.9+i*(H-1.8)/2,0,wd));
-      box(g,s.w,H,0.6,0,cH+H/2,-s.d/2+0.3,M(0xD8C3A0,.8));
-      const cw=(s.w-5.4)/2, ch=(H-5.4)/2;
-      // 下段：shakeの記録（shake handsの記録・活動写真・学生の作品のファイルボックス）
-      [0,1,2,3].forEach(k=>box(g,cw/4-1,ch*0.82,s.d*0.8,-s.w/2+2+cw/8+k*cw/4,cH+1.8+ch*0.41,0,M([0xF4F4F2,0xE8C170,0xF4F4F2,0x9BAE6F][k],.85)));
-      // 上段：貸し出し道具箱（マーカー・付箋・延長コード）
-      box(g,cw-6,ch*0.45,s.d*0.8,-cw/2-1,cH+3.6+ch+ch*0.225,0,M(0xF4F4F2,.7));
-      box(g,cw-6,ch*0.45,s.d*0.8, cw/2+1,cH+3.6+ch+ch*0.225,0,M(0xC96A3A,.75));
-      casters(g,[[-s.w/2+5,-s.d/2+5],[s.w/2-5,-s.d/2+5],[-s.w/2+5,s.d/2-5],[s.w/2-5,s.d/2-5]],2.4); },
+    pbench(g,s){ // 内田洋行 Puller ベンチ：布張りの薄い座（角丸）、外へ少し開く黒い細いパイプの脚4本と、低いH型の貫
+      rbox(g,s.w,6,s.d-4,0,s.h-3,0,M(s.color,.95),2.6);
+      const m=M(0x2A2A2A,.45); const X=s.w/2-8, Z=s.d/2-6;
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>tube(new THREE.Vector3(p[0]*X,s.h-6,p[1]*Z),new THREE.Vector3(p[0]*(X+3),0.5,p[1]*(Z+1.5)),1.1,m,g));
+      [-1,1].forEach(x=>tube(new THREE.Vector3(x*(X+0.8),14,-Z),new THREE.Vector3(x*(X+0.8),14,Z),0.9,m,g)); tube(new THREE.Vector3(-X,14,0),new THREE.Vector3(X,14,0),0.9,m,g);
+      },
+    planter(g,s){ // KOKUYO Any Wagon 2段：細いパイプのフレーム、上はトレー、下は深い箱、四隅にキャスター、両端に持ち手。上に植物を後から置く
+      const m=M(s.color,.6);
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>tube(new THREE.Vector3(p[0]*(s.w/2-2),5,p[1]*(s.d/2-2)),new THREE.Vector3(p[0]*(s.w/2-2),s.h-6,p[1]*(s.d/2-2)),1.0,m,g));
+      box(g,s.w-2,1.2,s.d-2,0,s.h-6,0,m); [-1,1].forEach(z=>box(g,s.w-2,3,0.8,0,s.h-4.5,z*(s.d/2-1),m)); [-1,1].forEach(x=>box(g,0.8,3,s.d-2,x*(s.w/2-1),s.h-4.5,0,m));   // 上のトレー
+      [-1,1].forEach(x=>{ tube(new THREE.Vector3(x*(s.w/2-2),s.h-6,-s.d/2+4),new THREE.Vector3(x*(s.w/2-2),s.h+6,-s.d/2+4),1.0,m,g); tube(new THREE.Vector3(x*(s.w/2-2),s.h+6,-s.d/2+4),new THREE.Vector3(x*(s.w/2-2),s.h+6,s.d/2-4),1.0,m,g); tube(new THREE.Vector3(x*(s.w/2-2),s.h+6,s.d/2-4),new THREE.Vector3(x*(s.w/2-2),s.h-6,s.d/2-4),1.0,m,g); });   // 持ち手
+      box(g,s.w-2,18,s.d-2,0,17,0,m);                                                                       // 下の深い箱
+      box(g,8,10,6,-6,30,2,M(0xF4F4F2,.8)); box(g,10,6,8,7,28,-3,M(0xE8C170,.8));                          // 箱の中（道具・記録）
+      casters(g,[[-s.w/2+3,-s.d/2+3],[s.w/2-3,-s.d/2+3],[-s.w/2+3,s.d/2-3],[s.w/2-3,s.d/2-3]],2.2); },
     shelfm(g,s){ // KOKUYO Any Wall 棚仕様 W1100 H1000：両面棚3段、大径キャスター
-      const m=M(0xEDEBE5,.6); [-1,1].forEach(x=>box(g,3,s.h-8,s.d,x*(s.w/2-1.5),(s.h-8)/2+8,0,m));
+      const m=M(s.color,.6); [-1,1].forEach(x=>box(g,3,s.h-8,s.d,x*(s.w/2-1.5),(s.h-8)/2+8,0,m));
       [0,1,2,3].forEach(i=>box(g,s.w,2.4,s.d,0,10+i*(s.h-12)/3,0,m));
       [0,1,2].forEach(i=>{ books(g,s.w-10,11.5+i*(s.h-12)/3,-s.d*0.25,s.d*0.42,10); books(g,s.w-10,11.5+i*(s.h-12)/3,s.d*0.25,s.d*0.42,8); });
       casters(g,[[-s.w/2+8,-s.d/2+8],[s.w/2-8,-s.d/2+8],[-s.w/2+8,s.d/2-8],[s.w/2-8,s.d/2-8]],4); },
-    anywall(g,s){ // KOKUYO Any Wall W1600 H1800：両面ボード、脚＋大径キャスター
-      const fr=M(0xD8D8D4,.5); box(g,s.w-6,s.h-30,5,0,(s.h-30)/2+22,0,M(s.color,.5)); box(g,s.w,3,6,0,s.h-6,0,fr);
-      [-1,1].forEach(x=>{ box(g,4,s.h-8,4,x*(s.w/2-2),(s.h-8)/2+6,0,fr); box(g,5,4,s.d,x*(s.w/2-2),6,0,fr); });
-      casters(g,[[-s.w/2+2,-s.d/2+6],[s.w/2-2,-s.d/2+6],[-s.w/2+2,s.d/2-6],[s.w/2-2,s.d/2-6]],4.5);
-      // 企画展示モード：片面に月替わりの展示（ポスター・写真・キャプション）を貼る
+    anywall(g,s){ // KOKUYO Any Wall（ストレート）：細い角パイプの格子フレームの間仕切り、大径キャスター。棚板を1枚、書ける面（ホワイトボード）を片面に
+      const fr=M(0xD8D0BE,.5); const H=s.h, W=s.w, y0=8;
+      [-1,1].forEach(x=>box(g,2.4,H-y0,2.4,x*(W/2-1.2),(H-y0)/2+y0,0,fr));
+      [y0+1, H-1.2].forEach(y=>box(g,W,2.4,2.4,0,y,0,fr));
+      for(let i=1;i<8;i++) box(g,1.4,H-y0-2,1.4,-W/2+i*W/8,(H-y0)/2+y0,0,fr);
+      [0.32,0.52,0.7,0.86].forEach(t=>box(g,W-2,1.4,1.4,0,y0+(H-y0)*t,0,fr));
+      box(g,W-4,1.6,s.d-8,0,y0+(H-y0)*0.32+1.4,0,M(0xEDEAE2,.6));
+      const wb=box(g,W*0.5,H*0.38,0.8,-W*0.22,y0+(H-y0)*0.66,1.6,M(0xFAFAF8,.3));
+      casters(g,[[-W/2+2,-s.d/2+6],[W/2-2,-s.d/2+6],[-W/2+2,s.d/2-6],[W/2-2,s.d/2-6]],4);
+      [-1,1].forEach(x=>box(g,3,2.4,s.d,x*(W/2-1.2),5,0,fr));
       const ex=new THREE.Group(); g.add(ex); const pal=[0xC96A3A,0x3B5B8C,0x9BAE6F,0xE8C170,0x2F3B57];
-      box(ex,s.w*0.5,12,0.6,-s.w*0.18,s.h-40,3.6,M(0x2B2B2B,.8));                                 // タイトル帯
-      [[-s.w*0.3,120,42,59],[-s.w*0.02,118,59,42],[s.w*0.28,122,42,59],[-s.w*0.25,55,36,26],[s.w*0.05,50,59,42],[s.w*0.3,60,26,36]].forEach((p,i)=>box(ex,p[2],p[3],0.6,p[0],p[1],3.6,M(pal[i%5],.8)));
-      ex.visible=false; g.userData.setMode=k=>{ ex.visible=k===1; }; },
+      box(ex,W*0.4,10,0.6,W*0.2,H-28,2.2,M(0x2B2B2B,.8));
+      [[W*0.12,120,42,59],[W*0.33,118,30,42],[W*0.1,62,30,42],[W*0.32,58,42,30]].forEach((p,i)=>box(ex,p[2],p[3],0.6,p[0],p[1],2.2,M(pal[i%5],.8)));
+      ex.visible=false; g.userData.setMode=k=>{ ex.visible=k===1; wb.visible=true; }; },
     corocoro(g,s){ // 内田洋行 corocoro 1200×500×1800：細いフレームにピンナップ板（紺）を差し込む、キャスター
       const fr=M(0x2B2B2B,.5); [-1,1].forEach(x=>{ cyl(g,1.6,1.6,s.h-8,x*(s.w/2-3),(s.h-8)/2+6,0,fr,10); box(g,4,3,s.d,x*(s.w/2-3),4.5,0,fr); });
       box(g,s.w-6,2,2,0,s.h-5,0,fr); const pm=[M(0x2F3B57,.9),M(0xFAFAF8,.4),M(0x15171B,.4)]; const panel=box(g,s.w-14,s.h*0.62,2.4,0,s.h*0.62/2+28,0,pm[0]); box(g,s.w-20,3,8,0,26,4,WOOD());
@@ -2782,15 +2797,17 @@ const NB=(()=>{
     screen(g,s){ // ITOKI スクリーンパネルAC 900×1565：布張りパネル＋足
       box(g,s.w,s.h-12,3.5,0,(s.h-12)/2+12,0,M(s.color,.95)); const fr=M(0x8A8F94,.5);
       [-1,1].forEach(x=>{ box(g,3,12,3,x*(s.w/2-6),6,0,fr); box(g,3,2,36,x*(s.w/2-6),1,0,fr); }); },
-    tatami(g,s){ // オリバー SW-842A 収納付畳 820×820×310
-      box(g,s.w,s.h-4,s.d,0,(s.h-4)/2,0,M(0x6B5A42,.85)); box(g,s.w-2,4,s.d-2,0,s.h-2,0,M(s.color,.9)); box(g,s.w-2,4.2,6,0,s.h-2,-s.d/2+3,M(0x3B4A2F,.9)); },
+    tatami(g,s){ // オリバー S・SW-842A・KY 収納付畳 W820×D820×H370：明るい木目の箱に、縁なしの畳（緑）を載せる。キャスター脚
+      box(g,s.w,s.h-9,s.d,0,(s.h-9)/2+5,0,M(0xCFA472,.7)); box(g,s.w-0.6,3.6,s.d-0.6,0,s.h-1.8,0,M(0xA7B07A,.95));
+      box(g,s.w-1,0.4,s.d-1,0,s.h-3.8,0,M(0x6E5634,.8));
+      casters(g,[[-s.w/2+7,-s.d/2+7],[s.w/2-7,-s.d/2+7],[-s.w/2+7,s.d/2-7],[s.w/2-7,s.d/2-7]],2.4); },
     insail(g,s){ // ITOKI インセイル 920×720×1390 SH420：高い背が包む1人用
       const f=M(s.color,.95,{side:THREE.DoubleSide}); box(g,s.w-14,10,s.d-12,0,42-5,4,M(0xD9C3A5,.9)); box(g,s.w-14,30,s.d-12,0,15,4,BLACK());
       const sh=new THREE.Mesh(new THREE.CylinderGeometry(s.w/2,s.w/2,s.h-30,28,1,true,Math.PI*0.95,Math.PI*1.1),f); sh.position.set(0,30+(s.h-30)/2,2); g.add(sh);
       casters(g,[[-s.w/2+10,-s.d/2+8],[s.w/2-10,-s.d/2+8],[-s.w/2+10,s.d/2-8],[s.w/2-10,s.d/2-8]],2.4); },
-    battery(g,s){ // ITOKI キャリータップ 475×600×900：移動式電源ユニット
-      box(g,s.w,s.h-6,s.d,0,(s.h-6)/2+6,0,M(s.color,.6)); box(g,s.w-10,2,s.d-20,0,s.h-1,0,M(0xE8912D,.6));
-      casters(g,[[-s.w/2+6,-s.d/2+6],[s.w/2-6,-s.d/2+6],[-s.w/2+6,s.d/2-6],[s.w/2-6,s.d/2-6]],3); },
+    battery(g,s){ // 内田洋行 Puller 止まり木ワイヤリングタワー：白い角柱（上に木のキャップ、側面にコンセント）、床に平たいベース板
+      box(g,s.w,1.5,s.d,0,0.75,0,M(0xE9E9E6,.4)); box(g,12,s.h-4,12,0,(s.h-4)/2+1.5,0,M(0xF1F1EE,.45));
+      box(g,15,2.6,15,0,s.h-1.3,0,M(0xD8B98C,.65)); box(g,8,4,0.6,0,s.h-16,6.2,M(0x2B2B2B,.6)); box(g,8,4,0.6,0,s.h-24,6.2,M(0x2B2B2B,.6)); },
     quie(g,s){ // 内田洋行 Quie S 1200×1200×2000：前が開いた1人用ブース（三方壁＋天井＋机）
       const wm=M(0xB8B4A8,.9), gl=M(0xBFE3EE,.1,{transparent:true,opacity:.25});
       box(g,s.w,s.h,4,0,s.h/2,-s.d/2+2,wm); [-1,1].forEach(x=>box(g,4,s.h,s.d,x*(s.w/2-2),s.h/2,0,wm));
@@ -2801,10 +2818,17 @@ const NB=(()=>{
       box(g,s.w-6,s.h*0.55-6,0.6,0,s.h*0.72,3,M(0x1F3350,.3));
       [-1,1].forEach(x=>{ cyl(g,2,2,s.h*0.45,x*s.w*0.25,s.h*0.225,-4,fr,10); box(g,8,4,s.d,x*s.w*0.25,2,0,fr); });
       casters(g,[[-s.w*0.25,-s.d/2+4],[s.w*0.25,-s.d/2+4],[-s.w*0.25,s.d/2-4],[s.w*0.25,s.d/2-4]],3); },
-    kitchen(g,s){ // KOKUYO Any Table ハイカウンター 1800×700 H900（可動コーヒー台）
-      box(g,s.w,3,s.d,0,s.h-1.5,0,M(0xF6F6F4,.45)); const m=BLACK(); legs4(g,s.w,s.d,s.h-3,8,1.6,m);
-      casters(g,[[-s.w/2+8,-s.d/2+8],[s.w/2-8,-s.d/2+8],[-s.w/2+8,s.d/2-8],[s.w/2-8,s.d/2-8]],2.4);
-      box(g,28,24,22,-s.w/2+30,s.h+12,-8,M(0x4A4A4A,.5)); box(g,40,3,30,s.w/2-40,s.h+1.5,0,M(0xB58B5A,.7)); },
+    kitchen(g,s){ // KOKUYO Any Table ハイカウンター W1200×D600×H1000（コーヒー台）：薄い白天板、細い丸パイプの脚4本（同色）、片側2本キャスター
+      box(g,s.w,2.4,s.d,0,s.h-1.2,0,M(0xEFEDE7,.45)); const m=M(0xEFEDE7,.45);
+      [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>tube(new THREE.Vector3(p[0]*(s.w/2-4),s.h-2.4,p[1]*(s.d/2-4)),new THREE.Vector3(p[0]*(s.w/2-4),3,p[1]*(s.d/2-4)),1.3,m,g));
+      tube(new THREE.Vector3(-s.w/2+4,30,0-s.d/2+4),new THREE.Vector3(s.w/2-4,30,-s.d/2+4),0.9,m,g);
+      casters(g,[[-s.w/2+4,s.d/2-4],[s.w/2-4,s.d/2-4]],2.4);
+      box(g,22,30,24,-s.w/2+22,s.h+15,-6,M(0x3A3A3A,.5)); cyl(g,4,3.5,9,-s.w/2+48,s.h+4.5,-10,M(0xF6F6F4,.5),12); cyl(g,4,3.5,9,-s.w/2+58,s.h+4.5,-10,M(0xC0643E,.6),12); box(g,34,2,24,s.w/2-30,s.h+1,0,OAK()); },
+    scrfold(g,s){ // 今あるボードスクリーン2連を、中央のヒンジでたたんだ状態（ボード置き場用）：2枚の板が平行に重なる。脚とキャスターは両端
+      const bm=M(0xFAFAF8,.35), fr=M(0xC9C9C5,.5), cm=M(0x9A9A9A,.5), W=s.w;
+      [-1,1].forEach(k=>{ box(g,W-2,s.h-14,3.5,0,(s.h-14)/2+10,k*3.2,bm); box(g,W,1.6,4,0,s.h-3.2,k*3.2,fr); });
+      box(g,3,s.h-14,10,-W/2+1.5,(s.h-14)/2+10,0,fr);
+      [-1,1].forEach(x=>{ box(g,6,6,s.d,x*(W/2-4),3,0,fr); [-1,1].forEach(z=>cyl(g,3.5,3.5,3,x*(W/2-4),3.5,z*(s.d/2-5),cm,10)); }); },
     wallbook(g,s){ // 壁面本棚 2000×300×1800（固定）
       const m=M(s.color,.6); [-1,1].forEach(x=>box(g,2.5,s.h,s.d,x*(s.w/2-1.25),s.h/2,0,m)); box(g,s.w,2,s.d,0,s.h-1,0,m);
       for(let i=0;i<6;i++){ box(g,s.w-5,2.2,s.d,0,4+i*(s.h-8)/6,0,m); if(i<5) books(g,s.w-10,5+i*(s.h-8)/6,0,s.d*0.7,16); } },
@@ -2826,16 +2850,33 @@ const NB=(()=>{
       box(g,150,35,1.6,10,55+17.5,0.8,M(0xC9CBC8,.85));                          // スタッフ帯（天板の陰：備品マニュアル・鍵）
       box(g,28,36,22,s.w/2-16,118,12,M(0x8A6A4A,.8)); },                        // 手紙ポスト（南端）
   };
-  function sofa(g,s,withBack){ // KOKUYO Any Sofa：四角い箱型、厚い座と背、背の上にアーチ状の持ち手フレーム、片側だけキャスター
-    s=Object.assign({sh:45},s); const f=M(s.color,.95), f2=M(0x9A7A50,.95), tm=M(0x6B6F66,.4,{metalness:.5});
-    box(g,s.w,22,s.d,0,19,0,f2);                                  // 台（床から8cm浮く）
-    box(g,s.w-2,16,s.d-2,0,38,0,f);                               // 座クッション（上面45）
-    const hb=withBack? 86 : 58, zb=-s.d/2+5;
-    if(withBack) box(g,s.w-2,30,16,0,61,-s.d/2+9,f);              // 背クッション
-    [-1,1].forEach(x=>tube(new THREE.Vector3(x*(s.w/2-6),withBack?44:40,zb),new THREE.Vector3(x*(s.w/2-6),hb,zb-6),1.1,tm,g));
-    tube(new THREE.Vector3(-(s.w/2-6),hb,zb-6),new THREE.Vector3((s.w/2-6),hb,zb-6),1.1,tm,g);   // 持ち手のアーチ（後ろへ傾く）
-    [[-1,1],[1,1]].forEach(p=>box(g,4,8,4,p[0]*(s.w/2-6),4,p[1]*(s.d/2-6),M(0x2B2B2B,.5)));      // 前はグライド
-    casters(g,[[-s.w/2+6,-s.d/2+6],[s.w/2-6,-s.d/2+6]],2.6); }
+  /* 角の丸い箱（クッション用）。幅w・高さh・奥行dの中に収まる */
+  function rbox(g,w,h,d,x,y,z,m,r){
+    r=Math.min(r,w/2-0.5,h/2-0.5,d/2-0.5);
+    const sh=new THREE.Shape(), W=w/2-r, H=h/2-r;
+    sh.moveTo(-W,-h/2); sh.lineTo(W,-h/2); sh.quadraticCurveTo(w/2,-h/2,w/2,-H); sh.lineTo(w/2,H); sh.quadraticCurveTo(w/2,h/2,W,h/2);
+    sh.lineTo(-W,h/2); sh.quadraticCurveTo(-w/2,h/2,-w/2,H); sh.lineTo(-w/2,-H); sh.quadraticCurveTo(-w/2,-h/2,-W,-h/2);
+    const geo=new THREE.ExtrudeGeometry(sh,{depth:Math.max(0.5,d-2*r),bevelEnabled:true,bevelThickness:r,bevelSize:0,bevelSegments:4,curveSegments:6});
+    geo.translate(0,0,-(d-2*r)/2); const o=new THREE.Mesh(geo,m); o.position.set(x,y,z); g.add(o); return o; }
+  function sofa(g,s,withBack){ // KOKUYO Any Sofa W650×D682 SH450：全体を布で包んだ、ころんと丸い座。細い金属フレームの脚（前はキャスター）。背ありは独立した四角い背クッションが後ろに立つ。背なしは後ろに金属のバーハンドル
+    s=Object.assign({sh:45},s);
+    const f=M(s.color,.98), fd=M(new THREE.Color(s.color).multiplyScalar(.9).getHex(),.98), fr=M(new THREE.Color(s.color).multiplyScalar(.75).getHex(),.5,{metalness:.35});
+    rbox(g,s.w-2,33,s.d-4,0,28.5,2,f,10);                              // 座：布で包んだ丸いブロック（上面45、床から12浮く）
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>tube(new THREE.Vector3(p[0]*(s.w/2-9),12,p[1]*(s.d/2-10)),new THREE.Vector3(p[0]*(s.w/2-9),2.5,p[1]*(s.d/2-10)),0.9,fr,g));   // 細い脚
+    [-1,1].forEach(z=>tube(new THREE.Vector3(-(s.w/2-9),11,z*(s.d/2-10)),new THREE.Vector3((s.w/2-9),11,z*(s.d/2-10)),0.8,fr,g));   // 座の下のフレーム
+    casters(g,[[-s.w/2+9,s.d/2-10],[s.w/2-9,s.d/2-10]],2.0);
+    if(withBack){
+      const b=rbox(g,s.w-6,30,14,0,61,-s.d/2+10,fd,6); b.rotation.x=-0.1;   // 独立した四角い背クッション
+    } else {
+      const y=52, zb=-s.d/2+4;                                            // 後ろのバーハンドル（座の上をまたぐ）
+      [-1,1].forEach(x=>tube(new THREE.Vector3(x*(s.w/2-9),40,zb),new THREE.Vector3(x*(s.w/2-9),y,zb),0.9,fr,g));
+      tube(new THREE.Vector3(-(s.w/2-9),y,zb),new THREE.Vector3((s.w/2-9),y,zb),0.9,fr,g);
+    }
+  }
+  NB.spklocker=function(g,s){ // 天白から来る小型のステンレス鍵付きロッカー（暗証番号のスマートロックに改造）
+    const st=M(0xB8BCBF,.35,{metalness:.6}); box(g,s.w,s.h,s.d,0,s.h/2,0,st);
+    box(g,s.w-4,s.h-6,0.6,0,s.h/2,s.d/2+0.3,M(0xA9ADB0,.3,{metalness:.6}));
+    box(g,8,11,1.2,s.w/2-9,s.h*0.62,s.d/2+0.9,M(0x1E1F22,.4)); box(g,5,5,0.4,s.w/2-9,s.h*0.64,s.d/2+1.6,M(0x5FD1B7,.4,{emissive:0x2A8A75,emissiveIntensity:.5})); };
 })();
 
 function buildFurn(spec){
@@ -3106,7 +3147,7 @@ function buildFurn(spec){
     const cap=new THREE.Mesh(new THREE.BoxGeometry(SEAT,4,5),woodM);
     cap.position.set(0, spec.h-2, zTop-3);
     cap.rotation.x=Math.atan2(LEAN, spec.h-LEG); g.add(cap);
-  } else if(spec.chairW){
+  } else if(spec.chairW && !(spec.nb && typeof NB!=='undefined' && NB[spec.nb])){
     /* 木製ハイチェアー（白）：クロームの細脚に、座面から背もたれまで一枚に曲がった成形合板。
        上面は白、裏面と小口は木。背もたれには角丸の横長の穴。 */
     const legM =new THREE.MeshStandardMaterial({color:0xC9CCCE,roughness:.28,metalness:.72});
@@ -3578,7 +3619,7 @@ function addFurn(specId, x, z, rot, silent){
   const spec=PALETTE.find(p=>p.id===specId); if(!spec) return;
   if(spec.qty!=null && furniture.filter(g=>g.userData.spec.id===specId).length>=spec.qty) return; // 保有数の上限
   const g=buildFurn(spec);
-  if(spec.isNew||spec.isIdea){ // 提案の新規品：足元にオレンジの輪／什器以外の仕掛け：青の輪
+  if(false && (spec.isNew||spec.isIdea)){ // （廃止）提案の新規品：足元にオレンジの輪／什器以外の仕掛け：青の輪
     const r=Math.max(spec.w,spec.d)/2+6;
     const ring=new THREE.Mesh(new THREE.RingGeometry(r-4,r,40),
       new THREE.MeshBasicMaterial({color:spec.isIdea?0x3B5B8C:0xE8912D,transparent:true,opacity:.8,side:THREE.DoubleSide,depthWrite:false}));
@@ -3609,7 +3650,7 @@ function addFurn(specId, x, z, rot, silent){
 /* パレットUI */
 const palEl=document.getElementById('palette');
 const CATMAP={
-  hidesk:'机・カウンター', lectern:'机・カウンター', counter:'机・カウンター', roundT:'机・カウンター',
+  hidesk:'机・カウンター', lectern:'机・カウンター', counter:'机・カウンター', roundT:'机・カウンター', spklocker:'収納・掲示',
   stoolB:'チェア・スツール', stoolW:'チェア・スツール',
   cubeBg:'チェア・スツール', cubeOr:'チェア・スツール', cubeBl:'チェア・スツール',
   btR:'チェア・スツール', btB:'チェア・スツール', btG:'チェア・スツール',
@@ -3624,22 +3665,17 @@ const CATMAP={
   anywall:'新規購入（提案）',
   ap01:'新規購入（提案）',
   battery:'新規購入（提案）',
-  bigmon:'新規購入（提案）',
-  copto:'新規購入（提案）',
   corocoro:'新規購入（提案）',
   dt_half:'新規購入（提案）',
   dt_sq:'新規購入（提案）',
   hazel:'新規購入（提案）',
   hemming:'新規購入（提案）',
-  insail:'新規購入（提案）',
   kitchen:'新規購入（提案）',
-  mlounge:'新規購入（提案）',
   pbench:'新規購入（提案）',
   planter:'新規購入（提案）',
   printer:'新規購入（提案）',
   quie:'新規購入（提案）',
   region:'新規購入（提案）',
-  screen:'新規購入（提案）',
   shelfm:'新規購入（提案）',
   signlow:'新規購入（提案）',
   sm107:'新規購入（提案）',
@@ -3651,6 +3687,8 @@ const CATMAP={
   wan:'新規購入（提案）',
   xstadium:'新規購入（提案）',
   magwall:'新規購入（提案）',
+  scrLf:'新規購入（提案）',
+  scrSf:'新規購入（提案）',
   rug:'仕掛け（什器以外・理想像）',
   lamp:'仕掛け（什器以外・理想像）',
   pendant:'仕掛け（什器以外・理想像）',
@@ -5799,5 +5837,235 @@ addEventListener('resize',()=>{
 })();
 </script>
 
+<script>
+const HANDS_ITEMS=[{"s": "anywall", "x": 200, "z": 290, "y": 0, "r": 0, "md": 1}, {"s": "region", "x": 450, "z": 540, "y": 0, "r": 0}, {"s": "cubeBl", "x": 541.8, "z": 564.6, "y": 0, "r": -105.0}, {"s": "cubeOr", "x": 474.6, "z": 631.8, "y": 0, "r": -165.0}, {"s": "cubeOr", "x": 382.8, "z": 607.2, "y": 0, "r": -225.0}, {"s": "cubeOr", "x": 358.2, "z": 515.4, "y": 0, "r": -285.0}, {"s": "cubeBl", "x": 425.4, "z": 448.2, "y": 0, "r": -345.0}, {"s": "cubeBl", "x": 517.2, "z": 472.8, "y": 0, "r": -405.0}, {"s": "pamp", "x": 150, "z": 400, "y": 0, "r": 0}, {"s": "pamp", "x": 150, "z": 480, "y": 0, "r": 0}, {"s": "gb803", "x": 60, "z": 365, "y": 0, "r": 90}, {"s": "gb803", "x": 60, "z": 455, "y": 0, "r": 90}, {"s": "poster", "x": 330, "z": 240, "y": 0, "r": 0}, {"s": "shelfm", "x": 722, "z": 385, "y": 0, "r": 90}, {"s": "pbench", "x": 722, "z": 502, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 620, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 842, "y": 0, "r": 90}, {"s": "pbench", "x": 722, "z": 959, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 1077, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 1299, "y": 0, "r": 90}, {"s": "pbench", "x": 722, "z": 1416, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 1534, "y": 0, "r": 90}, {"s": "planter", "x": 722, "z": 1640, "y": 0, "r": 90}, {"s": "planter", "x": 722, "z": 1760, "y": 0, "r": 90}, {"s": "region", "x": 430, "z": 960, "y": 0, "r": 0}, {"s": "sofa_b", "x": 380, "z": 870, "y": 0, "r": 0}, {"s": "sofa_b", "x": 480, "z": 870, "y": 0, "r": 0}, {"s": "sofa_b", "x": 380, "z": 1050, "y": 0, "r": 180}, {"s": "sofa_b", "x": 480, "z": 1050, "y": 0, "r": 180}, {"s": "anytable", "x": 440, "z": 1297.5, "y": 0, "r": 0}, {"s": "anytable", "x": 440, "z": 1362.5, "y": 0, "r": 180}, {"s": "hemming", "x": 440, "z": 1230, "y": 0, "r": 360.0}, {"s": "hemming", "x": 440, "z": 1430, "y": 0, "r": 180.0}, {"s": "hemming", "x": 352, "z": 1300, "y": 0, "r": 431.2}, {"s": "hemming", "x": 528, "z": 1300, "y": 0, "r": 288.8}, {"s": "hemming", "x": 352, "z": 1360, "y": 0, "r": 108.8}, {"s": "hemming", "x": 528, "z": 1360, "y": 0, "r": 251.2}, {"s": "hidesk", "x": 74, "z": 1070, "y": 0, "r": 0}, {"s": "stoolW", "x": 150, "z": 1040, "y": 0, "r": 270}, {"s": "stoolW", "x": 150, "z": 1100, "y": 0, "r": 270}, {"s": "hidesk", "x": 74, "z": 1676, "y": 0, "r": 0}, {"s": "stoolW", "x": 150, "z": 1646, "y": 0, "r": 270}, {"s": "stoolW", "x": 150, "z": 1706, "y": 0, "r": 270}, {"s": "alku", "x": 70, "z": 680, "y": 0, "r": 90}, {"s": "alku", "x": 70, "z": 790, "y": 0, "r": 90}, {"s": "alku", "x": 70, "z": 1935, "y": 0, "r": 90}, {"s": "alku", "x": 70, "z": 2040, "y": 0, "r": 90}, {"s": "alku", "x": 70, "z": 2250, "y": 0, "r": 90}, {"s": "alku", "x": 70, "z": 2355, "y": 0, "r": 90}, {"s": "soleil", "x": 220, "z": 1960, "y": 0, "r": 0}, {"s": "hazel", "x": 184, "z": 1900, "y": 0, "r": 0}, {"s": "hazel", "x": 256, "z": 1900, "y": 0, "r": 0}, {"s": "hazel", "x": 184, "z": 2020, "y": 0, "r": 180}, {"s": "hazel", "x": 256, "z": 2020, "y": 0, "r": 180}, {"s": "soleil", "x": 480, "z": 1960, "y": 0, "r": 0}, {"s": "hazel", "x": 444, "z": 1900, "y": 0, "r": 0}, {"s": "hazel", "x": 516, "z": 1900, "y": 0, "r": 0}, {"s": "hazel", "x": 444, "z": 2020, "y": 0, "r": 180}, {"s": "hazel", "x": 516, "z": 2020, "y": 0, "r": 180}, {"s": "soleil", "x": 220, "z": 2240, "y": 0, "r": 0}, {"s": "hazel", "x": 184, "z": 2180, "y": 0, "r": 0}, {"s": "hazel", "x": 256, "z": 2180, "y": 0, "r": 0}, {"s": "hazel", "x": 184, "z": 2300, "y": 0, "r": 180}, {"s": "hazel", "x": 256, "z": 2300, "y": 0, "r": 180}, {"s": "soleil", "x": 480, "z": 2240, "y": 0, "r": 0}, {"s": "hazel", "x": 444, "z": 2180, "y": 0, "r": 0}, {"s": "hazel", "x": 516, "z": 2180, "y": 0, "r": 0}, {"s": "hazel", "x": 444, "z": 2300, "y": 0, "r": 180}, {"s": "hazel", "x": 516, "z": 2300, "y": 0, "r": 180}, {"s": "eboard", "x": 690, "z": 2083, "y": 0, "r": -90}, {"s": "scrL", "x": 690, "z": 2290, "y": 0, "r": 90}, {"s": "tatami", "x": 111, "z": 1321, "y": 0, "r": 0}, {"s": "tatami", "x": 193, "z": 1321, "y": 0, "r": 0}, {"s": "tatami", "x": 111, "z": 1403, "y": 0, "r": 0}, {"s": "tatami", "x": 193, "z": 1403, "y": 0, "r": 0}, {"s": "xstadium", "x": 440, "z": 1655, "y": 0, "r": 180}, {"s": "kitchen", "x": 500, "z": 330, "y": 0, "r": 0}, {"s": "rug", "x": 430, "z": 980, "y": 0, "r": 0}, {"s": "wallcal", "x": 506, "z": 2445, "y": 0, "r": 180}, {"s": "tape", "x": 70, "z": 680, "y": 0, "r": 0}, {"s": "tape", "x": 70, "z": 790, "y": 0, "r": 0}, {"s": "tape", "x": 70, "z": 1935, "y": 0, "r": 0}, {"s": "tape", "x": 70, "z": 2040, "y": 0, "r": 0}, {"s": "tape", "x": 70, "z": 2250, "y": 0, "r": 0}, {"s": "tape", "x": 70, "z": 2355, "y": 0, "r": 0}, {"s": "photowall", "x": 719, "z": 2620, "y": 0, "r": 90}, {"s": "wb120", "x": 290, "z": 1300, "y": 0, "r": 90}, {"s": "wb120", "x": 690, "z": 1900, "y": 0, "r": 90}, {"s": "yoko", "x": 620, "z": 560, "y": 0, "r": 90}, {"s": "stoolW", "x": 300, "z": 2427, "y": 0, "r": 0}, {"s": "stoolW", "x": 300, "z": 2427, "y": 13, "r": 0}, {"s": "stoolW", "x": 300, "z": 2427, "y": 26, "r": 0}, {"s": "stoolW", "x": 300, "z": 2427, "y": 39, "r": 0}, {"s": "stoolW", "x": 345, "z": 2427, "y": 0, "r": 0}, {"s": "stoolW", "x": 345, "z": 2427, "y": 13, "r": 0}, {"s": "stoolW", "x": 345, "z": 2427, "y": 26, "r": 0}, {"s": "stoolW", "x": 345, "z": 2427, "y": 39, "r": 0}, {"s": "stoolW", "x": 480, "z": 2427, "y": 0, "r": 0}, {"s": "stoolW", "x": 480, "z": 2427, "y": 13, "r": 0}, {"s": "stoolW", "x": 480, "z": 2427, "y": 26, "r": 0}, {"s": "stoolW", "x": 480, "z": 2427, "y": 39, "r": 0}, {"s": "stoolW", "x": 525, "z": 2427, "y": 0, "r": 0}, {"s": "stoolW", "x": 525, "z": 2427, "y": 13, "r": 0}, {"s": "stoolW", "x": 525, "z": 2427, "y": 26, "r": 0}, {"s": "stoolW", "x": 525, "z": 2427, "y": 39, "r": 0}, {"s": "alku", "x": 235, "z": 430, "y": 0, "r": 90}, {"s": "btR", "x": 300, "z": 400, "y": 0, "r": 0}, {"s": "btB", "x": 548, "z": 920, "y": 0, "r": 0}, {"s": "btR", "x": 548, "z": 1000, "y": 0, "r": 0}, {"s": "btB", "x": 330, "z": 700, "y": 0, "r": 0}, {"s": "btR", "x": 570, "z": 700, "y": 0, "r": 0}, {"s": "btB", "x": 330, "z": 470, "y": 0, "r": 0}, {"s": "btR", "x": 590, "z": 1960, "y": 0, "r": 0}, {"s": "btB", "x": 350, "z": 1960, "y": 0, "r": 0}, {"s": "btR", "x": 590, "z": 2240, "y": 0, "r": 0}, {"s": "btB", "x": 350, "z": 2240, "y": 0, "r": 0}, {"s": "btR", "x": 165, "z": 1500, "y": 0, "r": 0}, {"s": "btB", "x": 215, "z": 1500, "y": 0, "r": 0}, {"s": "btR", "x": 630, "z": 1600, "y": 0, "r": 0}, {"s": "btB", "x": 630, "z": 1700, "y": 0, "r": 0}, {"s": "btR", "x": 270, "z": 1610, "y": 0, "r": 0}, {"s": "btB", "x": 645, "z": 665, "y": 0, "r": 0}, {"s": "alku", "x": 205, "z": 1070, "y": 0, "r": 90}, {"s": "alku", "x": 205, "z": 1676, "y": 0, "r": 90}, {"s": "scrLf", "x": 638, "z": 212, "y": 0, "r": 0}, {"s": "scrLf", "x": 647, "z": 227, "y": 0, "r": 0}, {"s": "scrLf", "x": 638, "z": 242, "y": 0, "r": 0}, {"s": "scrSf", "x": 647, "z": 257, "y": 0, "r": 0}, {"s": "scrSf", "x": 638, "z": 272, "y": 0, "r": 0}, {"s": "scrSf", "x": 647, "z": 287, "y": 0, "r": 0}, {"s": "alku", "x": 636, "z": 372, "y": 0, "r": 0}, {"s": "alku", "x": 646, "z": 394, "y": 0, "r": 0}, {"s": "spklocker", "x": 180, "z": 733, "y": 0, "r": 0}, {"s": "counter", "x": 405, "z": -150, "y": 0, "r": 0}, {"s": "stoolW", "x": 501.3, "z": -188.0, "y": 0, "r": 248.0}, {"s": "stoolW", "x": 444.8, "z": -104.2, "y": 0, "r": 224.0}, {"s": "stoolW", "x": 359.1, "z": -50.7, "y": 0, "r": 200.0}, {"s": "printer", "x": 322, "z": -300, "y": 0, "r": 0}, {"s": "stoolW", "x": 345, "z": -225, "y": 0, "r": 52}, {"s": "magwall", "x": 281, "z": -190, "y": 0, "r": 90}, {"s": "s_logo", "x": 282, "z": -200, "y": 0, "r": 90}, {"s": "b_info", "x": 283, "z": -235, "y": 0, "r": 90}, {"s": "b_cal", "x": 283, "z": -125, "y": 0, "r": 90}, {"s": "b_radio", "x": 283, "z": -125, "y": 0, "r": 90}, {"s": "b_open", "x": 283, "z": -290, "y": 0, "r": 90}, {"s": "b_manual", "x": 283, "z": -200, "y": 0, "r": 90}, {"s": "post", "x": 295, "z": -70, "y": 0, "r": 90}];
+/* ===== shake hands用：タップすると出る説明（音声で話した意図） ===== */
+const HANDS_INFO={
+  sofa_b:{t:'ソファ（コクヨ Any Sofa）',tag:'新しく買う',p:'anysofa',
+    d:'中央カウンターから奥を見たとき、家具が少しずつ高くなるように並べています。キューブ（一番低い）→ このソファ → 台形テーブルと椅子 → X-STADIUM。手前に低いもの、奥ほど高いものを置くと、部屋が広く見えます。',
+    n:'3Dでは重そうに見えますが、実物はキャスター付きで動かせる、かわいらしいソファです。'},
+  region:{t:'ソファの真ん中の低いテーブル（コクヨ Region）',tag:'新しく買う',p:'region',
+    d:'ソファ4台で囲む、広場の真ん中のテーブルです。手前から奥へ高くなる「段々」の2段目。'},
+  rug:{t:'ラグマット（丸い敷物）',tag:'今回の発注には入らない',
+    d:'家具の種類が増えると「これ、どこに置くんだっけ？」となりやすいので、「このラグの上にソファを置く」という目印になります。shakeの「ハイライト」（下の説明）の一つにもなります。',
+    n:'今回は施設部に頼めないので、別の予算か、みんなで作れないかも考えています。'},
+  cube:{t:'キューブ型のスツール（今あるもの）',tag:'今あるもの',
+    d:'入口に一番近い、一番地面に近い席です。自由に動かせて、輪にもなります。ここから奥へ向かって、座る高さが少しずつ上がっていきます。'},
+  bucket:{t:'バケツ型のスツール（オリバー BT STOOL・今あるもの）',tag:'今あるもの',
+    d:'最近入れたものなので、できるだけ生かします。赤と青の16脚を、ポーチ、広場、X-STADIUMの両わき、小上がりのそば、ラボの補助席に散らして、ちょっと腰かける用にします。',
+    n:'全部で30脚。緑の10脚と赤・青の4脚は天白キャンパスで使ってもらう想定です（重ねて片付けられないため）。'},
+  anytable:{t:'台形テーブル（コクヨ Any Table）',tag:'新しく買う',p:'anytable',
+    d:'アクティブラーニングの教室によくある台形のテーブルです。並べ方を変えれば、島にも、輪にもなります。段々の3段目。キャスター付きで動かせます。'},
+  hemming:{t:'背もたれ付きの椅子（コクヨ Hemming）',tag:'新しく買う',p:'hemming',
+    d:'「ハイチェアは座りにくい、ずっといられない」という声が多かったので、床の真ん中は背もたれ付きの普通の高さの椅子にしました。'},
+  xstadium:{t:'階段型の家具（コクヨ X-STADIUM）',tag:'新しく買う',p:'xstadium',
+    d:'この案で一番目を引くものです。ねらいは三つあります。\n① ワーキングスペースを、ラボ側と中央側の二つに自然に分けます。完全な壁ではないので、またいでのぞき込めます。\n② ラボ側から見た背面は、チラシや募集を貼る掲示板になります。\n③ shakeの新しい「ハイライト」（シンボル）になります。',
+    n:'ダブルタップで段を出し入れできます。段は1人で出し入れできますが、本体にキャスターはないので、動かすときはみんなで持ち上げます。'},
+  shelfm:{t:'本の通りの本棚（腰の高さ・キャスター付き）',tag:'新しく買う',
+    d:'今の白い本棚は、動かしにくくて、ワーキングスペースへの「壁」になっていました。一方で「本はアイデアの出どころとして大事」という声もありました。そこで、キャスター付きで背の低い本棚に替えて、「棚・ベンチ・棚」の組にして並べます。背が低いので通路から中をのぞけて、組と組の間は中へ入れる小道になります。',
+    n:'今の白い本棚は廃棄する方向で考えています。本の通りの棚は、コクヨ・内田洋行・オリバー・アイチの中から、腰の高さでキャスター付きのものを見積のときに選びます。'},
+  pbench:{t:'本棚の間のベンチ（内田洋行 Puller ベンチ）',tag:'新しく買う',p:'puller',
+    d:'本棚と本棚の間に置くベンチは「縁側」です。座って中を向いてもいいし、くるっと回って通路側を向いてもいい。これで「壁」の感じがだいぶ薄れます。'},
+  planter:{t:'緑を置けるワゴン（コクヨ Any Wagon）',tag:'新しく買う',p:'anywagon',
+    d:'「緑がほしい」「今のshakeは無機質で、人の気配や居場所感がない」という声から。キャスター付きの小さなワゴンを本の通りの奥に置き、上のトレーに植物（フェイクグリーンでも）を後から置けるようにしています。下の箱に何を入れるかは、みんなで決めたいところです。',
+    n:'植物そのものは今回の発注に入らないので、必要になったときに別の予算で。'},
+  soleil:{t:'ラボのテーブル（コクヨ Any Table 角形）',tag:'新しく買う',p:'anytable',
+    d:'プロジェクトルームに近い側を、グループでプロジェクトを進めやすい「ラボ」にします。テーブル（W1500×D750・2本キャスター脚）の長い辺に椅子を2脚ずつ、計4脚。プロジェクトルームから物を出して、すぐ近くで作業できます。キャスター付きで動かせます。',
+    n:'写真は同じシリーズの台形タイプ。ラボでは長方形（角形）を使います。'},
+  hazel:{t:'ラボの椅子（内田洋行 Hazel）',tag:'新しく買う',p:'hazel',
+    d:'ラボで長く作業できるように、キャスター付きで座りやすい椅子にしています。'},
+  eboard:{t:'電子黒板（今あるもの）',tag:'今あるもの',
+    d:'ラボに置いて、グループ作業で使います。'},
+  battery:{t:'電源タワー（内田洋行 Puller 止まり木ワイヤリングタワー）',tag:'新しく買う',p:'pullertower',
+    d:'ラボのどこでもパソコンが充電できるように。'},
+  scrL:{t:'ホワイトボードのスクリーン2連（今あるもの）',tag:'今あるもの',
+    d:'1台はラボの東側で、仕切りとホワイトボードを兼ねます。残りの6台（大3・小3）は、たたんで入口東の「ボード置き場」に並べておき、イベントや作業のときに広げて使います。'},
+  curtain:{t:'透明のカーテン（今あるもの）',tag:'今あるもの',
+    d:'実はあるのに、この10年ほとんど使われていません。せっかくあるなら使おう、という発想でラボを作りました。閉めると、ラボが一つの部屋のようになります。'},
+  hidesk:{t:'窓向きの一人の席（今あるハイデスク）',tag:'今あるもの',
+    d:'中央にいきなり座るのはプレッシャーです。人は壁際・窓際から座っていきます（飯田さんの「エッジ」の話）。そこで、窓際の柱と柱の間に、今のハイデスクを窓向きに置きました。一人でも二人でも座れます。',
+    n:'数は2か所だけ。shakeはコラボを優先したいので少なめにしています。一人でいたいならカフェゾーンの窓際もあります。ここは迷っているところです。今あるハイデスクを生かしている、という意味もあります。'},
+  stool:{t:'ハイチェア（今あるもの）',tag:'今あるもの',
+    d:'窓向きの席と、中央カウンター用に使います。'},
+  stack:{t:'積んだハイチェア（イベントの予備）',tag:'今あるもの',
+    d:'ハイチェアは全部捨てず、白い16脚を4脚ずつ積んで、プロジェクトルーム前の壁ぎわ（入口をよけた2か所）に置いておきます。白い壁になじみ、窓際の1人席もそのまま残せます。大きなイベントで椅子が足りないときに出します。'},
+  tatami:{t:'小上がり（キャスター付きの畳の台）',tag:'新しく買う',p:'tatami',
+    d:'今は4面パネルの裏で、キューブを並べて寝そべるのが一番人気です。居心地はいい一方で、外から何をしているか見えず、近寄りがたい面もありました。「ない方がいい」と「あった方がいい」の両方を取って、用意はするけれど、窓際のもう少しオープンな場所に置きます。靴を脱いで上がれます。'},
+  alku:{t:'ホワイトボード（今あるもの）',tag:'今あるもの',
+    d:'今あるホワイトボードは捨てずに全部shakeで使います。掲示用は入口まわり、作業用はラボの窓際、1人席の背中側にも。使っていないものは入口東の「ボード置き場」に並べておき、使うときに持っていって、ここへ戻します。'},
+  gb803:{t:'チラシ・募集のボード（今あるもの）',tag:'今あるもの',
+    d:'もともとの「アイデアエクスチェンジスペース」の考え方はそのまま。団体やイベントの情報をここに集めて、入ってきた人を奥へいざなう最初のきっかけにします。'},
+  pamp:{t:'パンフレットスタンド（今あるもの）',tag:'今あるもの',
+    d:'チラシコーナーにまとめます。'},
+  poster:{t:'shakeのポスタースタンド（今あるもの）',tag:'今あるもの',
+    d:'入口に、もとからあるポスタースタンドにshakeのポスターを貼って立てます。'},
+  anywall:{t:'企画展示の壁（コクヨ Any Wall）',tag:'新しく買う',p:'anywall',
+    d:'入口の近くで、月替わりの企画展示や、書ける面として使います。'},
+  spklocker:{t:'スピーカーマイクのロッカー（天白から）',tag:'天白からもらう',
+    d:'今はワイヤレスのスピーカーマイクの電源やマイクが4面パネルの背面の中にあって、その鍵を別の棟の防災センターまで借りに行かなければいけません。天白から小さな鍵付きロッカーをもらえることになったので、暗証番号で開くスマートロックに改造中です。番号を知っていれば、自分たちで出して音を出せます。'},
+  counter:{t:'中央カウンター（今あるもの）',tag:'今あるもの',
+    d:'相談窓口、情報の掲示、たまり場…いろんな機能を集めたい場所です。人の配置や物品管理のルールは、まだ残っている課題です。shake専用のアプリでここを支えることも考えています。'},
+  roundT:{t:'プロジェクトルーム1',tag:'今回は触らない',
+    d:'いずれラジオブースにしたい部屋です。専用の机や椅子は、みんなともう少し話してから（来年度以降）。今回は何も置きません。'},
+  kitchen:{t:'動かせるコーヒー台（コクヨ Any Table ハイカウンター）',tag:'新しく買う',p:'anytable',
+    d:'人が集まるきっかけとしての「飲み物」。立ったまま気軽に寄れる高さ（H1000）で、キャスター付きなのでイベントのときは受付台にもなります。',
+    n:'写真は同じシリーズの台形タイプ。ハイカウンターは W1200×D600×H1000 です。'},
+  photowall:{t:'写真の壁',tag:'仕掛け',d:'shakeの人たちや活動の記録を、通路から見える面に。'},
+  wallcal:{t:'大きな月間カレンダー',tag:'仕掛け',d:'今月なにがあるかが、一目で分かるように。'},
+  tape:{t:'床の定位置テープ',tag:'仕掛け',d:'「動かしたら戻す」ための目印。'}
+};
+const HANDS_ZONES=[
+  {x0:0,x1:264,z0:2464,z1:2708,t:'プロジェクトルーム1',d:'いずれラジオブースにしたい部屋。今回は新しい家具は入れません。'},
+  {x0:276,x1:456,z0:2464,z1:2786,t:'プロジェクトルーム2',d:'今回は触りません。何に使うかは、みんなともう少し話してから。'},
+  {x0:468,x1:636,z0:2464,z1:2786,t:'プロジェクトルーム3（物置）',d:'物置にすると決めた部屋です。予備のテーブルと、使わないホワイトボードを入れておきます。'},
+  {x0:0,x1:720,z0:1782,z1:2452,t:'ラボ',k:'soleil'},
+  {x0:0,x1:110,z0:1250,z1:1470,t:'小上がり',k:'tatami'},
+  {x0:300,x1:620,z0:1520,z1:1782,t:'X-STADIUMのまわり',k:'xstadium'},
+  {x0:300,x1:620,z0:1150,z1:1520,t:'工房',k:'anytable'},
+  {x0:300,x1:620,z0:760,z1:1150,t:'広場',k:'sofa_b'},
+  {x0:660,x1:780,z0:250,z1:1800,t:'本の通り',k:'shelfm'},
+  {x0:0,x1:700,z0:150,z1:640,t:'ポーチ（アイデアエクスチェンジ）',k:'gb803'},
+  {x0:0,x1:900,z0:-450,z1:150,t:'中央カウンター',k:'counter'}
+];
+const HANDS_HIGHLIGHT='「ハイライト」は、飯田美樹さん（PLATFORUM 2024の基調講演）が紹介した、人が惹かれる場所の7つのルールの一つ「ハイライトの周りにアクティビティを凝縮させる」から。ハイライトは、その場所の名前を聞いたとき心に浮かぶもの。今のshakeでは4面パネルがそれですが、劣化して役目を果たせていません。';
+const HANDS_SRC={
+  anysofa:['コクヨ','https://www.kokuyo.com/en/furniture/seating/stools/anysofa/'],
+  xstadium:['コクヨ','https://www.kokuyo.com/furniture/category/chair-sofa/otherchair/xstadium/'],
+  anytable:['コクヨ','https://www.kokuyo.com/furniture/category/desk-table/meetingtable-cafetable/anytable/'],
+  anywall:['コクヨ','https://www.kokuyo.com/furniture/category/storage/shelves-rack/anywall/'],
+  hemming:['コクヨ','https://www.kokuyo.com/furniture/category/chair-sofa/meetingchair-cafechair/hemming/'],
+  region:['コクヨ','https://www.kokuyo-furniture.co.jp/manabi/products/region/'],
+  pullertower:['内田洋行','https://office.uchida.co.jp/products/puller/'],
+  puller:['内田洋行','https://office.uchida.co.jp/products/puller/'],
+  hazel:['内田洋行','https://office.uchida.co.jp/products/hazel/'],
+  tatami:['オリバー','https://www.oliverinc.co.jp/products/detail?id=SSW842AKY'],
+  anywagon:['コクヨ','https://www.kokuyo.com/furniture/category/storage/wagon/anywagon/']
+};
+
+/* ===== shake hands用の見学モード（?hands で開く） =====
+   ・音声で説明した配置案を読み込む（この端末に保存している配置は上書きしない）
+   ・家具は動かせない。タップすると、実物の写真と「なぜここに置いたか」が出る
+   ・家具のない床をタップすると、その場所（ゾーン）の説明が出る */
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(!q.has('hands')) return;
+  window.HANDS_MODE=true;
+  document.body.classList.add('hands');
+  try{ save=function(){}; }catch(_){}                    // 見学モードでは端末の保存を書き換えない
+  const css=document.createElement('style');
+  css.textContent=`
+  body.hands #panel,body.hands #hint,body.hands #guide{display:none!important}
+  #hcard{position:fixed;z-index:60;right:16px;top:calc(var(--topH,52px) + 24px);width:min(380px,calc(100vw - 32px));
+    max-height:calc(100% - var(--topH,52px) - 48px);overflow:auto;background:#fff;border:1px solid #D8DDD2;border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.18);padding:14px 16px 16px;display:none;font-size:14px;line-height:1.7;color:#26312A}
+  #hcard.on{display:block}
+  #hcard .tg{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:#E4F1E2;color:#2E7D32;margin-bottom:6px}
+  #hcard .tg.old{background:#EEF0EC;color:#5C6B60}
+  #hcard h3{font-size:16px;margin:0 28px 8px 0;line-height:1.4}
+  #hcard img{width:100%;border-radius:10px;margin:4px 0 4px;display:block;background:#f4f4f2}
+  #hcard .cr{font-size:11px;color:#5C6B60;margin-bottom:8px}
+  #hcard .cr a{color:#2E7D32}
+  #hcard p{margin:6px 0;white-space:pre-line}
+  #hcard .n{font-size:12.5px;color:#5C6B60;background:#F6F7F3;border-radius:8px;padding:8px 10px;margin-top:8px}
+  #hcard .x{position:absolute;right:10px;top:8px;border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:#5C6B60;padding:4px 8px}
+  #hbanner{position:fixed;z-index:59;left:50%;transform:translateX(-50%);bottom:18px;width:min(560px,calc(100vw - 32px));
+    background:rgba(38,49,42,.92);color:#F2F5EF;border-radius:12px;padding:10px 40px 10px 14px;font-size:13px;line-height:1.6}
+  #hbanner b{color:#fff}
+  #hbanner .x{position:absolute;right:8px;top:6px;border:0;background:none;color:#F2F5EF;font-size:20px;cursor:pointer;padding:2px 6px}
+  @media (max-width:700px){ #hcard{right:8px;left:8px;width:auto;top:auto;bottom:8px;max-height:62vh} }`;
+  document.head.appendChild(css);
+
+  // 配置を読み込む（全部ロックして動かせないようにする）
+  restore(HANDS_ITEMS.map(f=>Object.assign({},f,{lk:1})));
+  refreshPalette && refreshPalette();
+
+  const card=document.createElement('div'); card.id='hcard'; document.body.appendChild(card);
+  const ban=document.createElement('div'); ban.id='hbanner';
+  ban.innerHTML='<b>shake handsのみなさんへ</b>　音声で説明した配置案です。家具や場所を<b>タップ</b>すると、実物の写真と、そこに置いた理由が出ます。階段型の家具はダブルタップで段を出し入れできます。左上の「見え方」で、新しく買うもの／今あるものを切り替えられます。<button class="x" aria-label="閉じる">×</button>';
+  document.body.appendChild(ban);
+  ban.querySelector('.x').onclick=()=>ban.remove();
+  setTimeout(()=>{ try{ flyTo([360,165,80],[450,70,1500]); }catch(_){} },400);   // 中央カウンターから奥を望む
+
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  function show(info,title){
+    if(!info) return;
+    const old=/今あるもの|天白|触らない/.test(info.tag||'');
+    let h=`<button class="x" aria-label="閉じる">×</button>`;
+    if(info.tag) h+=`<span class="tg${old?' old':''}">${esc(info.tag)}</span>`;
+    h+=`<h3>${esc(title||info.t)}</h3>`;
+    if(info.p){ const src=HANDS_SRC[info.p];
+      h+=`<img src="photos/${info.p}.jpg" alt="${esc(info.t)}の写真" onerror="this.remove()">`;
+      if(src) h+=`<div class="cr">写真：${esc(src[0])}の製品ページより（shake handsでの検討用）　<a href="${src[1]}" target="_blank" rel="noopener">製品ページ</a></div>`; }
+    if(title && title!==info.t) h+=`<p><b>${esc(info.t)}</b></p>`;
+    h+=`<p>${esc(info.d||'')}</p>`;
+    if(info.n) h+=`<div class="n">${esc(info.n)}</div>`;
+    if(info.hl) h+=`<div class="n">${esc(HANDS_HIGHLIGHT)}</div>`;
+    card.innerHTML=h; card.classList.add('on');
+    card.querySelector('.x').onclick=()=>card.classList.remove('on');
+  }
+  HANDS_INFO.xstadium.hl=true;
+  const KEY=id=>({cubeOr:'cube',cubeBl:'cube',cubeBg:'cube',btR:'bucket',btB:'bucket',btG:'bucket',
+     ap01:'hemming',wan:'hemming',wb120:'alku',yoko:'alku',scrS:'scrL',scrLf:'scrL',scrSf:'scrL',sofa_n:'sofa_b',
+     printer:'counter',magwall:'counter',s_logo:'counter',b_info:'counter',b_cal:'counter',b_radio:'counter',
+     b_open:'counter',b_manual:'counter',post:'counter',chairWL:'roundT'}[id]||id);
+
+
+  // ===== 既存／新規の切り替え（ボタンをタップするたびに 全部 → 新しく買うもの → 今あるもの → 全部） =====
+  const NEWSET=sp=>!!(sp && (sp.isNew||sp.isIdea));
+  const css2=document.createElement('style');
+  css2.textContent=`#hsw{position:fixed;z-index:58;left:12px;top:calc(var(--topH,52px) + 12px);display:flex;flex-direction:column;gap:4px;
+    background:rgba(255,255,255,.95);border:1px solid #D8DDD2;border-radius:12px;padding:8px;box-shadow:0 4px 14px rgba(0,0,0,.12);font-size:13px}
+  #hsw button{border:1px solid #CBD3C6;background:#fff;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer;text-align:left;color:#26312A}
+  #hsw button.on{background:#2E7D32;border-color:#2E7D32;color:#fff;font-weight:700}
+  #hsw .lb{font-size:11px;color:#5C6B60;padding:0 2px}`;
+  document.head.appendChild(css2);
+  const sw=document.createElement('div'); sw.id='hsw';
+  sw.innerHTML='<div class="lb">見え方</div><button data-m="0" class="on">すべて</button><button data-m="1">新しく買うもの</button><button data-m="2">今あるもの</button>';
+  document.body.appendChild(sw);
+  function ghost(g,on){
+    g.traverse(o=>{
+      if(!o.isMesh || !o.material) return;
+      if(on){
+        if(!o.userData._orig){ o.userData._orig=o.material;
+          const mk=m=>{ const c=m.clone(); c.transparent=true; c.opacity=Math.min(m.opacity??1,0.16); c.depthWrite=false; return c; };
+          o.userData._ghost=Array.isArray(o.material)? o.material.map(mk) : mk(o.material); }
+        o.material=o.userData._ghost; o.castShadow=false;
+      } else if(o.userData._orig){ o.material=o.userData._orig; o.castShadow=!o.userData.noShadow; }
+    });
+  }
+  window.handsView=function(m){
+    furnGroup.children.forEach(g=>{ const n=NEWSET(g.userData.spec); ghost(g, (m===1 && !n) || (m===2 && n)); });
+    sw.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.m===m));
+    try{ renderer.render(scene,camera); }catch(_){}
+  };
+  sw.querySelectorAll('button').forEach(b=>b.onclick=e=>{ e.stopPropagation(); handsView(+b.dataset.m); });
+
+  let down=null;
+  addEventListener('pointerdown',e=>{ down={x:e.clientX,y:e.clientY,t:performance.now()}; },true);
+  addEventListener('pointerup',e=>{
+    if(!down) return; const d=down; down=null;
+    if(e.target.closest && (e.target.closest('#hcard')||e.target.closest('#hbanner')||e.target.closest('#hsw')||e.target.closest('#topbar'))) return;
+    if(Math.hypot(e.clientX-d.x,e.clientY-d.y)>6 || performance.now()-d.t>600) return;   // ドラッグ（視点操作）は無視
+    if(typeof walkMode!=='undefined' && walkMode) {}
+    ptrPos(e); ray.setFromCamera(ptr,camera);
+    const hits=ray.intersectObjects(furnGroup.children.filter(c=>c.visible),true);
+    if(hits.length){
+      let g=hits[0].object; while(g.parent!==furnGroup) g=g.parent;
+      let k=KEY(g.userData.spec.id);
+      if((k==='stoolW'||k==='stoolB')) k=(g.position.y>1||g.position.z>2400)?'stack':'stool';
+      if(HANDS_INFO[k]){ show(HANDS_INFO[k]); return; }
+    }
+    const hc=ray.intersectObjects([curtain],true);
+    if(hc.length){ show(HANDS_INFO.curtain); return; }
+    const p=new THREE.Vector3();
+    if(ray.ray.intersectPlane(dragPlane,p)){
+      const z=HANDS_ZONES.find(z=>p.x>=z.x0&&p.x<=z.x1&&p.z>=z.z0&&p.z<=z.z1);
+      if(z){ if(z.k) show(HANDS_INFO[z.k],z.t); else show({t:z.t,d:z.d,tag:'場所'}); return; }
+    }
+    card.classList.remove('on');
+  },true);
+})();
+
+</script>
 </body>
 </html>
