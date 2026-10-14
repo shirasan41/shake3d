@@ -2565,7 +2565,7 @@ const PALETTE=[
   {id:'kitchen', name:'【新】KOKUYO Any Table ハイカウンター W1200×D600×H1000（コーヒー台）', w:120, d:60, h:100, color:0xD9C3A5, qty:9, isNew:true, nb:'kitchen', nb:'kitchen'},
   {id:'pbench', name:'【新】内田洋行 Puller ベンチ', w:120, d:40, h:47, color:0xB9862E, qty:99, isNew:true, nb:'pbench', nb:'pbench'},
   {id:'planter', name:'【新】KOKUYO Any Wagon 2段（上に植物を後から）', w:44, d:30, h:72, color:0xEFEDE7, qty:99, isNew:true, nb:'planter', nb:'planter'},
-  {id:'printer', name:'印刷機（既存の複合機）', w:70, d:60, h:95, color:0xB9BBB8, qty:9, isNew:true, nb:'printer', nb:'printer'},
+  {id:'printer', name:'印刷機（既存の複合機）', w:70, d:60, h:95, color:0xB9BBB8, qty:9, nb:'printer', nb:'printer'},
   {id:'quie', name:'【新】内田洋行 Quie S（1人用ブース）', w:120, d:120, h:200, color:0xD9C3A5, qty:99, isNew:true, nb:'quie', nb:'quie'},
   {id:'region', name:'【新】KOKUYO Region 円形ローテーブル φ900', w:90, d:90, h:45, color:0xD2B48A, qty:99, isNew:true, nb:'region', nb:'region'},
   {id:'shelfm', name:'【新】KOKUYO Any Wall 棚仕様（可動本棚）', w:110, d:45, h:100, color:0xEFEDE7, qty:99, isNew:true, nb:'shelfm', nb:'shelfm'},
@@ -2574,7 +2574,7 @@ const PALETTE=[
   {id:'sofa_b', name:'【新】KOKUYO Any Sofa 背あり', w:65, d:68, h:77, color:0xCDBFAA, qty:99, isNew:true, nb:'sofa_b', nb:'sofa_b'},
   {id:'sofa_n', name:'【新】KOKUYO Any Sofa 背なし', w:65, d:68, h:52, color:0xC0643E, qty:99, isNew:true, nb:'sofa_n', nb:'sofa_n'},
   {id:'soleil', name:'【新】KOKUYO Any Table 角形 W1500×D750（ラボ）', w:150, d:75, h:72, color:0xF4F4F2, qty:99, isNew:true, nb:'soleil', nb:'soleil'},
-  {id:'tatami', name:'【新】オリバー S・SW-842A 収納付畳システム', w:82, d:82, h:31, color:0xC7C19A, qty:99, isNew:true, nb:'tatami', nb:'tatami'},
+  {id:'tatami', name:'【新】オリバー S・SW-842A 収納付畳システム', w:82, d:82, h:37, color:0xC7C19A, qty:99, isNew:true, nb:'tatami', nb:'tatami'},
   {id:'wallbook', name:'【新】壁面本棚（製品未定）', w:200, d:30, h:180, color:0xC9A97A, qty:9, isNew:true, nb:'wallbook', nb:'wallbook'},
   {id:'wan', name:'【新】ITOKI ワンチェア 木脚', w:52, d:54, h:77, color:0xD9C3A5, qty:99, chairW:true, seatW:46, seatD:44, legH:42, backH:35, stackH:10, isNew:true, nb:'wan', nb:'wan'},
   {id:'xstadium', name:'【新】KOKUYO X-STADIUM', w:300, d:235, h:105, color:0xD9C3A5, qty:99, isNew:true, nb:'xstadium', modes:['STADIUM 展開','SOFA 半分','+SPACE 収納'], nb:'xstadium', modes:['STADIUM 展開','SOFA 半分','+SPACE 収納']},
@@ -2831,7 +2831,7 @@ const NB=(()=>{
       [-1,1].forEach(x=>{ box(g,4,5,s.d,x*(W/2-4),4.5,0,bk); box(g,4,6,4,x*(W/2-4),8,0,bk); [-1,1].forEach(z=>cyl(g,2.6,2.6,3,x*(W/2-4),2.6,z*(s.d/2-4),bk,10)); }); },
     yogibo(g,s){ // 今あるYogibo Mini（青）：形がくずれて、ただの大きなビーズクッションになったもの。平たくつぶれた丸いかたまり
       const m=M(0x2F5C9E,.95);
-      const a=new THREE.Mesh(new THREE.SphereGeometry(1,20,14),m); a.scale.set(s.w/2,s.h/2,s.d/2); a.position.y=s.h/2-2; g.add(a);
+      const a=new THREE.Mesh(new THREE.SphereGeometry(1,20,14),m); a.scale.set(s.w/2,s.h/2,s.d/2); a.position.y=s.h/2; g.add(a);
       const b=new THREE.Mesh(new THREE.SphereGeometry(1,16,12),m); b.scale.set(s.w*0.3,s.h*0.42,s.d*0.32); b.position.set(-s.w*0.12,s.h*0.62,-s.d*0.18); g.add(b);
       const c=new THREE.Mesh(new THREE.SphereGeometry(1,14,10),M(0x284F8A,.95)); c.scale.set(s.w*0.2,s.h*0.25,s.d*0.2); c.position.set(s.w*0.22,s.h*0.35,s.d*0.2); g.add(c); },
     scrLf(g,s){ this.scrfold(g,s); }, scrSf(g,s){ this.scrfold(g,s); },
@@ -3997,11 +3997,9 @@ function applySnap(g){
         y=Math.max(y,o.position.y+13);
       }
     }
-    if(spec.bucket&&os.bucket){                 // バケツ型もスタッキング
-      if(adx<16&&adz<16){
-        g.position.x=o.position.x; g.position.z=o.position.z;
-        y=Math.max(y,o.position.y+10);
-      }
+    // バケツ型（オリバー BT STOOL）は重ねられないので積まない（10/15 白川さん確認）
+    if(spec.id==='yogibo'&&os.id==='tatami'&&adx<os.w/2&&adz<os.d/2){   // ビーズクッションは小上がり（畳の台）の上に載る
+      y=Math.max(y,o.position.y+os.h);
     }
   }
   g.position.y=y;
@@ -4147,7 +4145,8 @@ function checkCollisions(){
   const bb=new THREE.Box3(), zoneHot=[false,false,false];
   furniture.forEach(g=>{ if(!g.visible) return; bb.setFromObject(g);   // 通路帯（配置不可）に掛かったら赤＋帯を点灯
     NOPLACE.forEach((r,i)=>{
-      if(bb.max.x>r[0]&&bb.min.x<r[2]&&bb.max.z>r[1]&&bb.min.z<r[3]){ g.userData.hit=true; zoneHot[i]=true; }
+      const cx=(bb.min.x+bb.max.x)/2, cz=(bb.min.z+bb.max.z)/2;   // 少しはみ出す程度は警告しない：家具の中心が通路帯に入ったときだけ赤くする（10/15）
+      if(cx>r[0]&&cx<r[2]&&cz>r[1]&&cz<r[3]){ g.userData.hit=true; zoneHot[i]=true; }
     }); });
   hotZones.forEach((h,i)=>h.visible=zoneHot[i]);
   furniture.forEach(g=>{ if(!isSel(g)) highlight(g, g.userData.hit?0xC62828:0x000000); });
@@ -5841,7 +5840,7 @@ addEventListener('resize',()=>{
 </script>
 
 <script>
-const HANDS_ITEMS=[{"s": "anywall", "x": 200, "z": 290, "y": 0, "r": 0, "md": 1}, {"s": "region", "x": 450, "z": 540, "y": 0, "r": 0}, {"s": "cubeBl", "x": 541.8, "z": 564.6, "y": 0, "r": -105.0}, {"s": "cubeOr", "x": 474.6, "z": 631.8, "y": 0, "r": -165.0}, {"s": "cubeOr", "x": 382.8, "z": 607.2, "y": 0, "r": -225.0}, {"s": "cubeOr", "x": 358.2, "z": 515.4, "y": 0, "r": -285.0}, {"s": "cubeBl", "x": 425.4, "z": 448.2, "y": 0, "r": -345.0}, {"s": "cubeBl", "x": 517.2, "z": 472.8, "y": 0, "r": -405.0}, {"s": "poster", "x": 330, "z": 240, "y": 0, "r": 0}, {"s": "shelfm", "x": 722, "z": 385, "y": 0, "r": 90}, {"s": "pbench", "x": 722, "z": 502, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 620, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 842, "y": 0, "r": 90}, {"s": "pbench", "x": 722, "z": 959, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 1077, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 1299, "y": 0, "r": 90}, {"s": "pbench", "x": 722, "z": 1416, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 1534, "y": 0, "r": 90}, {"s": "planter", "x": 722, "z": 1640, "y": 0, "r": 90}, {"s": "planter", "x": 722, "z": 1760, "y": 0, "r": 90}, {"s": "region", "x": 430, "z": 891, "y": 0, "r": 0}, {"s": "sofa_b", "x": 380, "z": 801, "y": 0, "r": 0}, {"s": "sofa_b", "x": 480, "z": 801, "y": 0, "r": 0}, {"s": "sofa_b", "x": 380, "z": 981, "y": 0, "r": 180}, {"s": "sofa_b", "x": 480, "z": 981, "y": 0, "r": 180}, {"s": "anytable", "x": 440, "z": 1296, "y": 0, "r": 0}, {"s": "anytable", "x": 440, "z": 1364, "y": 0, "r": 180}, {"s": "hemming", "x": 440, "z": 1230, "y": 0, "r": 360.0}, {"s": "hemming", "x": 440, "z": 1430, "y": 0, "r": 180.0}, {"s": "hemming", "x": 352, "z": 1300, "y": 0, "r": 431.2}, {"s": "hemming", "x": 528, "z": 1300, "y": 0, "r": 288.8}, {"s": "hemming", "x": 352, "z": 1360, "y": 0, "r": 108.8}, {"s": "hemming", "x": 528, "z": 1360, "y": 0, "r": 251.2}, {"s": "hidesk", "x": 74, "z": 1070, "y": 0, "r": 0}, {"s": "stoolW", "x": 150, "z": 1040, "y": 0, "r": 270}, {"s": "stoolW", "x": 150, "z": 1100, "y": 0, "r": 270}, {"s": "alku", "x": 70, "z": 680, "y": 0, "r": 90}, {"s": "alku", "x": 70, "z": 790, "y": 0, "r": 90}, {"s": "soleil", "x": 270, "z": 1940, "y": 0, "r": 0}, {"s": "hazel", "x": 234, "z": 1880, "y": 0, "r": 0}, {"s": "hazel", "x": 306, "z": 1880, "y": 0, "r": 0}, {"s": "hazel", "x": 234, "z": 2000, "y": 0, "r": 180}, {"s": "hazel", "x": 306, "z": 2000, "y": 0, "r": 180}, {"s": "soleil", "x": 510, "z": 1940, "y": 0, "r": 0}, {"s": "hazel", "x": 474, "z": 1880, "y": 0, "r": 0}, {"s": "hazel", "x": 546, "z": 1880, "y": 0, "r": 0}, {"s": "hazel", "x": 474, "z": 2000, "y": 0, "r": 180}, {"s": "hazel", "x": 546, "z": 2000, "y": 0, "r": 180}, {"s": "soleil", "x": 270, "z": 2270, "y": 0, "r": 0}, {"s": "hazel", "x": 234, "z": 2210, "y": 0, "r": 0}, {"s": "hazel", "x": 306, "z": 2210, "y": 0, "r": 0}, {"s": "hazel", "x": 234, "z": 2330, "y": 0, "r": 180}, {"s": "hazel", "x": 306, "z": 2330, "y": 0, "r": 180}, {"s": "soleil", "x": 510, "z": 2270, "y": 0, "r": 0}, {"s": "hazel", "x": 474, "z": 2210, "y": 0, "r": 0}, {"s": "hazel", "x": 546, "z": 2210, "y": 0, "r": 0}, {"s": "hazel", "x": 474, "z": 2330, "y": 0, "r": 180}, {"s": "hazel", "x": 546, "z": 2330, "y": 0, "r": 180}, {"s": "eboard", "x": 158, "z": 2147, "y": 0, "r": 90}, {"s": "scrL", "x": 690, "z": 2290, "y": 0, "r": 90}, {"s": "tatami", "x": 111, "z": 1321, "y": 0, "r": 0}, {"s": "tatami", "x": 193, "z": 1321, "y": 0, "r": 0}, {"s": "tatami", "x": 111, "z": 1403, "y": 0, "r": 0}, {"s": "tatami", "x": 193, "z": 1403, "y": 0, "r": 0}, {"s": "xstadium", "x": 440, "z": 1655, "y": 0, "r": 180}, {"s": "kitchen", "x": 500, "z": 330, "y": 0, "r": 0}, {"s": "rug", "x": 430, "z": 891, "y": 0, "r": 0}, {"s": "wallcal", "x": 118, "z": 263, "y": 0, "r": 90}, {"s": "tape", "x": 70, "z": 680, "y": 0, "r": 0}, {"s": "tape", "x": 70, "z": 790, "y": 0, "r": 0}, {"s": "photowall", "x": 719, "z": 2620, "y": 0, "r": 90}, {"s": "wb120", "x": 290, "z": 1300, "y": 0, "r": 90}, {"s": "wb120", "x": 690, "z": 1900, "y": 0, "r": 90}, {"s": "yoko", "x": 620, "z": 560, "y": 0, "r": 90}, {"s": "stoolW", "x": 32, "z": 55, "y": 0, "r": 0}, {"s": "stoolW", "x": 32, "z": 55, "y": 13, "r": 0}, {"s": "stoolW", "x": 32, "z": 55, "y": 26, "r": 0}, {"s": "stoolW", "x": 32, "z": 55, "y": 39, "r": 0}, {"s": "stoolW", "x": 77, "z": 55, "y": 0, "r": 0}, {"s": "stoolW", "x": 77, "z": 55, "y": 13, "r": 0}, {"s": "stoolW", "x": 77, "z": 55, "y": 26, "r": 0}, {"s": "stoolW", "x": 77, "z": 55, "y": 39, "r": 0}, {"s": "stoolW", "x": 32, "z": 100, "y": 0, "r": 0}, {"s": "stoolW", "x": 32, "z": 100, "y": 13, "r": 0}, {"s": "stoolW", "x": 32, "z": 100, "y": 26, "r": 0}, {"s": "stoolW", "x": 32, "z": 100, "y": 39, "r": 0}, {"s": "stoolW", "x": 77, "z": 100, "y": 0, "r": 0}, {"s": "stoolW", "x": 77, "z": 100, "y": 13, "r": 0}, {"s": "stoolW", "x": 77, "z": 100, "y": 26, "r": 0}, {"s": "stoolW", "x": 77, "z": 100, "y": 39, "r": 0}, {"s": "gb803", "x": 60, "z": 345, "y": 0, "r": 90}, {"s": "gb803", "x": 60, "z": 399, "y": 0, "r": 90}, {"s": "pamp", "x": 62, "z": 470, "y": 0, "r": 90}, {"s": "pamp", "x": 62, "z": 172, "y": 0, "r": 90}, {"s": "btR", "x": 300, "z": 2492, "y": 0, "r": 0}, {"s": "btR", "x": 300, "z": 2540, "y": 0, "r": 0}, {"s": "btR", "x": 300, "z": 2588, "y": 0, "r": 0}, {"s": "btR", "x": 300, "z": 2636, "y": 0, "r": 0}, {"s": "btR", "x": 300, "z": 2684, "y": 0, "r": 0}, {"s": "btR", "x": 300, "z": 2732, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2492, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2540, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2588, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2636, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2684, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2732, "y": 0, "r": 0}, {"s": "btR", "x": 410, "z": 2620, "y": 0, "r": 0}, {"s": "btR", "x": 410, "z": 2668, "y": 0, "r": 0}, {"s": "btB", "x": 410, "z": 2716, "y": 0, "r": 0}, {"s": "btB", "x": 410, "z": 2764, "y": 0, "r": 0}, {"s": "hidesk", "x": 74, "z": 1990, "y": 0, "r": 0}, {"s": "stoolW", "x": 150, "z": 1960, "y": 0, "r": 270}, {"s": "stoolW", "x": 150, "z": 2020, "y": 0, "r": 270}, {"s": "alku", "x": 60, "z": 1610, "y": 0, "r": 0}, {"s": "alku", "x": 63, "z": 1626, "y": 0, "r": 0}, {"s": "alku", "x": 60, "z": 1642, "y": 0, "r": 0}, {"s": "alku", "x": 63, "z": 1658, "y": 0, "r": 0}, {"s": "alku", "x": 60, "z": 1674, "y": 0, "r": 0}, {"s": "scrLf", "x": 61, "z": 1690, "y": 0, "r": 0}, {"s": "scrLf", "x": 58, "z": 1706, "y": 0, "r": 0}, {"s": "scrLf", "x": 61, "z": 1722, "y": 0, "r": 0}, {"s": "alku", "x": 60, "z": 2238, "y": 0, "r": 0}, {"s": "alku", "x": 63, "z": 2254, "y": 0, "r": 0}, {"s": "alku", "x": 60, "z": 2270, "y": 0, "r": 0}, {"s": "alku", "x": 63, "z": 2286, "y": 0, "r": 0}, {"s": "scrSf", "x": 58, "z": 2302, "y": 0, "r": 0}, {"s": "scrSf", "x": 61, "z": 2318, "y": 0, "r": 0}, {"s": "scrSf", "x": 58, "z": 2334, "y": 0, "r": 0}, {"s": "yogibo", "x": 128, "z": 1340, "y": 37, "r": 25}, {"s": "yogibo", "x": 185, "z": 1405, "y": 37, "r": -40}, {"s": "spklocker", "x": 180, "z": 733, "y": 0, "r": 0}, {"s": "counter", "x": 405, "z": -150, "y": 0, "r": 0}, {"s": "stoolW", "x": 501.3, "z": -188.0, "y": 0, "r": 248.0}, {"s": "stoolW", "x": 444.8, "z": -104.2, "y": 0, "r": 224.0}, {"s": "stoolW", "x": 359.1, "z": -50.7, "y": 0, "r": 200.0}, {"s": "printer", "x": 322, "z": -300, "y": 0, "r": 0}, {"s": "stoolW", "x": 345, "z": -225, "y": 0, "r": 52}, {"s": "magwall", "x": 281, "z": -190, "y": 0, "r": 90}, {"s": "s_logo", "x": 282, "z": -200, "y": 0, "r": 90}, {"s": "b_info", "x": 283, "z": -235, "y": 0, "r": 90}, {"s": "b_cal", "x": 283, "z": -125, "y": 0, "r": 90}, {"s": "b_radio", "x": 283, "z": -125, "y": 0, "r": 90}, {"s": "b_open", "x": 283, "z": -290, "y": 0, "r": 90}, {"s": "b_manual", "x": 283, "z": -200, "y": 0, "r": 90}, {"s": "post", "x": 295, "z": -70, "y": 0, "r": 90}];
+const HANDS_ITEMS=[{"s": "anywall", "x": 200, "z": 290, "y": 0, "r": 0, "md": 1}, {"s": "region", "x": 450, "z": 540, "y": 0, "r": 0}, {"s": "cubeBl", "x": 541.8, "z": 564.6, "y": 0, "r": -105.0}, {"s": "cubeOr", "x": 474.6, "z": 631.8, "y": 0, "r": -165.0}, {"s": "cubeOr", "x": 382.8, "z": 607.2, "y": 0, "r": -225.0}, {"s": "cubeOr", "x": 358.2, "z": 515.4, "y": 0, "r": -285.0}, {"s": "cubeBl", "x": 425.4, "z": 448.2, "y": 0, "r": -345.0}, {"s": "cubeBl", "x": 517.2, "z": 472.8, "y": 0, "r": -405.0}, {"s": "poster", "x": 330, "z": 240, "y": 0, "r": 0}, {"s": "shelfm", "x": 722, "z": 385, "y": 0, "r": 90}, {"s": "pbench", "x": 722, "z": 502, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 620, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 842, "y": 0, "r": 90}, {"s": "pbench", "x": 722, "z": 959, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 1077, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 1299, "y": 0, "r": 90}, {"s": "pbench", "x": 722, "z": 1416, "y": 0, "r": 90}, {"s": "shelfm", "x": 722, "z": 1534, "y": 0, "r": 90}, {"s": "planter", "x": 722, "z": 1640, "y": 0, "r": 90}, {"s": "planter", "x": 722, "z": 1760, "y": 0, "r": 90}, {"s": "region", "x": 430, "z": 891, "y": 0, "r": 0}, {"s": "sofa_b", "x": 380, "z": 801, "y": 0, "r": 0}, {"s": "sofa_b", "x": 480, "z": 801, "y": 0, "r": 0}, {"s": "sofa_b", "x": 380, "z": 981, "y": 0, "r": 180}, {"s": "sofa_b", "x": 480, "z": 981, "y": 0, "r": 180}, {"s": "anytable", "x": 440, "z": 1296, "y": 0, "r": 0}, {"s": "anytable", "x": 440, "z": 1364, "y": 0, "r": 180}, {"s": "hemming", "x": 440, "z": 1230, "y": 0, "r": 360.0}, {"s": "hemming", "x": 440, "z": 1430, "y": 0, "r": 180.0}, {"s": "hemming", "x": 352, "z": 1300, "y": 0, "r": 431.2}, {"s": "hemming", "x": 528, "z": 1300, "y": 0, "r": 288.8}, {"s": "hemming", "x": 352, "z": 1360, "y": 0, "r": 108.8}, {"s": "hemming", "x": 528, "z": 1360, "y": 0, "r": 251.2}, {"s": "hidesk", "x": 74, "z": 1676, "y": 0, "r": 0}, {"s": "stoolW", "x": 150, "z": 1646, "y": 0, "r": 270}, {"s": "stoolW", "x": 150, "z": 1706, "y": 0, "r": 270}, {"s": "alku", "x": 70, "z": 680, "y": 0, "r": 90}, {"s": "alku", "x": 70, "z": 790, "y": 0, "r": 90}, {"s": "soleil", "x": 270, "z": 1940, "y": 0, "r": 0}, {"s": "chairWL", "x": 234, "z": 1880, "y": 0, "r": 0}, {"s": "chairWL", "x": 306, "z": 1880, "y": 0, "r": 0}, {"s": "chairWL", "x": 234, "z": 2000, "y": 0, "r": 180}, {"s": "chairWL", "x": 306, "z": 2000, "y": 0, "r": 180}, {"s": "soleil", "x": 510, "z": 1940, "y": 0, "r": 0}, {"s": "chairWL", "x": 474, "z": 1880, "y": 0, "r": 0}, {"s": "chairWL", "x": 546, "z": 1880, "y": 0, "r": 0}, {"s": "chairWL", "x": 474, "z": 2000, "y": 0, "r": 180}, {"s": "chairWL", "x": 546, "z": 2000, "y": 0, "r": 180}, {"s": "soleil", "x": 270, "z": 2270, "y": 0, "r": 0}, {"s": "chairWL", "x": 234, "z": 2210, "y": 0, "r": 0}, {"s": "chairWL", "x": 306, "z": 2210, "y": 0, "r": 0}, {"s": "chairWL", "x": 234, "z": 2330, "y": 0, "r": 180}, {"s": "chairWL", "x": 306, "z": 2330, "y": 0, "r": 180}, {"s": "soleil", "x": 510, "z": 2270, "y": 0, "r": 0}, {"s": "chairWL", "x": 474, "z": 2210, "y": 0, "r": 0}, {"s": "chairWL", "x": 546, "z": 2210, "y": 0, "r": 0}, {"s": "chairWL", "x": 474, "z": 2330, "y": 0, "r": 180}, {"s": "chairWL", "x": 546, "z": 2330, "y": 0, "r": 180}, {"s": "eboard", "x": 158, "z": 2147, "y": 0, "r": 90}, {"s": "scrL", "x": 690, "z": 2290, "y": 0, "r": 90}, {"s": "tatami", "x": 111, "z": 1321, "y": 0, "r": 0}, {"s": "tatami", "x": 193, "z": 1321, "y": 0, "r": 0}, {"s": "tatami", "x": 111, "z": 1403, "y": 0, "r": 0}, {"s": "tatami", "x": 193, "z": 1403, "y": 0, "r": 0}, {"s": "xstadium", "x": 440, "z": 1655, "y": 0, "r": 180}, {"s": "kitchen", "x": 500, "z": 330, "y": 0, "r": 0}, {"s": "rug", "x": 430, "z": 891, "y": 0, "r": 0}, {"s": "wallcal", "x": 118, "z": 263, "y": 0, "r": 90}, {"s": "tape", "x": 70, "z": 680, "y": 0, "r": 0}, {"s": "tape", "x": 70, "z": 790, "y": 0, "r": 0}, {"s": "photowall", "x": 719, "z": 2620, "y": 0, "r": 90}, {"s": "wb120", "x": 290, "z": 1300, "y": 0, "r": 90}, {"s": "wb120", "x": 690, "z": 2050, "y": 0, "r": 90}, {"s": "yoko", "x": 124, "z": 112, "y": 0, "r": 108}, {"s": "stoolW", "x": 32, "z": 55, "y": 0, "r": 0}, {"s": "stoolW", "x": 32, "z": 55, "y": 13, "r": 0}, {"s": "stoolW", "x": 32, "z": 55, "y": 26, "r": 0}, {"s": "stoolW", "x": 32, "z": 55, "y": 39, "r": 0}, {"s": "stoolB", "x": 77, "z": 55, "y": 0, "r": 0}, {"s": "stoolB", "x": 77, "z": 55, "y": 13, "r": 0}, {"s": "stoolB", "x": 77, "z": 55, "y": 26, "r": 0}, {"s": "stoolB", "x": 77, "z": 55, "y": 39, "r": 0}, {"s": "stoolW", "x": 32, "z": 100, "y": 0, "r": 0}, {"s": "stoolW", "x": 32, "z": 100, "y": 13, "r": 0}, {"s": "stoolW", "x": 32, "z": 100, "y": 26, "r": 0}, {"s": "stoolW", "x": 32, "z": 100, "y": 39, "r": 0}, {"s": "stoolB", "x": 77, "z": 100, "y": 0, "r": 0}, {"s": "stoolB", "x": 77, "z": 100, "y": 13, "r": 0}, {"s": "stoolB", "x": 77, "z": 100, "y": 26, "r": 0}, {"s": "stoolB", "x": 77, "z": 100, "y": 39, "r": 0}, {"s": "pamp", "x": 62, "z": 365, "y": 0, "r": 270}, {"s": "pamp", "x": 62, "z": 445, "y": 0, "r": 270}, {"s": "gb803", "x": 342, "z": -352, "y": 0, "r": 90}, {"s": "gb803", "x": 390, "z": 1848, "y": 0, "r": 180}, {"s": "lectern", "x": 185, "z": 1065, "y": 0, "r": 90}, {"s": "rack", "x": 602, "z": 330, "y": 0, "r": 0}, {"s": "btR", "x": 300, "z": 2492, "y": 0, "r": 0}, {"s": "btR", "x": 300, "z": 2540, "y": 0, "r": 0}, {"s": "btR", "x": 300, "z": 2588, "y": 0, "r": 0}, {"s": "btR", "x": 300, "z": 2636, "y": 0, "r": 0}, {"s": "btR", "x": 300, "z": 2684, "y": 0, "r": 0}, {"s": "btR", "x": 300, "z": 2732, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2492, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2540, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2588, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2636, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2684, "y": 0, "r": 0}, {"s": "btB", "x": 348, "z": 2732, "y": 0, "r": 0}, {"s": "btR", "x": 410, "z": 2620, "y": 0, "r": 0}, {"s": "btR", "x": 410, "z": 2668, "y": 0, "r": 0}, {"s": "btB", "x": 410, "z": 2716, "y": 0, "r": 0}, {"s": "btB", "x": 410, "z": 2764, "y": 0, "r": 0}, {"s": "hidesk", "x": 74, "z": 1990, "y": 0, "r": 0}, {"s": "stoolW", "x": 150, "z": 1960, "y": 0, "r": 270}, {"s": "stoolW", "x": 150, "z": 2020, "y": 0, "r": 270}, {"s": "alku", "x": 60, "z": 982, "y": 0, "r": 0}, {"s": "alku", "x": 63, "z": 998, "y": 0, "r": 0}, {"s": "alku", "x": 60, "z": 1014, "y": 0, "r": 0}, {"s": "alku", "x": 63, "z": 1030, "y": 0, "r": 0}, {"s": "alku", "x": 60, "z": 1046, "y": 0, "r": 0}, {"s": "scrLf", "x": 61, "z": 1062, "y": 0, "r": 0}, {"s": "scrLf", "x": 58, "z": 1078, "y": 0, "r": 0}, {"s": "scrLf", "x": 61, "z": 1094, "y": 0, "r": 0}, {"s": "alku", "x": 60, "z": 2238, "y": 0, "r": 0}, {"s": "alku", "x": 63, "z": 2254, "y": 0, "r": 0}, {"s": "alku", "x": 60, "z": 2270, "y": 0, "r": 0}, {"s": "alku", "x": 63, "z": 2286, "y": 0, "r": 0}, {"s": "scrSf", "x": 58, "z": 2302, "y": 0, "r": 0}, {"s": "scrSf", "x": 61, "z": 2318, "y": 0, "r": 0}, {"s": "scrSf", "x": 58, "z": 2334, "y": 0, "r": 0}, {"s": "yogibo", "x": 128, "z": 1340, "y": 37, "r": 25}, {"s": "yogibo", "x": 185, "z": 1405, "y": 37, "r": -40}, {"s": "spklocker", "x": 180, "z": 733, "y": 0, "r": 0}, {"s": "counter", "x": 405, "z": -150, "y": 0, "r": 0}, {"s": "stoolW", "x": 511.8, "z": -220.2, "y": 0, "r": 256.0}, {"s": "stoolB", "x": 477.5, "z": -143.1, "y": 0, "r": 236.0}, {"s": "stoolW", "x": 418.8, "z": -82.4, "y": 0, "r": 216.0}, {"s": "stoolB", "x": 343.0, "z": -45.4, "y": 0, "r": 196.0}, {"s": "printer", "x": 322, "z": -300, "y": 0, "r": 0}, {"s": "stoolW", "x": 345, "z": -225, "y": 0, "r": 52}, {"s": "stoolB", "x": 310, "z": -175, "y": 0, "r": 90}, {"s": "magwall", "x": 281, "z": -190, "y": 0, "r": 90}, {"s": "s_logo", "x": 282, "z": -200, "y": 0, "r": 90}, {"s": "b_info", "x": 283, "z": -235, "y": 0, "r": 90}, {"s": "b_cal", "x": 283, "z": -125, "y": 0, "r": 90}, {"s": "b_radio", "x": 283, "z": -125, "y": 0, "r": 90}, {"s": "b_open", "x": 283, "z": -290, "y": 0, "r": 90}, {"s": "b_manual", "x": 283, "z": -200, "y": 0, "r": 90}, {"s": "post", "x": 295, "z": -70, "y": 0, "r": 90}];
 /* ===== shake hands用：タップすると出る説明（音声で話した意図） ===== */
 const HANDS_INFO={
   sofa_b:{t:'ソファ（コクヨ Any Sofa）',tag:'新しく買う',p:'anysofa',
@@ -5874,6 +5873,8 @@ const HANDS_INFO={
     n:'植物そのものは今回の発注に入らないので、必要になったときに別の予算で。'},
   soleil:{t:'ラボのテーブル（コクヨ Any Table 角形）',tag:'新しく買う',p:'anytable_rect',
     d:'プロジェクトルームに近い側を、グループでプロジェクトを進めやすい「ラボ」にします。テーブル（W1500×D750・2本キャスター脚）の長い辺に椅子を2脚ずつ、計4脚。プロジェクトルームから物を出して、すぐ近くで作業できます。キャスター付きで動かせます。',},
+  chairWL:{t:'ラボの椅子（天白から持ってくる木製チェア）',tag:'今あるもの（天白から）',
+    d:'天白キャンパスに余っている白い木製の椅子（背もたれ高め・43脚）から16脚を持ってきて、ラボで使います。新しく買わずに済みます。'},
   hazel:{t:'ラボの椅子（内田洋行 Hazel）',tag:'新しく買う',p:'hazel',
     d:'ラボで長く作業できるように、キャスター付きで座りやすい椅子にしています。'},
   eboard:{t:'電子黒板（今あるもの）',tag:'今あるもの',
@@ -5890,7 +5891,11 @@ const HANDS_INFO={
   stool:{t:'ハイチェア（今あるもの）',tag:'今あるもの',
     d:'窓向きの席と、中央カウンター用に使います。'},
   stack:{t:'積んだハイチェア（イベントの予備）',tag:'今あるもの',
-    d:'ハイチェアは全部捨てず、白い16脚を4脚ずつ積んで、入口側の窓際の柱と柱の間に置いておきます。通り道にはかからず、イベントのときにすぐ出せます。大きなイベントで椅子が足りないときに出します。'},
+    d:'ハイチェアは全部捨てず、白8脚・黒8脚を4脚ずつ積んで、入口側の窓際の柱と柱の間に置き、横型ホワイトボードで前を隠します。通り道にはかからず、イベントのときにすぐ出せます。大きなイベントで椅子が足りないときに出します。'},
+  lectern:{t:'演台（今あるもの）',tag:'今あるもの',
+    d:'捨てずに使います。4面パネルのすぐ横に置いておき、イベントや発表のときにパネルの前へ出して使います。'},
+  rack:{t:'折りたたみラック（今あるもの）',tag:'今あるもの',
+    d:'キャスター付きで、たためる3段のラックです。コーヒー台の横で、カップや道具を置く棚にします。'},
   yogibo:{t:'ビーズクッション（今あるYogibo・青）',tag:'今あるもの',
     d:'もう元の形はくずれて、大きなビーズクッションになっています。小上がりの畳の上に2つ置いて、寝ころんだり、もたれたりできるようにします。'},
   tatami:{t:'小上がり（キャスター付きの畳の台）',tag:'新しく買う',p:'tatami',
@@ -5898,7 +5903,7 @@ const HANDS_INFO={
   alku:{t:'ホワイトボード（今あるもの）',tag:'今あるもの',
     d:'今あるホワイトボードは捨てずに全部shakeで使います。掲示用は入口まわり、作業用はラボの窓際、1人席の背中側にも。使っていないものは、ラボの窓際の柱と柱の間（2か所）を「ボード置き場」にして、窓に直角に向けて、本棚に本を入れるように詰めて立てておきます。使うときに引き出して、ここへ戻します。'},
   gb803:{t:'チラシ・募集のボード（今あるもの）',tag:'今あるもの',
-    d:'もともとの「アイデアエクスチェンジスペース」の考え方はそのまま。団体やイベントの情報をここに集めて、入ってきた人を奥へいざなう最初のきっかけにします。'},
+    d:'2台あります。1台は中央カウンターの印刷機側の端に立てて、カフェ側から見えるshakeの「PR看板」に。もう1台はラボの北の入口（X-STADIUM側）に立てて、「ラボで今なにをしているか」を知らせる看板にします。'},
   pamp:{t:'パンフレットスタンド（今あるもの）',tag:'今あるもの',
     d:'チラシコーナーにまとめます。'},
   poster:{t:'shakeのポスタースタンド（今あるもの）',tag:'今あるもの',
@@ -5974,6 +5979,8 @@ const HANDS_SRC={
   #hcard .cr a{color:#2E7D32}
   #hcard p{margin:6px 0;white-space:pre-line}
   #hcard .n{font-size:12.5px;color:#5C6B60;background:#F6F7F3;border-radius:8px;padding:8px 10px;margin-top:8px}
+  #hcard .rot{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:12.5px;color:#5C6B60}
+  #hcard .rot button{border:1px solid #CBD3C6;background:#fff;border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer}
   #hcard .x{position:absolute;right:10px;top:8px;border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:#5C6B60;padding:4px 8px}
   #hbanner{position:fixed;z-index:59;left:50%;transform:translateX(-50%);bottom:18px;width:min(560px,calc(100vw - 32px));
     background:rgba(38,49,42,.92);color:#F2F5EF;border-radius:12px;padding:10px 40px 10px 14px;font-size:13px;line-height:1.6}
@@ -5988,13 +5995,15 @@ const HANDS_SRC={
 
   const card=document.createElement('div'); card.id='hcard'; document.body.appendChild(card);
   const ban=document.createElement('div'); ban.id='hbanner';
-  ban.innerHTML='<b>shake handsのみなさんへ</b>　音声で説明した配置案です。家具や場所を<b>タップ</b>すると、実物の写真と、そこに置いた理由が出ます。家具はドラッグで動かせます（保存はされず、開き直すと元に戻ります）。階段型の家具はダブルタップで段を出し入れできます。左上の「見え方」で、新しく買うもの／今あるものを切り替えられます。<button class="x" aria-label="閉じる">×</button>';
+  ban.innerHTML='<b>shake handsのみなさんへ</b>　音声で説明した配置案です。家具や場所を<b>タップ</b>すると、実物の写真と、そこに置いた理由が出ます。家具はドラッグで動かせ、タップして出るカードの「左へ／右へ」で向きも変えられます（保存はされず、開き直すと元に戻ります）。階段型の家具はダブルタップで段を出し入れできます。左上の「見え方」で、新しく買うもの／今あるものを切り替えられます。<button class="x" aria-label="閉じる">×</button>';
   document.body.appendChild(ban);
   ban.querySelector('.x').onclick=()=>ban.remove();
   setTimeout(()=>{ try{ flyTo([480,300,-160],[440,20,1250]); }catch(_){} },400);   // 中央カウンターの上から奥を見渡す
 
   const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  function show(info,title){
+  let curG=null;
+  function show(info,title,g){
+    curG=g||null;
     if(!info) return;
     const old=/今あるもの|天白|触らない/.test(info.tag||'');
     let h=`<button class="x" aria-label="閉じる">×</button>`;
@@ -6007,14 +6016,17 @@ const HANDS_SRC={
     h+=`<p>${esc(info.d||'')}</p>`;
     if(info.n) h+=`<div class="n">${esc(info.n)}</div>`;
     if(info.hl) h+=`<div class="n">${esc(HANDS_HIGHLIGHT)}</div>`;
+    if(curG) h+=`<div class="rot"><span>向きを変える（15°ずつ）</span><button data-r="1">↺ 左へ</button><button data-r="-1">右へ ↻</button></div>`;
     card.innerHTML=h; card.classList.add('on');
+    card.querySelectorAll('.rot button').forEach(b=>b.onclick=e=>{ e.stopPropagation(); if(!curG) return;
+      curG.rotation.y+=(+b.dataset.r)*Math.PI/12; try{ settle(curG,false); }catch(_){} try{ checkCollisions(); }catch(_){} try{ renderer.render(scene,camera); }catch(_){} });
     card.querySelector('.x').onclick=()=>card.classList.remove('on');
   }
   HANDS_INFO.xstadium.hl=true;
   const KEY=id=>({cubeOr:'cube',cubeBl:'cube',cubeBg:'cube',btR:'bucket',btB:'bucket',btG:'bucket',
      ap01:'hemming',wan:'hemming',wb120:'alku',yoko:'alku',scrS:'scrL',scrLf:'scrL',scrSf:'scrL',sofa_n:'sofa_b',
      printer:'counter',magwall:'counter',s_logo:'counter',b_info:'counter',b_cal:'counter',b_radio:'counter',
-     b_open:'counter',b_manual:'counter',post:'counter',chairWL:'roundT'}[id]||id);
+     b_open:'counter',b_manual:'counter',post:'counter'}[id]||id);
 
 
   // ===== 既存／新規の切り替え（ボタンをタップするたびに 全部 → 新しく買うもの → 今あるもの → 全部） =====
@@ -6047,6 +6059,9 @@ const HANDS_SRC={
   };
   sw.querySelectorAll('button').forEach(b=>b.onclick=e=>{ e.stopPropagation(); handsView(+b.dataset.m); });
 
+  // キーボードでも向きを変えられる：最後にタップした家具を Q（左）／E（右）で15度ずつ
+  addEventListener('keydown',e=>{ if(!curG||/input|textarea/i.test(e.target.tagName)) return; const k=e.key.toLowerCase(); if(k!=='q'&&k!=='e') return;
+    curG.rotation.y+=(k==='q'?1:-1)*Math.PI/12; try{ settle(curG,false); }catch(_){} try{ checkCollisions(); }catch(_){} e.preventDefault(); e.stopPropagation(); },true);
   let down=null;
   addEventListener('pointerdown',e=>{ down={x:e.clientX,y:e.clientY,t:performance.now()}; },true);
   addEventListener('pointerup',e=>{
@@ -6060,7 +6075,8 @@ const HANDS_SRC={
       let g=hits[0].object; while(g.parent!==furnGroup) g=g.parent;
       let k=KEY(g.userData.spec.id);
       if((k==='stoolW'||k==='stoolB')) k=(g.position.y>1||(g.position.x<110&&g.position.z<200))?'stack':'stool';
-      if(HANDS_INFO[k]){ show(HANDS_INFO[k]); return; }
+      if(HANDS_INFO[k]){ show(HANDS_INFO[k],null,g); return; }
+      show({t:(g.userData.spec.name||'').replace(/^【新】|^◇/,''),tag:NEWSET(g.userData.spec)?'新しく買う':'今あるもの',d:''},null,g); return;
     }
     const hc=ray.intersectObjects([curtain],true);
     if(hc.length){ show(HANDS_INFO.curtain); return; }
