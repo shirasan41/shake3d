@@ -2504,6 +2504,7 @@ function label(text,x,y,z,size){
 const furniture=[]; const furnGroup=new THREE.Group(); scene.add(furnGroup);
 const PALETTE=[
   {id:'hidesk', name:'ハイデスク',    w:90, d:90, h:94,  color:0xF2F1ED, qty:16, hidesk:true},
+  {id:'roundT', name:'丸テーブル（余剰・φ90）', w:90, d:90, h:70, color:0xD1A160, qty:2, nb:'roundT'},
   {id:'stoolB', name:'ハイチェアー(黒)', w:40, d:40, h:65.5, color:0x24211F, qty:28, stool:true},
   {id:'stoolW', name:'ハイチェアー(白)', w:40, d:40, h:65.5, color:0xF4F2EC, qty:30, stool:true},
   // 実測：内寸 幅86／高さ110、段は下から32・32・37cm。外寸は側板2＋土台10＋天板3
@@ -2708,6 +2709,9 @@ const NB=(()=>{
       shapeTop(g,sh,2.8,s.h-2.8,M(s.color,.6));
       const lm=M(0x8A8F94,.45); [[-s.w/2+12,-s.d/2+8],[s.w/2-12,-s.d/2+8],[-s.w*0.22,s.d/2-10],[s.w*0.22,s.d/2-10]].forEach(p=>tube(new THREE.Vector3(p[0],s.h-3,p[1]),new THREE.Vector3(p[0],0,p[1]),1.6,lm,g)); },
     dt_sq(g,s){ box(g,s.w,2.8,s.d,0,s.h-1.4,0,M(s.color,.6)); legs4(g,s.w,s.d,s.h-3,6,1.6,M(0x8A8F94,.45)); },
+    roundT(g,s){ // 余っている丸テーブル：木天板 φ900 H700、黒い柱脚、段々のベース
+      cyl(g,s.w/2,s.w/2,3,0,s.h-1.5,0,M(0xD1A160,.55),40); cyl(g,4,4,s.h-10,0,(s.h-10)/2+3,0,M(0x1E1E1E,.5),16);
+      [[28,1.2],[23,2.6],[18,4],[13,5.4]].forEach(([r,y])=>cyl(g,r,r,1.4,0,y,0,M(0x1A1A1A,.6),32)); },
     region(g,s){ // KOKUYO Region 円形 φ900 H450
       cyl(g,s.w/2,s.w/2,2.8,0,s.h-1.4,0,M(s.color,.55),40); legs4(g,s.w*0.62,s.d*0.62,s.h-3,0,1.8,WOOD(),2); },
     hazel(g,s){ chair(g,{sw:46,sd:46,sh:43,bh:32,seatM:M(0xC9A97A,.9),leg:'chrome',caster:true,shell:true}); },
@@ -3577,7 +3581,7 @@ function addFurn(specId, x, z, rot, silent){
 /* パレットUI */
 const palEl=document.getElementById('palette');
 const CATMAP={
-  hidesk:'机・カウンター', lectern:'机・カウンター', counter:'机・カウンター',
+  hidesk:'机・カウンター', lectern:'机・カウンター', counter:'机・カウンター', roundT:'机・カウンター',
   stoolB:'チェア・スツール', stoolW:'チェア・スツール',
   cubeBg:'チェア・スツール', cubeOr:'チェア・スツール', cubeBl:'チェア・スツール',
   btR:'チェア・スツール', btB:'チェア・スツール', btG:'チェア・スツール',
