@@ -4386,6 +4386,7 @@ function toggleShape(e){
     return;
   }
   let g=hits[0].object; while(g.parent!==furnGroup) g=g.parent;
+  if(!soloRoom){ const p=hits[0].point, k=roomAt(p.x,p.z)||roomAt(g.position.x,g.position.z); if(k){ askSolo(k); return; } }
   const sp=g.userData.spec;
   if(sp.bookshelf){                     // 白い棚：ダブルクリックした棚板1枚だけを斜め⇔真横に
     select(g);
