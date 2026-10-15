@@ -6009,6 +6009,9 @@ const HANDS_INFO={
   anywallB:{t:'ラボとの境界の壁（Bプラン・コクヨ Any Wall）',tag:'新しく買う（Bプラン）',p:'anywall',
     d:'「動く段々」のいちばん後ろ。高さ180cmのAny Wallを2台並べて、ラボとの境界にする。ラボ側の面はホワイトボードとして使える。キャスターで動かせるので、交流会や展示のときは場所を変えられる。',
     n:'X-STADIUMが担っていた「shakeの象徴」「背の高さのグラデーション（入口の低い島→100→180cm）」「ラボとの境界線」を、全部動く家具で受け持つ案。'},
+  boundary:{t:'ラボとハイデスクの島のあいだのホワイトボード（今ある2連スクリーン2台）',tag:'今あるもの',p:'gen_boundary',
+    d:'ラボとの境界に立てた2連スクリーンの、両面の使い方です。【ハイデスクの島・広場側】①「ここから先はラボ」：ラボとは何か、だれでも使えること、使い方3ステップ。②「いま、ラボにいる人」：名前マグネット（話しかけOK／集中タイム／手伝って！の色分け）。③「ラボから生まれたもの」：できたものの写真。④「となりの島から」：ハイデスクの島とラボのあいだの付箋の伝言板。【ラボ側】①「ラボのきまり」と帰る前チェック、②「アイデアの余白」（自由に書ける）、③「ふりかえり」（できた・わかった・つぎ）、④「今日のゴール」（島ごとに1つ）。',
+    n:'外から来た人には「入っていい」「だれがいる」「何が生まれている」が、ラボの中の人には「今日なにをやって、どう終わるか」が見えるようにしました。マグネットや付箋は100円ショップのもので十分。掲示の中身はイメージです。'},
   anywall:{t:'企画展示の壁（コクヨ Any Wall）',tag:'新しく買う',p:'gen_anywall',
     d:'入口に置く、両面で使える展示の壁。入口側は月替わりの企画展示（例：学生団体を紹介する「わたしたちのいま」）。広場側は、ラボで進行中のプロジェクトの途中経過を見せる「つくりかけ展」で、見た人が付箋でコメントを残せます。棚には付箋とペン。展示パネルは作らず、A3の紙を格子にダブルクリップで留めるだけなので、パネル代はかかりません（印刷はふつうのA3）。',
     n:'展示の中身はイメージです。来月の展示を出したい団体を募集する形にして、展示も「みんなでつくる」ものにしたい。'},
@@ -6126,7 +6129,7 @@ const HANDS_SRC={
       if(/^pop3d_/.test(info.p)) h+=`<div class="cr">3Dモデルの画面です。ポップの文面はイメージです。</div>`;
       else if(/^real_/.test(info.p)) h+=`<div class="cr">shakeで撮った今の写真です（8月30日の採寸のとき）。</div>`;
       else if(/^m3d_/.test(info.p)) h+=`<div class="cr">3Dモデルの見た目です（実物の写真はまだありません）。</div>`;
-      else if(/^gen_/.test(info.p)) h+=`<div class="cr">AI（Gemini）で作ったイメージ画像です${/pop/.test(info.p)?"（ポップの絵柄はあとから合成）":(/labwb|anywall|wallcal/.test(info.p)?"（掲示物の中身はあとから合成）":"")}。実際の写真ではありません。</div>`;
+      else if(/^gen_/.test(info.p)) h+=`<div class="cr">AI（Gemini）で作ったイメージ画像です${/pop/.test(info.p)?"（ポップの絵柄はあとから合成）":(/labwb|anywall|wallcal|boundary/.test(info.p)?"（掲示物の中身はあとから合成）":"")}。実際の写真ではありません。</div>`;
       else if(src) h+=`<div class="cr">写真：${esc(src[0])}の製品ページより（shake handsでの検討用）　<a href="${src[1]}" target="_blank" rel="noopener">製品ページ</a></div>`; }
     if(title && title!==info.t) h+=`<p><b>${esc(info.t)}</b></p>`;
     h+=`<p>${esc(info.d||'')}</p>`;
@@ -6210,6 +6213,7 @@ const HANDS_SRC={
       let k=KEY(g.userData.spec.id);
       if((k==='stoolW'||k==='stoolB')) k=(g.position.y>1||(g.position.x<110&&g.position.z<200))?'stack':'stool';
       if(k==='gb803'){ show(Object.assign({},HANDS_INFO.gb803,{p:g.position.z<0?'pop3d_shake':'pop3d_lab'}),null,g); return; }
+      if(k==='scrL' && Math.abs(g.position.z-1790)<10){ show(HANDS_INFO.boundary,null,g); return; }
       if((k==='wb120'||k==='scrL') && g.position.x>600 && g.position.z>1700 && g.position.z<2450){ show(HANDS_INFO.labwb,null,g); return; }
       if(HANDS_INFO[k]){ show(HANDS_INFO[k],null,g); return; }
       show({t:(g.userData.spec.name||'').replace(/^【新】|^◇/,''),tag:NEWSET(g.userData.spec)?'新しく買う':'今あるもの',d:''},null,g); return;
@@ -6402,6 +6406,68 @@ window.PW_IMG=["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEB
     x.strokeStyle=MK[2]; x.lineWidth=.5; x.beginPath(); x.moveTo(5+cw-2,41); x.quadraticCurveTo(6+cw,46,7+cw,40); x.stroke();
     txt(x,'つながったら線でむすぶ ／ おわったらはがす',W/2,H-17,3.4,MK[3],600,'center'); return c; }
   window.HB={boardProjects,boardKanban,boardAsk,boardWeek,boardMindmap,boardPlan};
+  /* ---- ラボとハイデスクの島のあいだの境界（2連スクリーン2台）の掲示：広場側4面・ラボ側4面 ---- */
+  const tag=(x,X,Y,W,name,grp,doing,st)=>{ const SC={ok:['#2E8B57','話しかけOK'],focus:['#D03B2F','集中タイム'],help:['#1F5FAF','手伝って！']}[st];
+    rr(x,X,Y,W,13,1.2,'#FFFFFF','#9AA0A6'); x.fillStyle=SC[0]; x.fillRect(X,Y,2.2,13); txt(x,name,X+4,Y+1.6,3.6,'#1A1A1A',800); txt(x,grp,X+W-2,Y+2.2,2.4,'#5F6368',600,'right');
+    wrap(x,doing,X+4,Y+6.6,W-22,2.5,'#3A3A3A',1.3); rr(x,X+W-17,Y+7.6,15,4.2,2.1,SC[0]); txt(x,SC[1],X+W-9.5,Y+8.3,2.3,'#FFFFFF',700,'center'); };
+  function bWelcome(W,H){ const [c,x]=wbBase(W,H);
+    x.fillStyle='#DCE11E'; x.fillRect(4,4,46,9); txt(x,'ここから先は',5,5,6.2,'#1A1A1A',800); txt(x,'「ラボ」',5,15,10,'#1A1A1A',800);
+    wrap(x,'グループでプロジェクトを進めるための場所です。団体に入っていなくても、だれでも使えます。',5,31,W-10,3.6,MK[3],1.5);
+    txt(x,'使い方',5,52,5,MK[0],800); x.strokeStyle=MK[0]; x.lineWidth=.4; x.beginPath(); x.moveTo(5,59); x.lineTo(30,59); x.stroke();
+    [['1','ラボ側の「今週」の表で、空いている島を見る'],['2','使う時間に、名前を書いた付箋を貼る'],['3','机と椅子を2台ずつのもとの形にもどして帰る']].forEach(([n,t],i)=>{ const Y=64+i*20;
+      x.beginPath(); x.arc(9,Y+3.5,3.6,0,Math.PI*2); x.fillStyle=MK[0]; x.fill(); txt(x,n,9,Y+1.2,4.2,'#FFFFFF',800,'center'); wrap(x,t,16,Y,W-21,3.5,MK[3],1.4); });
+    rr(x,5,H-36,W-10,28,2,null,MK[1]); wrap(x,'わからないことは、中央カウンターのスタッフへ。島を1つだけ使うなら、予約なしでもOK。',8,H-32,W-16,3.4,MK[1],1.45);
+    return c; }
+  function bWhoIn(W,H){ const [c,x]=wbBase(W,H);
+    txt(x,'いま、ラボにいる人',5,5,6.4,MK[0],800); wrap(x,'来たら名前のマグネットを貼って、帰るときにはがす。色で「話しかけていいか」がわかります。',5,14,W-10,3,MK[3],1.4);
+    const P=[['ゆうま','まちあるき部','店主さんへの質問リスト','ok'],['しずく','shakeラジオ','#14の台本','focus'],['けいご','shake hands','学祭のポスター','help'],['あやか','ボランティア部','能登ツアーの報告書','ok'],['はると','DRAFT','事業計画の壁打ち','help'],['みお','こども食堂','学習支援の教材','focus']];
+    P.forEach((p,i)=>tag(x,5,30+i*16.5,W-10,...p));
+    txt(x,'マグネットは下の缶の中',5,H-14,3,'#5F6368',600); return c; }
+  function bMade(W,H){ return (async()=>{ const [c,x]=wbBase(W,H); const ims=await Promise.all([8,10,2].map(loadPW));
+    txt(x,'ラボから生まれたもの',5,5,6.2,MK[0],800); wrap(x,'ここで生まれた「できたもの」を貼っていきます。',5,14,W-10,3,MK[3],1.4);
+    const L=[['大曽根 商店街マップ v3','まちあるき部・10月'],['shakeラジオ #13 収録','shakeラジオ・10月'],['学祭のポスター','shake hands・9月']];
+    L.forEach(([t,s],i)=>{ const Y=24+i*44; x.fillStyle='rgba(0,0,0,.12)'; x.fillRect(6.6,Y+.8,W-12,39); x.fillStyle='#FFFFFF'; x.fillRect(6,Y,W-12,39); photoInto(x,ims[i],8,Y+2,W-16,26); txt(x,t,8,Y+29.5,3.2,'#1A1A1A',800); txt(x,s,8,Y+34.2,2.4,'#5F6368',600); pin(x,W/2,Y+1.2,MK[1]); });
+    txt(x,'できたら写真を1枚、カウンターへ',5,H-9,3,'#5F6368',600); return c; })(); }
+  function bRelay(W,H){ const [c,x]=wbBase(W,H);
+    txt(x,'となりの島から',5,5,6.2,MK[0],800); wrap(x,'ハイデスクの島とラボのあいだの、ひとこと伝言板。',5,14,W-10,3,MK[3],1.4);
+    const N=[['ラボで話してた商店街マップ、気になる！見せてほしい','#FFF27A'],['プリンターの紙、補充しておきました','#C8F2A8'],['17時からここで打合せします。少しにぎやかになります','#FFC1D6'],['ホワイトボードのペン、青がかすれてます','#B9E6FF'],['だれかExcel得意な人いませんか → けいご','#FFD59A']];
+    N.forEach(([t,cl],i)=>sticky(x,6+(i%2)*4,24+i*24,W-16,20,cl,t,3.1));
+    return c; }
+  function bGoal(W,H){ const [c,x]=wbBase(W,H);
+    txt(x,'今日のゴール',5,5,7,MK[1],800); txt(x,'10/21（水）',W-5,7.5,3.6,MK[3],600,'right');
+    wrap(x,'島ごとに、今日おわらせたいことを1つだけ。おわったら ✓',5,16,W-10,3,MK[3],1.4);
+    const G=[['島A','まちあるき部','お店リストを35軒そろえる',1],['島B','shakeラジオ','#14の台本を仕上げる',0],['島C','DRAFT','事業計画のスライド10枚',0],['島D','（あいてます）','',0]];
+    G.forEach(([k,g,t,d],i)=>{ const Y=28+i*30; x.strokeStyle=MK[3]; x.lineWidth=.3; x.strokeRect(5,Y,W-10,26); txt(x,k,8,Y+2,4.4,MK[0],800); txt(x,g,22,Y+3,3,'#5F6368',600);
+      if(t) wrap(x,t,8,Y+10,W-26,3.6,MK[3],1.35); x.strokeStyle=MK[2]; x.lineWidth=.5; x.strokeRect(W-15,Y+9,8,8); if(d){ x.beginPath(); x.moveTo(W-14,Y+13); x.lineTo(W-11.5,Y+16); x.lineTo(W-6,Y+7.5); x.lineWidth=.9; x.stroke(); } });
+    return c; }
+  function bRefl(W,H){ const [c,x]=wbBase(W,H);
+    txt(x,'ふりかえり',5,5,7,MK[2],800); wrap(x,'帰る前に5分。付箋を1枚ずつ。',5,15,W-10,3,MK[3],1.4);
+    const C=[['できた',['お店20軒→28軒','台本の構成がきまった'],0],['わかった',['朝の方が店主さんと話せる','BGMは著作権に注意'],2],['つぎ',['残り7軒は金曜に','ゲストに連絡する'],4]];
+    C.forEach(([h,ns,ci],i)=>{ const Y=25+i*45; txt(x,h,5,Y,4.6,MK[i===0?2:i===1?0:1],800); x.strokeStyle=MK[3]; x.lineWidth=.3; x.beginPath(); x.moveTo(5,Y+6.5); x.lineTo(W-5,Y+6.5); x.stroke();
+      ns.forEach((t,j)=>sticky(x,5+j*((W-10)/2)+1,Y+9,(W-10)/2-3,17,NOTE[(ci+j)%5],t,3)); });
+    return c; }
+  function bFree(W,H){ const [c,x]=wbBase(W,H);
+    txt(x,'アイデアの余白',5,5,6.4,MK[0],800); txt(x,'ここは自由に書いてOK',5,14,3.2,MK[3],600);
+    x.strokeStyle=MK[1]; x.lineWidth=.5; x.beginPath(); x.arc(W*0.42,58,13,0,Math.PI*2); x.stroke(); txt(x,'学祭',W*0.42,52,4.2,MK[1],800,'center'); txt(x,'×ラジオ？',W*0.42,57.5,3.6,MK[1],700,'center');
+    x.strokeStyle=MK[0]; [[W*0.42+13,58,W-12,48],[W*0.42-13,58,10,72],[W*0.42,71,W*0.55,96]].forEach(([a,b,c2,d])=>{ x.beginPath(); x.moveTo(a,b); x.lineTo(c2,d); x.stroke(); });
+    txt(x,'公開収録',W-30,42,3.4,MK[0],700); txt(x,'店主さん出演',6,74,3.4,MK[0],700); txt(x,'リスナー投票',W*0.45,98,3.4,MK[0],700);
+    sticky(x,8,112,W*0.5,16,NOTE[0],'これ、来週の定例で話そう',3); x.strokeStyle=MK[2]; x.beginPath(); x.moveTo(W*0.65,120); x.quadraticCurveTo(W*0.8,135,W*0.62,145); x.stroke(); txt(x,'←だれか絵描いて',W*0.3,148,3,MK[2],700);
+    return c; }
+  function bRules(W,H){ const [c,x]=wbBase(W,H);
+    txt(x,'ラボのきまり',5,5,7,MK[3],800);
+    const R=['だれでも使える。予約の島は、予約の人が優先','食べるのは自分の島で。こぼしたらすぐふく','音を出すときは、まわりにひと声','帰るときは、机を2台ずつ・椅子を4脚にもどす','忘れものはカウンターへ'];
+    R.forEach((t,i)=>{ const Y=17+i*17; txt(x,String(i+1),6,Y,4.4,MK[0],800); wrap(x,t,13,Y+.4,W-18,3.3,MK[3],1.4); });
+    txt(x,'帰る前チェック',5,108,5,MK[1],800); ['ホワイトボードを消した','ゴミを持ち帰った','名前マグネットをはがした','電源タップをしまった'].forEach((t,i)=>{ const Y=117+i*10; x.strokeStyle=MK[1]; x.lineWidth=.45; x.strokeRect(6,Y,5,5); txt(x,t,14,Y+.3,3.2,MK[3],600); });
+    return c; }
+  async function boundaryBoards(){
+    const scr=furniture.filter(g=>g.userData.spec.id==='scrL' && Math.abs(g.position.z-1790)<5).sort((a,b)=>b.position.x-a.position.x);   // 広場側から見て左から（xが大きい方が左）
+    const S=[bWelcome,bWhoIn,bMade,bRelay], N=[bRules,bFree,bRefl,bGoal];   // 広場側：左から ／ ラボ側：左から（裏から見ると並びが逆）
+    for(let si=0;si<scr.length;si++){ const g=scr[si], s=g.userData.spec, PW=s.w/2, Hh=s.h-10, W=PW-6, HH=Hh-6;
+      for(const [n,k] of [['hingeL',0],['hingeR',1]]){ const h=g.getObjectByName(n); if(!h) continue; const side=k?1:-1;
+        const iS=si*2+(k?0:1), iN=3-iS;
+        const a=plane(await S[iS](W,HH),W,HH); a.position.set(side*PW/2,9+Hh/2,-1.3); a.rotation.y=Math.PI; h.add(a);
+        const b=plane(N[iN](W,HH),W,HH); b.position.set(side*PW/2,9+Hh/2,1.3); h.add(b); } } }
+  window.HB4={bWelcome,bWhoIn,bMade,bRelay,bGoal,bRefl,bFree,bRules};
   function labBoards(){
     const put=(g,c,W,H,y,z,flip,parent)=>{ const m=plane(c,W,H); m.position.set(0,y,z); if(flip) m.rotation.y=Math.PI; (parent||g).add(m); };
     furniture.filter(g=>g.userData.spec.id==='wb120' && g.position.x>600 && g.position.z>1700 && g.position.z<2450).forEach(g=>{ const s=g.userData.spec, y=s.h-8-s.bh/2, W=s.bw-4, H=s.bh-4;
@@ -6500,7 +6566,7 @@ window.PW_IMG=["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEB
       const mb=plane(b,W,H); mb.material.transparent=true; mb.material.alphaTest=.05; mb.position.set(0,y,1.6); g.add(mb); }
   }
   window.HB3={wallFront,wallBack,sheetsFront,sheetsBack};
-  window.handsTexApply=function(){ try{ counterWall(); addPops(); addCork(); photoWall(); labBoards(); calendars(); anyWalls(); }catch(e){ console.warn('hands_tex',e); } };
+  window.handsTexApply=function(){ try{ counterWall(); addPops(); addCork(); photoWall(); labBoards(); calendars(); anyWalls(); boundaryBoards(); }catch(e){ console.warn('hands_tex',e); } };
   window.handsTexApply();
 })();
 
