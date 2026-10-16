@@ -2746,7 +2746,7 @@ const NB=(()=>{
       g.userData.fold=0; g.userData.setFold=t=>{ t=Math.max(0,Math.min(1,t)); const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2; g.userData.fold=t;
         legs.forEach(p=>{ p.rotation.z=-e*(Math.PI/2-0.25); }); top.position.y=H-0.9-e*(H-4); ring.position.y=top.position.y; legs.forEach(p=>p.position.y=H-1.8-e*(H-4)); }; },
     navette(g,s){ // 愛知 Navette（NVT-C-SC）W535×D550×H815・座面高455：白いスチール脚4本＋キャスター、白い樹脂の背（スリット入り）、肘、布の座（アイスグリーン）。座を跳ね上げて前後に重ねられる。ダブルクリックで座の跳ね上げ
-      const NVC=[0x8FC6C2,0xC9A030,0x2F86C3,0xE8907F]; window.__navI=((window.__navI||0)+1)%NVC.length;   // 座の色は4色を混ぜる（アイスグリーン・マスタード・セルリアンブルー・コーラルピンク 10/16 白川さん）
+      const NVC=[0x8FC6C2,0xC9A030,0x2F86C3]; window.__navI=((window.__navI||0)+1)%NVC.length;   // 座の色は3色（アイスグリーン・マスタード・セルリアンブルー）。島ごとに同じ色が隣り合わないよう、置いたあとで並べ直す（10/16 白川さん）
       const fr=M(0xF2F2EF,.4), pl=M(0xEDEDEA,.5), fab=M(NVC[window.__navI],.95), dark=M(0x3A3A3A,.6);
       const W=s.w, D=s.d, SH=s.sh||45.5;
       [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([x,z])=>tube(new THREE.Vector3(x*(W/2-7),SH-4,z*(D/2-12)),new THREE.Vector3(x*(W/2-4),4,z*(D/2-5)),1.2,fr,g));
@@ -2755,7 +2755,7 @@ const NB=(()=>{
       const back=new THREE.Group(); g.add(back); box(back,W-12,32,1.6,0,s.h-18,D/2-6,pl); for(let i=0;i<7;i++) box(back,3,1.2,1.7,-12+i*4,s.h-27,D/2-6,dark); box(back,W-14,16,2.2,0,s.h-10,D/2-7.5,fab);
       [-1,1].forEach(x=>tube(new THREE.Vector3(x*(W/2-7),SH,D/2-6),new THREE.Vector3(x*(W/2-7),s.h-4,D/2-5),1.1,fr,g));
       const seat=new THREE.Group(); seat.position.set(0,SH-2,D/2-10); g.add(seat);   // 座の後ろ側を軸に跳ね上げる
-      box(seat,W-10,5,D-16,0,0,-(D-16)/2,fab); box(seat,W-12,1.2,D-18,0,-3,-(D-16)/2,pl);
+      box(seat,W-10,5,D-16,0,0,-(D-16)/2,fab); g.userData.fab=fab; box(seat,W-12,1.2,D-18,0,-3,-(D-16)/2,pl);
       g.userData.fold=0; g.userData.setFold=t=>{ t=Math.max(0,Math.min(1,t)); const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2; g.userData.fold=t; seat.rotation.x=-e*Math.PI*0.5; }; },
     anytable(g,s){ // 内田洋行 NEUT フラップタイプ 台形（1575TTCS）長辺1500・短辺750・奥行650 H720：60°の台形＝2台で正六角形。天板跳ね上げ・キャスター付
       const sh=new THREE.Shape(); const L=s.w/2, S_=s.w/4, D=s.d/2;
@@ -2824,7 +2824,7 @@ const NB=(()=>{
       box(g,8,10,6,-6,30,2,M(0xF4F4F2,.8)); box(g,10,6,8,7,28,-3,M(0xE8C170,.8));                          // 箱の中（道具・記録）
       casters(g,[[-s.w/2+3,-s.d/2+3],[s.w/2-3,-s.d/2+3],[-s.w/2+3,s.d/2-3],[s.w/2-3,s.d/2-3]],2.2); },
     shelfm(g,s){ // 内田洋行 多目的書架STシリーズ 直線書架3段 キャスター付（ST-TS15）W900×D450×H1125、ホワイトバーチ、背板なしの両面オープン棚。ローカル+z＝通路側（ブックスタンドで面置き）、-z＝shake中央側（背表紙）
-      const m=M(s.color,.6), H=(s.h-14)/3, top=12+3*H+1.5;
+      const m=M(0xD9BE94,.6), H=(s.h-14)/3, top=12+3*H+1.5;   // 木目のナチュラル色（製品写真 ST-TS15 に合わせる 10/16）
       [-1,1].forEach(x=>box(g,3,s.h-8,s.d,x*(s.w/2-1.5),(s.h-8)/2+8,0,m));
       [0,1,2,3].forEach(i=>box(g,s.w,i===3?3:2.4,s.d,0,12+i*H,0,m));
       box(g,s.w-6,4,s.d-2,0,10,0,m); // 台輪
@@ -5965,9 +5965,9 @@ const HANDS_INFO={
   "region":{ "t": "折りたたみの丸テーブル（KingCamp）", "tag": "新しく買う", "p": "kingcamp", "d": "ソファの真ん中と、入口のキューブの真ん中に置く丸テーブル（直径90cm）。高さは42〜70cmのあいだで無段階に変えられるので、立ち話や作業のときは高くもできますが、普段はソファやキューブに合わせて低くしておく想定です（3Dでは44cmにしてある）。\n天板は4枚の竹の板で、脚をたたんで板を重ねると収納袋に入ります（キャンプ用品なので一人で持って動かせます）。\n【ダブルクリックで折りたたみ／もう一度ダブルクリックで開く】", "n": "大手家具メーカーの製品ではないので、別ルートを使って今回の発注に入れるかもしれないです（1台 約2万円）。キャンプ用なので、竹と黒いアルミ脚の見た目です。" },
   "rug":{ "t": "ラグマット（丸い敷物）", "tag": "あればよいもの", "p": "m3d_rug", "d": "家具の種類が増えると「これ、どこに置くんだっけ？」となりやすいので、「このラグの上にソファを置く」という目印になります。shakeの「ハイライト」の一つにもなります。", "n": "直径2〜3mの円形ラグは、ラグ専門店やカーペットメーカーのオーダーで作れます。\n今回の発注は什器・家具の提案ですので、実際にすぐ購入することはできず、「あればよいもの」としています。" },
   "cube":{ "t": "キューブ型のスツール（今あるもの）", "tag": "今あるもの", "p": "m3d_cube", "d": "入口に一番近い、一番地面に近い席です。自由に動かせて、輪にもなります。ここから奥へ向かって、座る高さが少しずつ上がっていきます。" },
-  "bucket":{ "t": "バケツ型のスツール（オリバー BT STOOL・今あるもの）", "tag": "今あるもの", "p": "m3d_bucket", "d": "キューブ型のスツールの経年劣化により、代替品になるもとして昨年導入したもの（キューブ型のスツールは型として古く、購入できなかった）ですが、キューブ型に比べて使いにくいという声が多く、持て余し気味です。ただし、shakeの備品で一番新しく購入したものなので廃棄は考えられず、予備の椅子として空間内に格納することを提案します。\n具体的には、赤と青の16脚はプロジェクトルーム2にまとめて置き、イベントや人数が多いときに出して使います。\n\nただし施設部の立場としては、最近購入したものより開設当初に購入したものを優先して配置するのはいかがなものか（使わないものをどうして購入したのか）と感じると思うので、宣材写真やオフィシャルの場ではバケツ型のスツールに取り替えておく必要があるかもしれません。", "n": "全部で30脚あるが、緑の10脚と赤・青の4脚は天白キャンパスで使ってもらいたいと思っています（あまりのも多いと重ねて格納できないため）。ただし天白でもそこまでの需要が作れるか微妙なところで、もしかしたらこの3Dモデルで示したよりも多い量を格納しないといけなくなるかもしれません。" },
+  "bucket":{ "t": "バケツ型のスツール（オリバー BT STOOL・今あるもの）", "tag": "今あるもの", "p": "m3d_bucket", "d": "キューブ型のスツールの経年劣化により、代替品になるもとして昨年導入したもの（キューブ型のスツールは型として古く、購入できなかった）ですが、キューブ型に比べて使いにくいという声が多く、持て余し気味です。ただし、shakeの備品で一番新しく購入したものなので廃棄は考えられず、予備の椅子として空間内に格納することを提案します。\n具体的には、赤と青の16脚はプロジェクトルーム2にまとめて置き、イベントや人数が多いときに出して使います。\n\nただし施設部の立場としては、最近購入したものより開設当初に購入したものを優先して配置するのはいかがなものか（使わないものをどうして購入したのか）と感じると思うので、宣材写真やオフィシャルの場ではバケツ型のスツールに取り替えておく必要があるかもしれません。", "n": "全部で30脚あるが、緑の10脚と赤・青の4脚は天白キャンパスで使ってもらいたいと思っています（あまりにも多いと重ねて格納できないため）。ただし天白でもそこまでの需要が作れるか微妙なところで、もしかしたらこの3Dモデルで示したよりも多い量を格納しないといけなくなるかもしれません。" },
   "chabu":{ "t": "小上がりの小さな丸テーブル", "tag": "新しく買う", "p": "chabu", "d": "小上がりの畳の上に置く、1〜2人用の丸いちゃぶ台（直径60cm・高さ31.5cm）。座って飲み物やノートパソコンを置ける。脚を折りたたむと厚さ5cmになります。\n【ダブルクリックで脚をたたむ／もう一度で開く】", "n": "大手家具メーカーの製品ではないので、別ルートを使って今回の発注に入れるかもしれないです（Amazonで約3,000円）。天板の耐荷重は6kgなので、ものを置くための台として使います。" },
-  "navette":{ "t": "台形テーブルの椅子（愛知 Navette）", "tag": "新しく買う", "p": "navette", "d": "台形テーブルの島に置く、キャスター付きの椅子（幅53.5×奥行55×高さ81.5cm・座面の高さ45.5cm）。座を跳ね上げると、前後に重ねて（平行スタック）片づけられるので、持ち上げずにまとめられる。ワークショップのときは、台形テーブルの組み方に合わせてすぐ動かせる。\n【ダブルクリックで座の跳ね上げ／もう一度で戻す】", "n": "フレームと背は白。座の布は1色にそろえず、アイスグリーン・マスタード・セルリアンブルー・コーラルピンクの4色を混ぜるのはどうでしょうか（3Dの色）。張地は10色から選べます。", "xn": "<div class=\"swt\">張地の10色（○が3Dで使った4色）</div><div class=\"sws\"><div class=\"sw\"><i style=\"background:#2B2B2B\"></i><span>ブラック<br><small>06</small></span></div><div class=\"sw\"><i style=\"background:#8E8E8C\"></i><span>グレー<br><small>04</small></span></div><div class=\"sw\"><i style=\"background:#2F3E66\"></i><span>インディゴ<br><small>48</small></span></div><div class=\"sw on\"><i style=\"background:#2F86C3\"></i><span>セルリアンブルー<br><small>58</small></span></div><div class=\"sw on\"><i style=\"background:#AFD8CB\"></i><span>アイスグリーン<br><small>61</small></span></div><div class=\"sw\"><i style=\"background:#2E9C86\"></i><span>コバルトグリーン<br><small>62</small></span></div><div class=\"sw\"><i style=\"background:#76A94A\"></i><span>グラスグリーン<br><small>71</small></span></div><div class=\"sw on\"><i style=\"background:#C9A030\"></i><span>マスタード<br><small>21</small></span></div><div class=\"sw\"><i style=\"background:#C9622E\"></i><span>バートンオレンジ<br><small>27</small></span></div><div class=\"sw on\"><i style=\"background:#E8907F\"></i><span>コーラルピンク<br><small>32</small></span></div></div><div class=\"cr\">背とフレームは白・ライトグレー・黒の3色（脚の色とセット）。色は愛知のサイトの色名から。画面の色は目安です。</div>" },
+  "navette":{ "t": "台形テーブルの椅子（愛知 Navette）", "tag": "新しく買う", "p": "navette", "d": "台形テーブルの島に置く、キャスター付きの椅子（幅53.5×奥行55×高さ81.5cm・座面の高さ45.5cm）。座を跳ね上げると、前後に重ねて（平行スタック）片づけられるので、持ち上げずにまとめられる。ワークショップのときは、台形テーブルの組み方に合わせてすぐ動かせる。\n【ダブルクリックで座の跳ね上げ／もう一度で戻す】", "n": "フレームと背は白。座の布は1色にそろえず、アイスグリーン・マスタード・セルリアンブルーの3色を、同じ色が隣り合わないように混ぜるのはどうでしょうか（3Dの色）。張地は10色から選べます。", "xn": "<div class=\"swt\">張地の10色（○が3Dで使った3色）</div><div class=\"sws\"><div class=\"sw\"><i style=\"background:#2B2B2B\"></i><span>ブラック<br><small>06</small></span></div><div class=\"sw\"><i style=\"background:#8E8E8C\"></i><span>グレー<br><small>04</small></span></div><div class=\"sw\"><i style=\"background:#2F3E66\"></i><span>インディゴ<br><small>48</small></span></div><div class=\"sw on\"><i style=\"background:#2F86C3\"></i><span>セルリアンブルー<br><small>58</small></span></div><div class=\"sw on\"><i style=\"background:#AFD8CB\"></i><span>アイスグリーン<br><small>61</small></span></div><div class=\"sw\"><i style=\"background:#2E9C86\"></i><span>コバルトグリーン<br><small>62</small></span></div><div class=\"sw\"><i style=\"background:#76A94A\"></i><span>グラスグリーン<br><small>71</small></span></div><div class=\"sw on\"><i style=\"background:#C9A030\"></i><span>マスタード<br><small>21</small></span></div><div class=\"sw\"><i style=\"background:#C9622E\"></i><span>バートンオレンジ<br><small>27</small></span></div><div class=\"sw\"><i style=\"background:#E8907F\"></i><span>コーラルピンク<br><small>32</small></span></div></div><div class=\"cr\">背とフレームは白・ライトグレー・黒の3色（脚の色とセット）。色は愛知のサイトの色名から。画面の色は目安です。</div>" },
   "anytable":{ "t": "台形テーブル（内田洋行 NEUT フラップ 台形）", "tag": "新しく買う", "p": "neut", "d": "正六角形を半分にした形の台形テーブル（長辺150cm・奥行65cm）。2台で6人の島、4台なら1列の会議テーブルや、前を向く弧にもなります。\n天板を跳ね上げてたためて、重ねて片づけられます。キャスター付き。", "x": "<div class=\"swt\">ワークショップのときの4つの組み方（ワークショップの会場に切り替えると3Dでも選べます）</div><div class=\"pts\"><div class=\"pt\"><div class=\"pv\"><svg viewBox=\"0 0 548 195\" style=\"width:100%;height:96px\"><polygon points=\"180,65 30,65 68,130 142,130\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"142,130 292,130 255,65 180,65\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"405,65 255,65 292,130 368,130\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"368,130 518,130 480,65 405,65\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><circle cx=\"130\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"80\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"105\" cy=\"165\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"192\" cy=\"165\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"242\" cy=\"165\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"218\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"355\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"305\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"330\" cy=\"165\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"418\" cy=\"165\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"468\" cy=\"165\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"442\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/></svg></div><b>大きな1卓</b><span>4台を互い違いにつないだ長い帯・12人</span></div><div class=\"pt\"><div class=\"pv\"><svg viewBox=\"0 0 480 413\" style=\"width:100%;height:96px\"><polygon points=\"130,372 130,222 65,259 65,334\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"130,222 130,372 195,334 195,259\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"350,192 350,42 285,79 285,154\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"350,42 350,192 415,154 415,79\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><circle cx=\"80\" cy=\"210\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"30\" cy=\"297\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"80\" cy=\"383\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"180\" cy=\"383\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"230\" cy=\"297\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"180\" cy=\"210\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"300\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"250\" cy=\"117\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"300\" cy=\"203\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"400\" cy=\"203\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"450\" cy=\"117\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"400\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/></svg></div><b>島2つ</b><span>2台で正六角形・6人ずつ</span></div><div class=\"pt\"><div class=\"pv\"><svg viewBox=\"0 0 453 260\" style=\"width:100%;height:96px\"><polygon points=\"42,195 192,195 154,130 79,130\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"192,65 42,65 79,130 154,130\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"262,195 412,195 374,130 299,130\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"412,65 262,65 299,130 374,130\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><circle cx=\"92\" cy=\"230\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"142\" cy=\"230\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"203\" cy=\"145\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"142\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"92\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"30\" cy=\"115\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"312\" cy=\"230\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"362\" cy=\"230\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"423\" cy=\"145\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"362\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"312\" cy=\"30\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"250\" cy=\"115\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/></svg></div><b>小さな島2つ</b><span>短い辺どうしをつないだ形・6人ずつ</span></div><div class=\"pt\"><div class=\"pv\"><svg viewBox=\"0 0 380 440\" style=\"width:100%;height:96px\"><polygon points=\"30,165 180,165 142,100 68,100\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"200,165 350,165 312,100 238,100\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"30,375 180,375 142,310 68,310\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><polygon points=\"200,375 350,375 312,310 238,310\" fill=\"#E9DCC6\" stroke=\"#8A6A4A\" stroke-width=\"3\"/><circle cx=\"68\" cy=\"200\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"105\" cy=\"200\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"142\" cy=\"200\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"238\" cy=\"200\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"275\" cy=\"200\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"312\" cy=\"200\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"68\" cy=\"410\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"105\" cy=\"410\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"142\" cy=\"410\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"238\" cy=\"410\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"275\" cy=\"410\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><circle cx=\"312\" cy=\"410\" r=\"17\" fill=\"#A9D3C6\" stroke=\"#3E7D6E\" stroke-width=\"3\"/><text x=\"190\" y=\"22\" text-anchor=\"middle\" font-size=\"26\" fill=\"#5C6B60\">▲ 前（発表者・モニター）</text></svg></div><b>前を向く</b><span>2列×2台・講義や発表を聞くとき・12人</span></div></div><div class=\"cr\">内田洋行のカタログの組み合わせ例から。茶色＝台形テーブル、緑の丸＝Navetteの椅子。</div>" },
   "shelfm":{ "t": "本棚（内田洋行 多目的書架ST 3段・キャスター付き ST-TS15）", "tag": "新しく買う", "p": "st_shelf", "d": "今の白い本棚は、動かしにくくて、ワーキングスペースへの「壁」になっているという声が多かったです。\nでは全く無くていいのか（廃棄すればいいのか）というと、一方で「本はプロジェクト活動の発想の出どころとして大事」「本のある空間が、空間としての魅力を高める」という声もありました。\nそこで、キャスター付きで背の低い本棚に替えて、「棚・ベンチ・棚」の“組”にして並べることを提案します。今の白い本棚より背が低いので、通路から中をのぞけて、“組”と“組”の間は中へ入れる小道になります。\n候補は内田洋行の多目的書架ST（直線書架3段・キャスター付き ST-TS15、幅90×奥行45×高さ112.5cm、背板なしで両面から使えます）。\n通路側はブックスタンドで表紙を見せ（面置き）、shakeの中側は背表紙が並んでいる想定です。天板の上にもスタンドで、通路向き・中側向きに数冊ずつ表紙を見せます（現状の通り）。", "n": "今の白い本棚は廃棄する方向で考えるのはどうでしょうか。ST-TS15は6台（定価 14.6万円／台・税抜）。棚と棚の間のベンチは、キャスター付きのPullerベンチを提案します。" },
   "pbench":{ "t": "本棚の間のベンチ（内田洋行 Puller［プラー］ベンチ 棚付）", "tag": "新しく買う", "p": "puller_bench", "d": "本棚と本棚の間に置く、片側キャスター付きのベンチ（幅120cm・高さ47cm）。反対側を少し持ち上げれば、手押し車のように転がして動かせます。下の棚には本を平置きできます（活用方法は要検討）。本棚と本棚の間に置くベンチは「縁側」でどうでしょうか（床面の色と合わせて境界を溶かす意図）。座って中を向いてもいいし、くるっと回って通路側を向いてもいい「縁側」のような機能を意図します。これで「壁」の感じがだいぶ薄れるのではないか、と思います。", "n": "「動かせない什器はいやだ」という声を受けて、キャスターのない多目的書架STのベンチ（ST-TS19）から変更（10/15）。希望小売価格 ¥114,800（税込）×4台。座面の色は7色から選べる（3Dでは緑）。", "xn": "<div class=\"swt\">座面の7色（○が3Dの色）</div><div class=\"sws\"><div class=\"sw on\"><i style=\"background:#5F9A57\"></i><span>グリーン</span></div><div class=\"sw\"><i style=\"background:#2B2B2B\"></i><span>ブラック</span></div><div class=\"sw\"><i style=\"background:#707070\"></i><span>ディムグレイ</span></div><div class=\"sw\"><i style=\"background:#B9B3A8\"></i><span>アッシュ</span></div><div class=\"sw\"><i style=\"background:#2C3B5E\"></i><span>ナイトブルー</span></div><div class=\"sw\"><i style=\"background:#E6D24A\"></i><span>Lイエロー</span></div><div class=\"sw\"><i style=\"background:#E07B36\"></i><span>Cオレンジ</span></div></div><div class=\"cr\">フレームはサンドブラック（またはブラック）。色名はアスクルの品番一覧から。画面の色は目安です。</div>" },
@@ -6107,7 +6107,7 @@ const HANDS_SRC={
 
   const card=document.createElement('div'); card.id='hcard'; document.body.appendChild(card);
   const ban=document.createElement('div'); ban.id='hbanner';
-  ban.innerHTML='<b>shake handsのみなさんへ</b>　家具や、床に立っている<b>場所の札（ⓘ）</b>・床そのものを<b>タップ</b>すると、実物の写真や、その場所・家具の説明が出ます。家具は最初は固定されています。左のパネルの「家具は固定中」を押すと、ドラッグで動かしたり、カードの「左へ／右へ」で向きを変えたりできます（保存はされず、開き直すと元に戻ります）。折りたたみの丸テーブル・椅子の座・小上がりのふたは、ダブルクリック（ダブルタップ）で動きます。家具や場所への声は、上の「💬 みんなの声」やカードの下から書きこめます。左上の「見え方」で、新しく買うもの／今あるものを切り替えられます。<button class="x" aria-label="閉じる">×</button>';
+  ban.innerHTML='<b>shake handsのみなさんへ</b>　家具や、床に立っている<b>場所の札（ⓘ）</b>・床そのものを<b>タップ</b>すると、実物の写真や、その場所・家具の説明が出ます。家具は最初は固定されています。左のパネルの「家具は固定中」を押すと、ドラッグで動かしたり、カードの「左へ／右へ」で向きを変えたりできます（保存はされず、開き直すと元に戻ります）。折りたたみの丸テーブル・椅子の座・小上がりのふたは、ダブルクリック（ダブルタップ）で動きます。カードの下の「みんなの意見」で、意見を一文で出したり、ほかの人の意見に「賛成・反対・保留」で答えたりできます。上の「💬 みんなの声」からは、まだ答えていない意見に順に答えたり、みんなが合意していること・意見が分かれていることを見たりできます。左上の「見え方」で、新しく買うもの／今あるものを切り替えられます。<button class="x" aria-label="閉じる">×</button>';
   document.body.appendChild(ban);
   ban.querySelector('.x').onclick=()=>ban.remove();
   setTimeout(()=>{ try{ flyTo([480,300,-160],[440,20,1250]); }catch(_){} },400);   // 中央カウンターの上から奥を見渡す
@@ -6138,7 +6138,7 @@ const HANDS_SRC={
     if(info.n) h+=`<div class="n">${esc(info.n)}</div>`;
     if(info.xn) h+=info.xn;
     if(curG) h+=`<div class="rot"><span>向きを変える（15°ずつ）</span><button data-r="1">↺ 左へ</button><button data-r="-1">右へ ↻</button></div>`;
-    card.innerHTML=h; card.classList.add('on');
+    card.innerHTML=h; card.classList.add('on'); { const L=document.getElementById('cmlist'); if(L) L.classList.remove('on'); }
     try{ const key=title||info.t; window.HANDS_COMMENTS_FOR&&window.HANDS_COMMENTS_FOR(key,key); }catch(_){}
     card.querySelectorAll('.rot button').forEach(b=>b.onclick=e=>{ e.stopPropagation(); if(!curG) return;
       curG.rotation.y+=(+b.dataset.r)*Math.PI/12; try{ settle(curG,false); }catch(_){} try{ checkCollisions(); }catch(_){} try{ renderer.render(scene,camera); }catch(_){} try{ save(); }catch(_){} });
@@ -6186,8 +6186,18 @@ const HANDS_SRC={
   #hlock small{display:block;font-size:11px;color:#5C6B60;font-weight:400}
   body.hlocked #hcard .rot{display:none}`;
   document.head.appendChild(lockCss);
+  /* 台形テーブルの椅子：島ごとに、ぐるりと回る順に3色をくり返す（同じ色が隣り合わない） */
+  const NAVC=[0x8FC6C2,0xC9A030,0x2F86C3];
+  window.handsNavColors=function(){ try{
+    const ns=furniture.filter(g=>g.userData.spec&&g.userData.spec.id==='navette'&&g.userData.fab); const seen=new Set();
+    ns.forEach(g0=>{ if(seen.has(g0)) return; const isl=[g0]; seen.add(g0);
+      for(let i=0;i<isl.length;i++) ns.forEach(h=>{ if(!seen.has(h)&&Math.hypot(h.position.x-isl[i].position.x,h.position.z-isl[i].position.z)<150){ seen.add(h); isl.push(h); } });
+      const cx=isl.reduce((a,g)=>a+g.position.x,0)/isl.length, cz=isl.reduce((a,g)=>a+g.position.z,0)/isl.length;
+      isl.sort((a,b)=>Math.atan2(a.position.z-cz,a.position.x-cx)-Math.atan2(b.position.z-cz,b.position.x-cx));
+      const n=isl.length; isl.forEach((g,i)=>{ let k=i%3; if(n%3===1&&i===n-1) k=1; g.userData.fab.color.setHex(NAVC[k]); }); });
+  }catch(e){ console.warn('navc',e); } };
   const applyLock=()=>{ try{ furniture.forEach(g=>{ g.userData.lock=!!window.HANDS_LOCK; }); }catch(_){} };
-  try{ const _restore=restore; restore=function(){ const r=_restore.apply(this,arguments); applyLock(); return r; }; }catch(e){ console.warn('lock',e); }
+  try{ const _restore=restore; restore=function(){ const r=_restore.apply(this,arguments); applyLock(); window.handsNavColors(); return r; }; }catch(e){ console.warn('lock',e); }
   const lb=document.createElement('button'); lb.id='hlock';
   const lockUI=()=>{ const on=!window.HANDS_LOCK; lb.classList.toggle('on',on); document.body.classList.toggle('hlocked',!on);
     lb.innerHTML=`<span class="sl"></span><span><b>${on?'家具を動かせます':'家具は固定中'}</b><small>${on?'ドラッグで移動・カードで向き変更（押すと固定）':'押すと、動かしてみられます'}</small></span>`; };
@@ -6196,7 +6206,7 @@ const HANDS_SRC={
     try{ renderer.render(scene,camera); }catch(_){} };
   lb.onclick=e=>{ e.stopPropagation(); window.handsSetLock(!window.HANDS_LOCK); };
   sw.insertBefore(lb,sw.firstChild); applyLock(); lockUI();
-  setTimeout(applyLock,1500); setTimeout(applyLock,4000);
+  setTimeout(()=>{ applyLock(); window.handsNavColors(); },1500); setTimeout(()=>{ applyLock(); window.handsNavColors(); },4000); window.handsNavColors();
   function ghost(g,on){
     g.traverse(o=>{
       if(!o.isMesh || !o.material) return;
@@ -6240,6 +6250,7 @@ const HANDS_SRC={
     e.preventDefault(); },true);
   addEventListener('pointerup',e=>{
     if(!down) return; const d=down; down=null;
+    if(e.target!==renderer.domElement) return;   // ボタンやパネルの上で離したときは、3Dの選択をしない（全体に戻る が効かない不具合 10/16）
     if(e.target.closest && (e.target.closest('#hcard')||e.target.closest('#hbanner')||e.target.closest('#hsw')||(e.target.tagName==='TEXTAREA')||e.target.closest('#topbar'))) return;
     if(Math.hypot(e.clientX-d.x,e.clientY-d.y)>6 || performance.now()-d.t>600) return;   // ドラッグ（視点操作）は無視
     if(typeof walkMode!=='undefined' && walkMode) {}
@@ -6266,6 +6277,7 @@ const HANDS_SRC={
   /* ---- 場所（ゾーン）もクリックできることを見せる（10/16 白川さん）：床の上に「場所名」の札を立て、床にカーソルを乗せると場所の範囲が光る ---- */
 
   /* ---- 4面パネル（固定の建物の一部なので家具ではない）もクリックで説明（10/16） ---- */
+  (function(){ const b=document.getElementById('solo-exit'); if(b) b.addEventListener('pointerup',e=>{ e.stopPropagation(); try{ exitSolo(); }catch(_){} },true); })();
   var panel4Hit=new THREE.Mesh(new THREE.BoxGeometry(132,255,249.5),new THREE.MeshBasicMaterial({visible:false}));
   panel4Hit.position.set(118+66,127.5,891); scene.add(panel4Hit);
   var zonePins=[];
@@ -6363,7 +6375,7 @@ const HANDS_SRC={
   /* ---- 「使い方」ボタン：この見学モードの使い方カードを出す（10/16） ---- */
   (function(){ const b=document.getElementById('b-help'); if(!b) return;
     b.addEventListener('click',e=>{ e.stopImmediatePropagation(); e.preventDefault();
-      show({t:'この3Dモデルの使い方',tag:'使い方',d:'・家具をクリック（タップ）すると、写真と、そこに置いた理由が出ます。\n・床や、空中の「ⓘ 場所名」の札をクリックすると、その場所の説明が出ます。左のパネルの「場所」からも選べます。\n・家具は最初は固定されています（うっかり動かさないように）。左のパネルの「家具は固定中」を押すと、ドラッグで動かしたり、カードの「左へ／右へ」で向きを変えたりできます。固定中でも、家具を押して説明を見たり、声を書いたりできます。\n・折りたためる家具（丸テーブル・ちゃぶ台・椅子の座・小上がりの天板）は、ダブルクリックで動きます。\n・上の「元に戻す／やり直す」（⌘Z／⇧⌘Z、WindowsはCtrl+Z／Ctrl+Y）で、動かす前に戻せます。\n・左のパネルの「見え方」で、新しく買うもの／今あるものを切り替えられます。「会場」「人」で、イベントの日や人がいるときの様子も見られます。\n・視点は、ドラッグで回転、右ドラッグ（2本指）で移動、ホイール（ピンチ）で拡大・縮小。上の「全体」「真上から」などのボタンでも切り替えられます。\n・動かした配置は保存されません。ページを開き直すと元に戻ります。'}); },true); })();
+      show({t:'この3Dモデルの使い方',tag:'使い方',d:'・家具をクリック（タップ）すると、写真と、そこに置いた理由が出ます。\n・床や、空中の「ⓘ 場所名」の札をクリックすると、その場所の説明が出ます。左のパネルの「場所」からも選べます。\n・家具は最初は固定されています（うっかり動かさないように）。左のパネルの「家具は固定中」を押すと、ドラッグで動かしたり、カードの「左へ／右へ」で向きを変えたりできます。固定中でも、家具を押して説明を見たり、声を書いたりできます。\n・折りたためる家具（丸テーブル・ちゃぶ台・椅子の座・小上がりの天板）は、ダブルクリックで動きます。\n・上の「元に戻す／やり直す」（⌘Z／⇧⌘Z、WindowsはCtrl+Z／Ctrl+Y）で、動かす前に戻せます。\n・左のパネルの「見え方」で、新しく買うもの／今あるものを切り替えられます。「会場」「人」で、イベントの日や人がいるときの様子も見られます。\n・カードの下の「みんなの意見」では、その家具・場所への意見に「賛成・反対・保留」で答えたり、新しい意見を一文で出したりできます（返信の欄はありません。ちがう考えは、新しい意見として出してください）。\n・上の「💬 みんなの声」では、まだ答えていない意見に一つずつ答えられます。「合意」「分かれている」「グループ」のタブで、みんなの見え方が分かります（台湾などで使われている「Polis（ポリス）」の考え方）。\n・視点は、ドラッグで回転、右ドラッグ（2本指）で移動、ホイール（ピンチ）で拡大・縮小。上の「全体」「真上から」などのボタンでも切り替えられます。\n・動かした配置は保存されません。ページを開き直すと元に戻ります。'}); },true); })();
 
   /* コメントの行き先（カードの名前 → 家具・場所） */
   Object.defineProperty(window,'HANDS_TARGETS',{get(){ const T={};
@@ -6938,186 +6950,295 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   const hv=window.handsView; if(hv){ window.handsView=function(m){ window.__hview=m; hv(m); }; }
 })();
 
-/* ===== みんなの声（什器・場所へのコメント）10/16 白川さん =====
-   保存先：Googleスプレッドシート（Apps Script のウェブアプリ経由）。
-   COMMENTS_API が空のあいだは、この端末のブラウザ内だけに保存する（お試し用）。 */
+/* ===== みんなの声（Polis方式）10/16 白川さん =====
+   台湾の vTaiwan などで使われている「Polis（ポリス）」の考え方を借りた仕組み。
+   ・だれでも、家具・場所・全体のテーマについて「一文の意見」（140字まで）を出せる
+   ・ほかの人の意見に「賛成／反対／保留（わからない）」で答える（返信や反論はしない＝言い争いにならない）
+   ・答えのパターンから、意見のグループ（似た答え方をする人の集まり）を自動で見つけ、
+     「グループをこえて合意していること」「意見が分かれていること」「各グループらしい意見」を見えるようにする
+   保存先：Googleスプレッドシート（Apps Script のウェブアプリ）。COMMENTS_API が空なら、この端末の中だけに保存（お試し用）。 */
 (function(){
   if(!/[?&]hands\b/.test(location.search)) return;
   const COMMENTS_API = (window.COMMENTS_API!==undefined) ? window.COMMENTS_API : 'https://script.google.com/macros/s/AKfycbyRuORVVgsWallk8rlNljpedJeqhnmB2PLUznZvqtWrK4YqQaDNm9GBNXC6d_3GbU3q/exec';
-  const LKEY='shake3d-comments-local-v1', NKEY='shake3d-comment-name', LIKEKEY='shake3d-comment-liked';
+  const LKEY='shake3d-polis-local-v1', NKEY='shake3d-comment-name', VKEY='shake3d-polis-voter', MYV='shake3d-polis-myvotes';
+  const MAXLEN=140;
   const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const lget=(k,d)=>{ try{ return JSON.parse(localStorage.getItem(k)||'null')??d; }catch(_){ return d; } };
   const lset=(k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(_){} };
-  let ALL=[], loaded=false;
+  // この端末の投票者ID（名前とは結びつけない）
+  let VOTER=lget(VKEY,''); if(!VOTER){ VOTER='v'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); lset(VKEY,VOTER); }
+
+  let ALL=[], VOTES={}, loaded=false;          // VOTES[sid] = {voterId: 1|-1|0}
+  const mine=()=>lget(MYV,{});                  // この端末の票（送信前に画面へ反映するため）
+  const PKEY='shake3d-polis-pending';
+  async function flush(){ const Q=lget(PKEY,{}); const ks=Object.keys(Q); if(!ks.length) return; for(const sid of ks){ try{ const r=await api.send({action:'vote',id:sid,voter:VOTER,vote:Q[sid]}); if(r&&r.ok){ const Q2=lget(PKEY,{}); if(Q2[sid]===Q[sid]){ delete Q2[sid]; lset(PKEY,Q2); } } }catch(_){ return; } } }
   const api={
     async list(){
-      if(!COMMENTS_API) return lget(LKEY,[]);
-      const r=await fetch(COMMENTS_API+'?action=list&t='+Date.now()); const j=await r.json(); return j.comments||[];
+      if(!COMMENTS_API){ const L=lget(LKEY,{s:[],v:{}}); return {comments:L.s, votes:L.v}; }
+      const r=await fetch(COMMENTS_API+'?action=list&t='+Date.now()); const j=await r.json();
+      const V={}; (j.votes||[]).forEach(([voter,sid,v])=>{ (V[sid]=V[sid]||{})[voter]=+v; });
+      return {comments:j.comments||[], votes:V};
     },
     async send(o){
-      if(!COMMENTS_API){ const L=lget(LKEY,[]);
-        if(o.action==='add'){ L.push({id:'L'+Date.now(),item:o.item,itemName:o.itemName,name:o.name,text:o.text,parent:o.parent||'',at:new Date().toISOString(),likes:0}); }
-        if(o.action==='like'){ const c=L.find(c=>c.id===o.id); if(c) c.likes=(+c.likes||0)+1; }
+      if(!COMMENTS_API){ const L=lget(LKEY,{s:[],v:{}});
+        if(o.action==='add'){ L.s.push({id:'L'+Date.now(),item:o.item,itemName:o.itemName,name:o.name,text:o.text,at:new Date().toISOString()}); }
+        if(o.action==='vote'){ (L.v[o.id]=L.v[o.id]||{})[o.voter]=o.vote; }
         lset(LKEY,L); return {ok:true}; }
       const r=await fetch(COMMENTS_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)}); return r.json();
     }
   };
-  async function refresh(){ try{ ALL=(await api.list()).filter(c=>c && !c.hidden); loaded=true; }catch(e){ console.warn('comments',e); } updateBadges(); renderList(); renderThread(); }
+  async function refresh(){
+    try{ await flush(); }catch(_){}
+    try{ const r=await api.list(); ALL=(r.comments||[]).filter(c=>c && !c.hidden && !c.parent); VOTES=r.votes||{}; loaded=true;
+      const M=mine(); Object.entries(M).forEach(([sid,v])=>{ (VOTES[sid]=VOTES[sid]||{})[VOTER]=v; });   // 自分の票は手元を優先
+    }catch(e){ console.warn('comments',e); }
+    analyze(); updateBadges(); renderList(); renderThread();
+  }
   const ago=iso=>{ const d=(Date.now()-new Date(iso))/1000; if(d<60) return 'たった今'; if(d<3600) return Math.floor(d/60)+'分前'; if(d<86400) return Math.floor(d/3600)+'時間前'; const t=new Date(iso); return (t.getMonth()+1)+'/'+t.getDate(); };
-  const avatar=n=>{ const s=String(n||'匿名'); let h=0; for(const ch of s) h=(h*31+ch.charCodeAt(0))%360; return `<i class="av" style="background:hsl(${h},55%,48%)">${esc(s.slice(0,1))}</i>`; };
+
+  /* ---- 集計：賛成・反対・保留 ---- */
+  function agg(sid,members){ const V=VOTES[sid]||{}; let a=0,d=0,p=0;
+    for(const [u,v] of Object.entries(V)){ if(members && !members.has(u)) continue; if(v>0) a++; else if(v<0) d++; else p++; }
+    return {a,d,p,n:a+d+p}; }
+  const myVote=sid=>{ const V=VOTES[sid]||{}; return (VOTER in V)? V[VOTER] : null; };
+
+  /* ---- 分析（Polis と同じ考え方を小さな人数向けに）----
+     1) 人×意見の表を作る（賛成=+1、反対=-1、保留・未回答=0）
+     2) 主成分分析（PCA）で2次元に縮める
+     3) k-means で 2〜4 のグループに分け、シルエット値がいちばん良い数を選ぶ
+     4) グループごとの「らしさ」（repness）と、グループをこえた合意（group-informed consensus）を計算 */
+  let AN={groups:[],coords:{},ok:false,P:0};
+  let SEED=1; const rnd=()=>{ SEED=(SEED*16807)%2147483647; return (SEED-1)/2147483646; };
+  const MINV=3;                 // グループ分けに入る人の最低回答数
+  function analyze(){
+    AN={groups:[],coords:{},ok:false,P:0}; SEED=12345;
+    const sids=ALL.map(c=>c.id).filter(s=>agg(s).n>=2);
+    const voters={}; sids.forEach(s=>Object.keys(VOTES[s]||{}).forEach(u=>{ voters[u]=(voters[u]||0)+1; }));
+    const P=Object.keys(voters).filter(u=>voters[u]>=MINV); AN.P=P.length;
+    if(P.length<6 || sids.length<3) return;
+    const X=P.map(u=>sids.map(s=>{ const v=(VOTES[s]||{})[u]; return v>0?1:v<0?-1:0; }));
+    const m=sids.map((_,j)=>X.reduce((t,r)=>t+r[j],0)/P.length); X.forEach(r=>r.forEach((_,j)=>r[j]-=m[j]));
+    const pc=k0=>{ let w=sids.map(()=>rnd()-.5); for(let it=0;it<60;it++){ const s=X.map(r=>r.reduce((t,x,j)=>t+x*w[j],0)); const nw=sids.map((_,j)=>X.reduce((t,r,i)=>t+r[j]*s[i],0));
+        k0.forEach(c=>{ const d=nw.reduce((t,x,j)=>t+x*c[j],0); nw.forEach((_,j)=>nw[j]-=d*c[j]); }); const n=Math.hypot(...nw)||1; w=nw.map(x=>x/n); } return w; };
+    const c1=pc([]), c2=pc([c1]);
+    const Y=X.map(r=>[r.reduce((t,x,j)=>t+x*c1[j],0), r.reduce((t,x,j)=>t+x*c2[j],0)]);
+    const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+    const km=k=>{ let best=null;
+      for(let rep=0;rep<12;rep++){ let C=[]; const idx=[...Y.keys()].map(i=>[rnd(),i]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); for(let i=0;i<k;i++) C.push(Y[idx[i]].slice());
+        let L=[]; for(let it=0;it<40;it++){ L=Y.map(y=>{ let bi=0,bd=1e9; C.forEach((c,i)=>{ const d=dist(y,c); if(d<bd){bd=d;bi=i;} }); return bi; });
+          C=C.map((c,i)=>{ const pts=Y.filter((_,j)=>L[j]===i); return pts.length?[pts.reduce((t,p)=>t+p[0],0)/pts.length,pts.reduce((t,p)=>t+p[1],0)/pts.length]:c; }); }
+        if(new Set(L).size<k) continue;
+        const minSz=Math.max(3,Math.ceil(Y.length*0.12)); if([...Array(k).keys()].some(g=>L.filter(x=>x===g).length<minSz)) continue;   // 小さすぎるグループは作らない
+        const sil=Y.reduce((t,y,i)=>{ const own=Y.filter((_,j)=>L[j]===L[i]&&j!==i); if(!own.length) return t; const a=own.reduce((s,z)=>s+dist(y,z),0)/own.length;
+          let b=1e9; for(let g=0;g<k;g++){ if(g===L[i]) continue; const o=Y.filter((_,j)=>L[j]===g); if(o.length) b=Math.min(b,o.reduce((s,z)=>s+dist(y,z),0)/o.length); }
+          return t+(b-a)/Math.max(a,b,1e-9); },0)/Y.length;
+        if(!best||sil>best.sil) best={L,C,sil,k}; }
+      return best; };
+    let best=null; for(let k=2;k<=Math.min(4,Math.floor(P.length/3));k++){ const r=km(k); if(r && (!best||r.sil>best.sil+0.02)) best=r; }
+    if(!best) return;
+    const names='ABCD';
+    const order=[...Array(best.k).keys()].map(g=>[g,best.L.filter(x=>x===g).length]).sort((a,b)=>b[1]-a[1]||a[0]-b[0]).map(x=>x[0]);
+    AN.groups=order.map((g,i)=>({name:'グループ'+names[i], members:new Set(P.filter((_,j)=>best.L[j]===g))})).filter(g=>g.members.size);
+    P.forEach((u,i)=>AN.coords[u]={x:Y[i][0],y:Y[i][1],g:order.indexOf(best.L[i])});
+    AN.ok=true;
+  }
+  // グループをこえた合意：各グループの賛成率（ベイズ補正）の積。グループがないときは全体の賛成率
+  function consensus(sid){ if(!AN.ok){ const t=agg(sid); return (t.a+1)/(t.n+2); }
+    return AN.groups.reduce((x,g)=>{ const t=agg(sid,g.members); return x*(t.a+1)/(t.n+2); },1); }
+  // そのグループ「らしい」意見（グループの中と外での差）
+  function repness(sid,g){ const t=agg(sid,g.members); const rest=new Set(); AN.groups.forEach(h=>{ if(h!==g) h.members.forEach(u=>rest.add(u)); }); const o=agg(sid,rest);
+    const pa=(t.a+1)/(t.n+2), pd=(t.d+1)/(t.n+2), ra=pa/((o.a+1)/(o.n+2)), rd=pd/((o.d+1)/(o.n+2));
+    return ra*pa>=rd*pd ? {s:ra*pa,dir:1,r:ra,p:pa,t} : {s:rd*pd,dir:-1,r:rd,p:pd,t}; }
+  const divisive=sid=>{ const t=agg(sid); if(t.n<4) return 0; return Math.min(t.a,t.d)/t.n; };
 
   /* ---- 見た目 ---- */
   const st=document.createElement('style'); st.textContent=`
   #hcard .cm{margin-top:12px;border-top:1px solid #E1E6DA;padding-top:10px}
   #hcard .cm h4,#cmlist h4{margin:0 0 6px;font-size:14px;color:#26312A}
-  .cmi{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid #EEF1EA;font-size:13px;line-height:1.55;color:#26312A}
-  .cmi.rp{position:relative}
-  .cmi .ln{position:absolute;left:-12px;top:0;bottom:0;border-left:2px solid #E1E6DA}
-  #cmlist .cmf.top{background:#F6F7F3;border-radius:10px;padding:8px;margin:6px 0 10px}
-  #cmlist .tp{font-size:12px;color:#26312A}#cmlist .tps{font:inherit;font-size:12.5px;border:1px solid #CBD3C6;border-radius:6px;padding:3px 6px;margin-left:4px}
-  .cmi .av{flex:0 0 26px;height:26px;border-radius:50%;color:#fff;font-style:normal;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center}
-  .cmi .bd{flex:1;min-width:0}
-  .cmi .nm{font-weight:700;font-size:12.5px}.cmi .tm{color:#7A857C;font-size:11px;margin-left:6px}
-  .cmi .tx{white-space:pre-wrap;word-break:break-word}
-  .cmi .ac{display:flex;gap:12px;margin-top:2px}
-  .cmi .ac button{border:0;background:none;color:#5C6B60;font-size:12px;cursor:pointer;padding:0}
-  .cmi .ac button.on{color:#D0427A;font-weight:700}
-  .cmi .it{display:inline-block;font-size:11px;background:#EEF3E6;color:#2E7D32;border-radius:99px;padding:1px 8px;margin-bottom:2px;cursor:pointer;border:0}
+  .pst{border:1px solid #E1E6DA;border-radius:12px;padding:9px 10px;margin:8px 0;background:#fff}
+  .pst .it{display:inline-block;font-size:11px;background:#EEF3E6;color:#2E7D32;border-radius:99px;padding:1px 8px;margin-bottom:4px;cursor:pointer;border:0}
+  .pst .tx{font-size:14px;line-height:1.6;color:#26312A;white-space:pre-wrap;word-break:break-word}
+  .pst .by{font-size:11px;color:#7A857C;margin-top:2px}
+  .pst .vt{display:flex;gap:6px;margin-top:8px}
+  .pst .vt button{flex:1;border:1.5px solid #CBD3C6;background:#fff;border-radius:10px;padding:7px 4px;font-size:13px;font-weight:700;cursor:pointer;color:#26312A}
+  .pst .vt button.a.on{background:#2E7D32;border-color:#2E7D32;color:#fff}
+  .pst .vt button.d.on{background:#C0392B;border-color:#C0392B;color:#fff}
+  .pst .vt button.p.on{background:#7A857C;border-color:#7A857C;color:#fff}
+  .pst .bar{display:flex;height:8px;border-radius:99px;overflow:hidden;margin-top:8px;background:#EEF1EA}
+  .pst .bar i{display:block}.pst .bar .ba{background:#2E7D32}.pst .bar .bd{background:#C0392B}.pst .bar .bp{background:#BFC7BC}
+  .pst .num{font-size:11.5px;color:#5C6B60;margin-top:3px}
+  .pst .gb{font-size:11px;color:#5C6B60;margin-top:3px}
   .cmf{display:flex;flex-direction:column;gap:6px;margin-top:8px}
   .cmf input,.cmf textarea{font:inherit;font-size:13px;border:1px solid #CBD3C6;border-radius:8px;padding:6px 8px;resize:vertical}
   .cmf .rw{display:flex;gap:6px;align-items:center}
   .cmf button.snd{background:#2E7D32;color:#fff;border:0;border-radius:8px;padding:7px 14px;font-weight:700;cursor:pointer}
-  .cmf .rpto{font-size:12px;color:#5C6B60}
-  .cmf .me{flex:1;display:flex;align-items:center;gap:6px;font-size:12.5px;color:#26312A}.cmf .me .av{flex:0 0 22px;height:22px;border-radius:50%;color:#fff;font-style:normal;font-size:11px;display:flex;align-items:center;justify-content:center}
+  .cmf .me{flex:1;display:flex;align-items:center;gap:6px;font-size:12.5px;color:#26312A}
   .cmf .chn{border:0;background:none;color:#2E7D32;font-size:12px;cursor:pointer;padding:0;text-decoration:underline}
   .cmf .anon{font-size:12px;color:#5C6B60;display:flex;align-items:center;gap:4px;cursor:pointer}
-  .cmf .nmh{font-size:11.5px;color:#7A857C}
+  .cmf .nmh,.cmf .cnt{font-size:11.5px;color:#7A857C}
   .cmempty{font-size:12.5px;color:#7A857C;padding:4px 0}
   #b-voices .bdg[hidden]{display:none}
   #b-voices .bdg{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:99px;background:#D0427A;color:#fff;font-size:11px}
-  #cmlist{position:fixed;z-index:61;right:8px;top:calc(var(--topH,52px) + 12px);width:min(380px,calc(100vw - 16px));max-height:calc(100vh - var(--topH,52px) - 30px);overflow:auto;
+  #cmlist{position:fixed;z-index:61;right:8px;top:calc(var(--topH,52px) + 12px);width:min(400px,calc(100vw - 16px));max-height:calc(100vh - var(--topH,52px) - 30px);overflow:auto;
     background:#fff;border:1px solid #D8DDD2;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:12px 14px;display:none}
   #cmlist.on{display:block}
   #cmlist .x{position:absolute;right:8px;top:6px;border:0;background:none;font-size:22px;cursor:pointer;color:#5C6B60}
-  #cmlist .srt{display:flex;gap:6px;margin:4px 0 8px}#cmlist .srt button{border:1px solid #CBD3C6;background:#fff;border-radius:99px;padding:3px 10px;font-size:12px;cursor:pointer}
-  #cmlist .srt button.on{background:#2E7D32;color:#fff;border-color:#2E7D32}
-  #cmlist .nt{font-size:11.5px;color:#7A857C;margin-bottom:6px}`;
+  #cmlist .tabs{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 8px}
+  #cmlist .tabs button{border:1px solid #CBD3C6;background:#fff;border-radius:99px;padding:4px 10px;font-size:12px;cursor:pointer}
+  #cmlist .tabs button.on{background:#2E7D32;color:#fff;border-color:#2E7D32}
+  #cmlist .nt{font-size:11.5px;color:#7A857C;margin-bottom:6px;line-height:1.6}
+  #cmlist .box{background:#F6F7F3;border-radius:10px;padding:8px 10px;margin:6px 0 10px}
+  #cmlist .tps{font:inherit;font-size:12.5px;border:1px solid #CBD3C6;border-radius:6px;padding:3px 6px;margin-left:4px}
+  #cmlist .prog{font-size:12px;color:#5C6B60;margin:4px 0}
+  #cmlist .gcard{border-left:5px solid #999;padding:4px 0 4px 10px;margin:10px 0}
+  #cmlist .skip{border:0;background:none;color:#2E7D32;cursor:pointer;font-size:12.5px;text-decoration:underline;padding:0}`;
   document.head.appendChild(st);
+  const GCOL=['#2F86C3','#C9A030','#8E44AD','#16A085'];
 
-  /* ---- 上のバーに「みんなの声」 ---- */
-  const TOPICS=['全体について','全体の方針・考え方','運用・ルール','予算','動画・3Dモデルについて','その他'];   // 家具や場所ではない声のテーマ
+  /* ---- 意見カード（賛成・反対・保留） ---- */
+  const TOPICS=['全体について','全体の方針・考え方','運用・ルール','予算','動画・3Dモデルについて','その他'];
   const ZNAMES=()=>(window.HANDS_ZONES||[]).map(z=>z.t);
   const kindOf=k=>TOPICS.includes(k)?'topic':(ZNAMES().includes(k)?'area':'item');
+  function stmt(c,showItem){ const t=agg(c.id), mv=myVote(c.id), seen=mv!==null;
+    const pct=x=>t.n?Math.round(x*100/t.n):0;
+    let h=`<div class="pst" data-id="${esc(c.id)}">`+
+      (showItem?`<button class="it" data-item="${esc(c.item)}">${kindOf(c.item)==='topic'?'🗂 ':kindOf(c.item)==='area'?'📍 ':'🪑 '}${esc(c.itemName||c.item)}</button><br>`:'')+
+      `<div class="tx">${esc(c.text)}</div><div class="by">${esc(c.name||'匿名')}・${ago(c.at)}${c.via==='form'?'（フォームから）':''}</div>`+
+      `<div class="vt"><button class="a${mv===1?' on':''}" data-v="1">賛成</button><button class="d${mv===-1?' on':''}" data-v="-1">反対</button><button class="p${mv===0?' on':''}" data-v="0" title="わからない・どちらとも言えない">保留</button></div>`;
+    if(seen){ h+=`<div class="bar"><i class="ba" style="width:${pct(t.a)}%"></i><i class="bd" style="width:${pct(t.d)}%"></i><i class="bp" style="width:${pct(t.p)}%"></i></div>`+
+      `<div class="num">賛成 ${t.a}・反対 ${t.d}・保留 ${t.p}（${t.n}人が回答）</div>`;
+      if(AN.ok) h+='<div class="gb">'+AN.groups.map((g,i)=>{ const u=agg(c.id,g.members); return `<span style="color:${GCOL[i]}">●</span>${esc(g.name)} 賛成${u.n?Math.round(u.a*100/u.n):0}%`; }).join('　')+'</div>'; }
+    else h+=`<div class="num">答えると、みんなの結果が見られます</div>`;
+    return h+'</div>'; }
+  function wireVotes(root){
+    root.querySelectorAll('.pst .vt button').forEach(b=>b.onclick=async e=>{ e.stopPropagation(); const sid=b.closest('.pst').dataset.id, v=+b.dataset.v;
+      const M=mine(); M[sid]=v; lset(MYV,M); (VOTES[sid]=VOTES[sid]||{})[VOTER]=v; lastVoted=sid; analyze(); updateBadges(); renderList(); renderThread();
+      const Q=lget(PKEY,{}); Q[sid]=v; lset(PKEY,Q); flush(); });
+    root.querySelectorAll('.pst [data-item]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.item; if(kindOf(k)==='topic'){ tab='all'; renderList(); } else goto(k); });
+  }
+
+  /* ---- 上のバーに「みんなの声」と一覧パネル ---- */
   const help=document.getElementById('b-help');
   const vb=document.createElement('button'); vb.className='btn small primary'; vb.id='b-voices'; vb.innerHTML='💬 みんなの声<span class="bdg" hidden>0</span>';
   if(help&&help.parentNode) help.parentNode.insertBefore(vb,help.nextSibling);
   const panel=document.createElement('div'); panel.id='cmlist'; document.body.appendChild(panel);
-  let sortBy='new', filt='all', pTopic=TOPICS[0], pReply=null;
-  vb.onclick=e=>{ e.stopPropagation(); panel.classList.toggle('on'); if(panel.classList.contains('on')) refresh(); };
-  const kids=id=>ALL.filter(r=>r.parent===id).sort((a,b)=>new Date(a.at)-new Date(b.at));
-  const countTree=c=>1+kids(c.id).reduce((n,k)=>n+countTree(k),0);
-  function tree(list,depth,showItem,ctx){ return list.map(c=>item(c,depth,showItem&&depth===0,ctx)+tree(kids(c.id),depth+1,false,ctx)).join(''); }
+  let tab='answer', pTopic=TOPICS[0], skipped=new Set(), lastVoted=null;
+  vb.onclick=e=>{ e.stopPropagation(); panel.classList.toggle('on'); if(panel.classList.contains('on')){ const c=document.getElementById('hcard'); if(c) c.classList.remove('on'); refresh(); } };
+  // 答える順：自分がまだ答えていない意見のうち、回答の少ないものから（新しい意見にも票が集まるように）
+  const queue=()=>ALL.filter(c=>myVote(c.id)===null && !skipped.has(c.id)).sort((a,b)=>agg(a.id).n-agg(b.id).n || new Date(b.at)-new Date(a.at));
   function renderList(){
-    const b=vb.querySelector('.bdg'); b.hidden=!ALL.length; b.textContent=ALL.length;
+    const unanswered=ALL.filter(c=>myVote(c.id)===null).length;
+    const b=vb.querySelector('.bdg'); b.hidden=!unanswered; b.textContent=unanswered; b.title='まだ答えていない意見';
     if(!panel.classList.contains('on')) return;
-    let top=ALL.filter(c=>!c.parent && ALL.every(p=>p.id!==c.parent));
-    top=ALL.filter(c=>!c.parent);
-    if(filt!=='all') top=top.filter(c=>TOPICS.includes(filt)? c.item===filt : kindOf(c.item)===filt);
-    const L=sortBy==='like'? top.slice().sort((a,b)=>(+b.likes||0)-(+a.likes||0)) : top.slice().sort((a,b)=>new Date(b.at)-new Date(a.at));
     const keep=panel.querySelector('.cmf textarea')?panel.querySelector('.cmf textarea').value:'';
-    const chip=(k,l)=>`<button data-f="${esc(k)}" class="${filt===k?'on':''}">${esc(l)}</button>`;
-    panel.innerHTML='<button class="x" aria-label="閉じる">×</button><h4>💬 みんなの声（'+ALL.length+'）</h4>'+
-      '<div class="nt">家具や場所をクリックすると、そこへの声が見られて、書きこめます。家具や場所ではない、全体の方針などへの声は、下の欄から書けます。</div>'+
-      '<div class="cmf top"><div class="tp">テーマ：<select class="tps">'+TOPICS.map(t=>`<option${t===pTopic?' selected':''}>${esc(t)}</option>`).join('')+'</select></div>'+formHTML(pReply,'全体の方針や、家具・場所に限らない声をどうぞ')+'</div>'+
-      '<div class="srt">'+chip('all','すべて')+chip('topic','全体・方針')+chip('area','エリア')+chip('item','家具・什器')+'</div>'+
-      '<div class="srt">'+`<button data-s="new" class="${sortBy==='new'?'on':''}">新しい順</button><button data-s="like" class="${sortBy==='like'?'on':''}">いいねが多い順</button>`+'</div>'+
-      (L.length? tree(L,0,true,'panel') : '<div class="cmempty">まだ声はありません。</div>')+
-      (COMMENTS_API?'':'<div class="nt" style="margin-top:8px">※いまはお試し中のため、この端末の中だけに保存されます。</div>');
+    const T=(k,l)=>`<button data-tab="${k}" class="${tab===k?'on':''}">${l}</button>`;
+    let body='';
+    if(tab==='answer'){ const q=queue(), c=q[0], done=ALL.length-unanswered;
+      body=`<div class="nt">みんなの意見に、ひとつずつ「賛成・反対・保留」で答えてください。言い返す場所はありません。ちがう考えは、下の欄から<b>新しい意見</b>として出してください。</div>`+
+        `<div class="prog">${ALL.length}件のうち ${done}件に答えました</div>`+
+        (lastVoted&&ALL.find(x=>x.id===lastVoted)?(()=>{ const t=agg(lastVoted), c0=ALL.find(x=>x.id===lastVoted); return `<div class="nt" style="background:#F6F7F3;border-radius:8px;padding:6px 8px">いま答えた「${esc(c0.text.length>24?c0.text.slice(0,24)+'…':c0.text)}」は、賛成 ${t.a}・反対 ${t.d}・保留 ${t.p}</div>`; })():'')+
+        (c? stmt(c,true)+`<button class="skip" data-skip="${esc(c.id)}">あとで答える →</button>` : `<div class="cmempty">${ALL.length?'ぜんぶ答えました。ありがとうございます！「合意」「分かれている」「グループ」のタブで、みんなの見え方を確かめられます。':'まだ意見はありません。最初の意見をどうぞ。'}</div>`); }
+    else if(tab==='agree'){ const L=ALL.filter(c=>agg(c.id).n>=3).map(c=>[c,consensus(c.id)]).filter(([c,s])=>agg(c.id).a/agg(c.id).n>=0.6).sort((a,b)=>b[1]-a[1]).slice(0,12);
+      body=`<div class="nt">${AN.ok?'どの意見グループでも賛成が多い意見（グループをこえた合意）':'賛成が多い意見（3人以上が答えたもの）'}です。ここが、みんなで進めやすいところです。</div>`+(L.length?L.map(([c])=>stmt(c,true)).join(''):'<div class="cmempty">まだありません。回答が集まると出てきます。</div>'); }
+    else if(tab==='split'){ const L=ALL.map(c=>[c,divisive(c.id)]).filter(x=>x[1]>=0.25).sort((a,b)=>b[1]-a[1]).slice(0,12);
+      body=`<div class="nt">賛成と反対がどちらも多い意見です。ここは、話し合いが必要なところです。</div>`+(L.length?L.map(([c])=>stmt(c,true)).join(''):'<div class="cmempty">まだありません。回答が集まると出てきます。</div>'); }
+    else if(tab==='groups'){ body=groupsHTML(); }
+    else { const L=ALL.slice().sort((a,b)=>new Date(b.at)-new Date(a.at)); body=`<div class="nt">すべての意見（新しい順）</div>`+(L.length?L.map(c=>stmt(c,true)).join(''):'<div class="cmempty">まだ意見はありません。</div>'); }
+    panel.innerHTML='<button class="x" aria-label="閉じる">×</button><h4>💬 みんなの声（意見 '+ALL.length+'件・'+Object.keys(voterSet()).length+'人が回答）</h4>'+
+      '<div class="tabs">'+T('answer','🗳 答える')+T('agree','🤝 合意')+T('split','⚖️ 分かれている')+T('groups','👥 グループ')+T('all','すべて')+'</div>'+body+
+      '<div class="box"><div style="font-size:12.5px;font-weight:700;margin-bottom:4px">新しい意見を出す</div><div style="font-size:12px">テーマ：<select class="tps">'+TOPICS.map(t=>`<option${t===pTopic?' selected':''}>${esc(t)}</option>`).join('')+'</select></div>'+
+      '<div class="cmf">'+formHTML('家具や場所のことは、その家具・場所を押して書けます')+'</div></div>'+
+      '<div class="nt">3Dの吹き出し：<b style="color:#2E7D32">緑</b>＝賛成が多い意見がある／<b style="color:#D9822B">オレンジ</b>＝意見が分かれている／<b style="color:#D0427A">ピンク</b>＝これから。数字は意見の数。</div>'+
+      '<div class="nt">しくみ：台湾などで使われている「Polis（ポリス）」の考え方を借りています。答え方が似ている人どうしを自動でグループにして、グループをこえて合意できることを見つけます。だれがどう答えたかは表示されません。</div>'+
+      (COMMENTS_API?'':'<div class="nt">※いまはお試し中のため、この端末の中だけに保存されます。</div>');
     panel.querySelector('.x').onclick=()=>panel.classList.remove('on');
-    panel.querySelectorAll('[data-s]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); sortBy=b.dataset.s; renderList(); });
-    panel.querySelectorAll('[data-f]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); filt=b.dataset.f; renderList(); });
-    const sel=panel.querySelector('.tps'); sel.onchange=e=>{ pTopic=sel.value; }; sel.addEventListener('pointerdown',e=>e.stopPropagation());
-    bindForm(panel.querySelector('.cmf.top'),()=>({key:pReply?(ALL.find(c=>c.id===pReply)||{}).item:pTopic,name:pReply?(ALL.find(c=>c.id===pReply)||{}).itemName:pTopic,parent:pReply}),()=>{ pReply=null; },()=>{ pReply=null; renderList(); },renderList);
-    panel.querySelector('.cmf.top textarea').value=keep;
-    wire(panel,'panel');
+    panel.querySelectorAll('[data-tab]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); tab=b.dataset.tab; renderList(); panel.scrollTop=0; });
+    const sk=panel.querySelector('[data-skip]'); if(sk) sk.onclick=e=>{ e.stopPropagation(); skipped.add(sk.dataset.skip); renderList(); };
+    const sel=panel.querySelector('.tps'); sel.onchange=()=>{ pTopic=sel.value; }; sel.addEventListener('pointerdown',e=>e.stopPropagation());
+    bindForm(panel.querySelector('.cmf'),()=>({key:pTopic,name:pTopic}),renderList);
+    panel.querySelector('.cmf textarea').value=keep;
+    wireVotes(panel);
   }
-  const liked=()=>lget(LIKEKEY,[]);
-  function item(c,depth,showItem,ctx){ const lk=liked().includes(c.id), d=Math.min(depth,5);
-    return `<div class="cmi${depth?' rp':''}" data-id="${esc(c.id)}" style="margin-left:${d*20}px">${depth?'<span class="ln"></span>':''}${avatar(c.name)}<div class="bd">`+
-      (showItem?`<button class="it" data-item="${esc(c.item)}">${kindOf(c.item)==='topic'?'🗂 ':kindOf(c.item)==='area'?'📍 ':''}${esc(c.itemName||c.item)}</button><br>`:'')+
-      `<span class="nm">${esc(c.name||'匿名')}</span><span class="tm">${ago(c.at)}</span>${c.via==='form'?'<span class="tm">（フォームから）</span>':''}<div class="tx">${esc(c.text)}</div>`+
-      `<div class="ac"><button class="lk${lk?' on':''}" data-like="${esc(c.id)}">${lk?'♥':'♡'} ${+c.likes||0}</button>`+(c.via==='form'?'':`<button data-reply="${esc(c.id)}">返信</button>`)+`</div></div></div>`; }
-  function wire(root,ctx){
-    root.querySelectorAll('[data-like]').forEach(b=>b.onclick=async e=>{ e.stopPropagation(); const id=b.dataset.like, L=liked(); if(L.includes(id)) return; L.push(id); lset(LIKEKEY,L);
-      const c=ALL.find(c=>c.id===id); if(c) c.likes=(+c.likes||0)+1; renderList(); renderThread(); try{ await api.send({action:'like',id}); }catch(_){} });
-    root.querySelectorAll('[data-item]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.item; if(kindOf(k)==='topic'){ filt=k; renderList(); } else goto(k); });
-    root.querySelectorAll('[data-reply]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const id=b.dataset.reply;
-      if(ctx==='panel'){ pReply=id; renderList(); const ta=panel.querySelector('.cmf.top textarea'); if(ta){ ta.focus(); panel.scrollTop=0; } }
-      else { replyTo=id; renderThread(); const ta=document.querySelector('#hcard .cmf textarea'); if(ta) ta.focus(); } });
-  }
-  /* 書きこみ欄（カードと一覧で共通） */
-  function formHTML(reply,ph){ const nm=lget(NKEY,''), rc=reply&&ALL.find(c=>c.id===reply);
-    return (rc?`<div class="rpto">↪ ${esc(rc.name||'匿名')}さんへの返信${rc.itemName?'（'+esc(rc.itemName)+'）':''}　<button class="cx" style="border:0;background:none;color:#2E7D32;cursor:pointer">やめる</button></div>`:'')+
-      `<textarea rows="2" maxlength="600" placeholder="${rc?'返信を書く':esc(ph)}"></textarea>`+
+  const voterSet=()=>{ const S={}; ALL.forEach(c=>Object.keys(VOTES[c.id]||{}).forEach(u=>S[u]=1)); return S; };   // 今ある意見への回答者だけ数える
+  function groupsHTML(){
+    if(!AN.ok) return `<div class="nt">意見のグループは、<b>6人以上</b>がそれぞれ<b>${MINV}件以上</b>答えると表示されます（いま ${AN.P}人）。答えが集まるほど、はっきりします。</div>`;
+    const pts=Object.entries(AN.coords); const xs=pts.map(p=>p[1].x), ys=pts.map(p=>p[1].y);
+    const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys), W=340, H=170;
+    const sx=x=>14+(x-x0)/((x1-x0)||1)*(W-28), sy=y=>14+(y-y0)/((y1-y0)||1)*(H-28);
+    const me=AN.coords[VOTER];
+    let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;background:#F6F7F3;border-radius:10px">`+pts.map(([u,p])=>`<circle cx="${sx(p.x).toFixed(1)}" cy="${sy(p.y).toFixed(1)}" r="${u===VOTER?7:5}" fill="${GCOL[p.g]}" fill-opacity="${u===VOTER?1:.6}" ${u===VOTER?'stroke="#26312A" stroke-width="2"':''}/>`).join('')+
+      (me?`<text x="${(sx(me.x)+9).toFixed(1)}" y="${(sy(me.y)+4).toFixed(1)}" font-size="12" font-weight="700" fill="#26312A">あなた</text>`:'')+'</svg>';
+    let h=`<div class="nt">点は回答した人（${pts.length}人）。答え方が似ている人ほど近くに集まります。色がグループです。${me?'':'（あなたは、もう少し答えると地図に出ます）'}</div>`+svg;
+    AN.groups.forEach((g,i)=>{ const L=ALL.filter(c=>agg(c.id,g.members).n>=2).map(c=>[c,repness(c.id,g)]).filter(([c,r])=>r.r>1.25&&r.p>0.55).sort((a,b)=>b[1].s-a[1].s).slice(0,3);
+      h+=`<div class="gcard" style="border-color:${GCOL[i]}"><b style="color:${GCOL[i]}">${esc(g.name)}</b>（${g.members.size}人）${me&&me.g===i?' ← あなた':''}<div class="nt" style="margin:2px 0">このグループらしい答え：</div>`+
+        (L.length?L.map(([c,r])=>`<div style="font-size:13px;margin:3px 0">${r.dir>0?'<b style="color:#2E7D32">賛成</b>':'<b style="color:#C0392B">反対</b>'} ${Math.round(r.p*100)}%：${esc(c.text)}</div>`).join(''):'<div class="cmempty">まだ特徴ははっきりしません。</div>')+'</div>'; });
+    return h; }
+
+  /* ---- 書きこみ欄（一文の意見） ---- */
+  let editName=false;
+  function formHTML(ph){ const nm=lget(NKEY,'');
+    return `<textarea rows="2" maxlength="${MAXLEN}" placeholder="${esc(ph)}"></textarea><div class="cnt">一文で、ほかの人が賛成・反対で答えられる形で（${MAXLEN}字まで）。例：「ソファは窓のほうを向けたい」</div>`+
       ((nm && !editName)
-        ? `<div class="rw"><span class="me">${avatar(nm)}<b>${esc(nm)}</b>さんとして書く　<button class="chn">名前を変える</button></span><button class="snd">送る</button></div><label class="anon"><input type="checkbox" class="anc">匿名で書く</label>`
-        : `<div class="rw"><input class="nmi" maxlength="30" placeholder="名前（必須・ニックネームでOK）" value="${esc(nm)}" style="flex:1;min-width:0"><button class="snd">送る</button></div><label class="anon"><input type="checkbox" class="anc">匿名で書く</label><div class="nmh">はじめに名前を入れてください。この端末では次から同じ名前で書けます（あとで変えられます）。名前を出したくないときは「匿名で書く」にチェック。</div>`); }
-  function bindForm(box,getTarget,onCancelReply,onSent,rerender){
-    const ta=box.querySelector('textarea');
+        ? `<div class="rw"><span class="me"><b>${esc(nm)}</b>さんとして出す　<button class="chn">名前を変える</button></span><button class="snd">出す</button></div><label class="anon"><input type="checkbox" class="anc">匿名で出す</label>`
+        : `<div class="rw"><input class="nmi" maxlength="30" placeholder="名前（ニックネームでOK）" value="${esc(nm)}" style="flex:1;min-width:0"><button class="snd">出す</button></div><label class="anon"><input type="checkbox" class="anc">匿名で出す</label><div class="nmh">名前は意見の下に小さく出ます。この端末では次から同じ名前で出せます。賛成・反対の回答は、名前と結びつかず、だれが答えたかは表示されません。</div>`); }
+  function bindForm(box,getTarget,rerender){
+    const ta=box.querySelector('textarea'); const cnt=box.querySelector('.cnt'); const base=cnt?cnt.textContent:'';
+    if(cnt) ta.addEventListener('input',()=>{ cnt.textContent=ta.value.length? `のこり ${MAXLEN-ta.value.length}字` : base; });
     box.querySelectorAll('textarea,input,select').forEach(el=>{ el.addEventListener('keydown',e=>e.stopPropagation()); el.addEventListener('pointerdown',e=>e.stopPropagation()); });
-    const cx=box.querySelector('.cx'); if(cx) cx.onclick=e=>{ e.stopPropagation(); onCancelReply(); rerender(); };
-    const chn=box.querySelector('.chn'); if(chn) chn.onclick=e=>{ e.stopPropagation(); const v=ta.value; editName=true; rerender(); const t2=(box.isConnected?box:document).querySelector('textarea'); };
+    const chn=box.querySelector('.chn'); if(chn) chn.onclick=e=>{ e.stopPropagation(); editName=true; rerender(); };
     box.querySelector('.snd').onclick=async e=>{ e.stopPropagation(); const ni=box.querySelector('.nmi'); const name=ni? ni.value.trim() : lget(NKEY,'');
       const anon=box.querySelector('.anc')&&box.querySelector('.anc').checked;
-      const text=ta.value.trim(); if(!text){ ta.focus(); return; }
-      if(anon){ if(!confirm('匿名で送ります。\n\n匿名の声も、ひとつずつ大切に読みます。\nただ、だれの声かが分かると、shake handsのメンバーから「もう少し詳しく聞かせて」と声をかけたり、いっしょに形にしたりできます。\n\nこのまま匿名で送りますか？\n（「キャンセル」を押すと、名前を入れて送れます）')) { box.querySelector('.anc').checked=false; return; } }
-      else if(!name){ ni.style.borderColor='#D0427A'; ni.focus(); ni.placeholder='名前を入れてください（または「匿名で書く」にチェック）'; return; }
+      const text=ta.value.trim().slice(0,MAXLEN); if(!text){ ta.focus(); return; }
+      if(anon){ if(!confirm('匿名で出します。\n\n匿名の意見も、ひとつずつ大切に読みます。\nただ、だれの意見かが分かると、shake handsのメンバーから「もう少し詳しく聞かせて」と声をかけたり、いっしょに形にしたりできます。\n\nこのまま匿名で出しますか？\n（「キャンセル」を押すと、名前を入れて出せます）')) { box.querySelector('.anc').checked=false; return; } }
+      else if(!name){ ni.style.borderColor='#D0427A'; ni.focus(); ni.placeholder='名前を入れてください（または「匿名で出す」にチェック）'; return; }
       const sendName=anon?'匿名':name; if(!anon){ lset(NKEY,name); editName=false; }
       const t=getTarget(); const b=e.target; b.disabled=true; b.textContent='送信中…';
-      try{ await api.send({action:'add',item:t.key,itemName:t.name,name:sendName,text,parent:t.parent||''}); ta.value=''; onSent(); await refresh(); }
+      try{ await api.send({action:'add',item:t.key,itemName:t.name,name:sendName,text}); ta.value=''; await refresh(); }
       catch(err){ alert('送れませんでした。時間をおいてもう一度お試しください。'); }
-      b.disabled=false; b.textContent='送る'; };
+      b.disabled=false; b.textContent='出す'; };
   }
   /* その家具・場所へ移動してカードを開く */
-  function goto(key,reply){ panel.classList.remove('on');
+  function goto(key){ panel.classList.remove('on');
     const t=window.HANDS_TARGETS&&window.HANDS_TARGETS[key];
     if(t&&t.zone){ try{ window.showZone(t.zone); }catch(_){} }
     else if(t&&t.g){ const g=t.g; try{ flyTo([g.position.x+120,180,g.position.z-260],[g.position.x,40,g.position.z]); }catch(_){} try{ window.HANDS_SHOW(t.info,null,g); }catch(_){} }
     else if(t&&t.info){ try{ window.HANDS_SHOW(t.info); }catch(_){} }
-    if(reply){ replyTo=reply; renderThread(); }
   }
 
-  /* ---- カードの下にスレッドと書きこみ欄 ---- */
-  let curKey=null, curName='', replyTo=null, editName=false;
-  window.HANDS_COMMENTS_FOR=function(key,name){ curKey=key; curName=name; replyTo=null; renderThread(); if(!loaded) refresh(); };
+  /* ---- カードの下：その家具・場所への意見 ---- */
+  let curKey=null, curName='';
+  window.HANDS_COMMENTS_FOR=function(key,name){ curKey=key; curName=name; renderThread(); if(!loaded) refresh(); };
   function renderThread(){
     const card=document.getElementById('hcard'); if(!card||!curKey||!card.classList.contains('on')) return;
     let box=card.querySelector('.cm'); if(!box){ box=document.createElement('div'); box.className='cm'; const rot=card.querySelector('.rot'); card.insertBefore(box,rot||null); }
-    const top=ALL.filter(c=>c.item===curKey&&!c.parent).sort((a,b)=>new Date(a.at)-new Date(b.at));
-    const n=top.reduce((s,c)=>s+countTree(c),0);
+    const L=ALL.filter(c=>c.item===curKey).sort((a,b)=>new Date(a.at)-new Date(b.at));
     const keep=box.querySelector('textarea')?box.querySelector('textarea').value:'';
-    box.innerHTML=`<h4>💬 みんなの声（${n}）</h4>`+(top.length? tree(top,0,false,'card') : '<div class="cmempty">まだ声はありません。「ここがいい」「ここが心配」、ひとことでも大歓迎です。</div>')+
-      `<div class="cmf">`+formHTML(replyTo,'この'+(curName?'「'+curName+'」':'家具・場所')+'への声を書く')+`</div>`;
+    box.innerHTML=`<h4>💬 みんなの意見（${L.length}）</h4><div class="cmempty" style="padding:0 0 2px">賛成・反対・保留で答えてください。ちがう考えは、新しい意見として出せます。</div>`+
+      (L.length? L.map(c=>stmt(c,false)).join('') : '<div class="cmempty">まだ意見はありません。最初の意見をどうぞ。</div>')+
+      `<div class="cmf">`+formHTML('この'+(curName?'「'+curName+'」':'家具・場所')+'への意見を一文で')+`</div>`;
     box.querySelector('.cmf textarea').value=keep;
-    bindForm(box.querySelector('.cmf'),()=>({key:curKey,name:curName,parent:replyTo}),()=>{ replyTo=null; },()=>{ replyTo=null; },renderThread);
-    wire(box,'card');
+    bindForm(box.querySelector('.cmf'),()=>({key:curKey,name:curName}),renderThread);
+    wireVotes(box);
   }
 
-  /* ---- 声がある家具・場所の上に吹き出し（件数）を出す ---- */
+  /* ---- 意見がある家具・場所の上に吹き出し（件数）。色：緑＝賛成が多い、オレンジ＝分かれている ---- */
   const bubbles=[];
-  function bubbleTex(n){ const c=document.createElement('canvas'); c.width=128; c.height=96; const x=c.getContext('2d');
-    x.fillStyle='#D0427A'; x.beginPath(); x.moveTo(20,8); x.arcTo(120,8,120,70,16); x.arcTo(120,70,8,70,16); x.lineTo(46,70); x.lineTo(30,92); x.lineTo(34,70); x.arcTo(8,70,8,8,16); x.arcTo(8,8,120,8,16); x.closePath(); x.fill();
+  function bubbleTex(n,col){ const c=document.createElement('canvas'); c.width=128; c.height=96; const x=c.getContext('2d');
+    x.fillStyle=col; x.beginPath(); x.moveTo(20,8); x.arcTo(120,8,120,70,16); x.arcTo(120,70,8,70,16); x.lineTo(46,70); x.lineTo(30,92); x.lineTo(34,70); x.arcTo(8,70,8,8,16); x.arcTo(8,8,120,8,16); x.closePath(); x.fill();
     x.fillStyle='#fff'; x.font='bold 40px sans-serif'; x.textAlign='center'; x.textBaseline='middle'; x.fillText('💬'+n,64,40); const t=new THREE.CanvasTexture(c); return t; }
   function updateBadges(){
     bubbles.forEach(b=>scene.remove(b)); bubbles.length=0;
-    const T=window.HANDS_TARGETS||{}; const cnt={}; ALL.forEach(c=>{ cnt[c.item]=(cnt[c.item]||0)+1; });
-    Object.entries(cnt).forEach(([k,n])=>{ const t=T[k]; if(!t) return; let p;
+    const T=window.HANDS_TARGETS||{}; const by={}; ALL.forEach(c=>{ (by[c.item]=by[c.item]||[]).push(c); });
+    Object.entries(by).forEach(([k,L])=>{ const t=T[k]; if(!t) return; let p;
       if(t.g){ const bb=new THREE.Box3().setFromObject(t.g); p=new THREE.Vector3((bb.min.x+bb.max.x)/2,bb.max.y+18,(bb.min.z+bb.max.z)/2); }
       else if(t.zone){ const z=t.zone; p=new THREE.Vector3((z.x0+z.x1)/2+60,150,(z.z0+z.z1)/2); } else return;
-      const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:bubbleTex(n),depthTest:false,transparent:true,sizeAttenuation:false})); sp.scale.set(0.034*1.33,0.034,1); sp.renderOrder=998; sp.position.copy(p); sp.userData.cmKey=k; scene.add(sp); bubbles.push(sp); });
+      const split=L.some(c=>divisive(c.id)>=0.25), agree=L.some(c=>{ const a=agg(c.id); return a.n>=3&&a.a/a.n>=0.6; });
+      const col=split?'#D9822B':agree?'#2E7D32':'#D0427A';
+      const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:bubbleTex(L.length,col),depthTest:false,transparent:true,sizeAttenuation:false})); sp.scale.set(0.034*1.33,0.034,1); sp.renderOrder=998; sp.position.copy(p); sp.userData.cmKey=k; scene.add(sp); bubbles.push(sp); });
     window.HANDS_CM_BUBBLES=bubbles; try{ renderer.render(scene,camera); }catch(_){}
   }
   window.HANDS_CM_GOTO=goto;
+  window.HANDS_POLIS={analyze:()=>AN, refresh};
   setTimeout(refresh,2500); setInterval(()=>{ if(document.visibilityState==='visible') refresh(); },60000);
 })();
 
