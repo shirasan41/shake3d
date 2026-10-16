@@ -6092,10 +6092,19 @@ const HANDS_SRC={
   #hcard .rot{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:12.5px;color:#5C6B60}
   #hcard .rot button{border:1px solid #CBD3C6;background:#fff;border-radius:8px;padding:5px 10px;font-size:13px;cursor:pointer}
   #hcard .x{position:absolute;right:10px;top:8px;border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:#5C6B60;padding:4px 8px}
-  #hbanner{position:fixed;z-index:59;left:50%;transform:translateX(-50%);bottom:18px;width:min(560px,calc(100vw - 32px));
-    background:rgba(38,49,42,.92);color:#F2F5EF;border-radius:12px;padding:10px 40px 10px 14px;font-size:13px;line-height:1.6}
-  #hbanner b{color:#fff}
+  #hbanner{position:fixed;z-index:59;left:50%;transform:translateX(-50%);bottom:18px;width:min(620px,calc(100vw - 24px));
+    background:rgba(28,38,31,.94);color:#F2F5EF;border-radius:16px;padding:12px 40px 12px 14px;font-size:13px;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.25);backdrop-filter:blur(6px)}
   #hbanner .x{position:absolute;right:8px;top:6px;border:0;background:none;color:#F2F5EF;font-size:20px;cursor:pointer;padding:2px 6px}
+  #hbanner .hi{font-weight:800;font-size:13px;margin-bottom:8px;color:#CDE8C9}
+  #hbanner .st3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  #hbanner .st3 div{background:rgba(255,255,255,.08);border-radius:12px;padding:8px 9px;display:flex;gap:8px;align-items:center}
+  #hbanner .st3 i{font-style:normal;font-size:22px;line-height:1}
+  #hbanner .st3 b{display:block;font-size:13px;color:#fff}
+  #hbanner .st3 small{display:block;font-size:11px;color:#C9D6C6}
+  #hbanner .go{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+  #hbanner .go button{border:0;border-radius:99px;padding:7px 14px;font-weight:800;font-size:13px;cursor:pointer}
+  #hbanner .go .p{background:#8BD17C;color:#14361A}#hbanner .go .s{background:rgba(255,255,255,.12);color:#fff}
+  @media (max-width:560px){ #hbanner{padding:10px 34px 10px 10px} #hbanner .st3{gap:6px} #hbanner .st3 div{flex-direction:column;text-align:center;gap:4px;padding:7px 4px} #hbanner .st3 small{font-size:10px} #hbanner .st3 b{font-size:12px} }
   @media (max-width:700px){ #hcard{right:8px;left:8px;width:auto;top:auto;bottom:8px;max-height:62vh} }`;
   document.head.appendChild(css);
 
@@ -6107,9 +6116,14 @@ const HANDS_SRC={
 
   const card=document.createElement('div'); card.id='hcard'; document.body.appendChild(card);
   const ban=document.createElement('div'); ban.id='hbanner';
-  ban.innerHTML='<b>shake handsのみなさんへ</b>　家具や、床に立っている<b>場所の札（ⓘ）</b>・床そのものを<b>タップ</b>すると、実物の写真や、その場所・家具の説明が出ます。家具は最初は固定されています。左のパネルの「家具は固定中」を押すと、ドラッグで動かしたり、カードの「左へ／右へ」で向きを変えたりできます（保存はされず、開き直すと元に戻ります）。折りたたみの丸テーブル・椅子の座・小上がりのふたは、ダブルクリック（ダブルタップ）で動きます。カードの下の「みんなの意見」で、意見を一文で出したり、ほかの人の意見に「賛成・反対・保留」で答えたりできます。上の「💬 みんなの声」からは、まだ答えていない意見に順に答えたり、みんなが合意していること・意見が分かれていることを見たりできます。左上の「見え方」で、新しく買うもの／今あるものを切り替えられます。<button class="x" aria-label="閉じる">×</button>';
+  ban.innerHTML='<div class="hi">shakeの新しい配置案へ、ようこそ</div><div class="st3">'+
+    '<div><i>👆</i><span><b>押すと説明</b><small>家具・床・ⓘの札</small></span></div>'+
+    '<div><i>🗳</i><span><b>意見に答える</b><small>賛成・反対・保留で</small></span></div>'+
+    '<div><i>✋</i><span><b>動かしてみる</b><small>左の「家具は固定中」を外す</small></span></div></div>'+
+    '<div class="go"><button class="p" data-go="v">🗳 みんなの声に答える</button><button class="s" data-go="h">使い方</button></div><button class="x" aria-label="閉じる">×</button>';
   document.body.appendChild(ban);
   ban.querySelector('.x').onclick=()=>ban.remove();
+  ban.querySelectorAll('[data-go]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const id=b.dataset.go==='v'?'b-voices':'b-help'; const t=document.getElementById(id); ban.remove(); if(t) t.click(); });
   setTimeout(()=>{ try{ flyTo([480,300,-160],[440,20,1250]); }catch(_){} },400);   // 中央カウンターの上から奥を見渡す
 
   const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -6968,7 +6982,28 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   // この端末の投票者ID（名前とは結びつけない）
   let VOTER=lget(VKEY,''); if(!VOTER){ VOTER='v'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); lset(VKEY,VOTER); }
 
-  let ALL=[], VOTES={}, loaded=false;          // VOTES[sid] = {voterId: 1|-1|0}
+  /* 配置案からの「たたき台」の意見（最初から賛成・反対で答えられるように。白川さんの配置案の要点） */
+  const SEEDS=[
+    ['全体の方針・考え方','ハイチェアを主役にせず、いろいろな高さの席を混ぜる方針がよい'],
+    ['全体の方針・考え方','家具は、できるだけキャスター付きで動かせるものにするのがよい'],
+    ['運用・ルール','ホワイトボードの置き場所は、決めておいたほうがよい'],
+    ['運用・ルール','掲示の貼り替えや家具の片づけは、shake handsで分担して考えたい'],
+    ['予算','新しく買う家具は「動かせること」と「使い方の幅」で選ぶのがよい']
+  ].map(([item,text],i)=>({id:'Q'+String(i+1).padStart(2,'0'),item,itemName:item,name:'配置案より',text,at:'',seed:true}));
+
+  /* 家具・エリアごとの「案」＝白川さんの配置案（shake hands などの声をまとめたもの）。これに賛成・反対・保留で答えるのが基本 */
+  const hsh=t=>{ let h=5381; for(const ch of String(t)) h=((h*33)^ch.charCodeAt(0))>>>0; return h.toString(36); };
+  let BASE=null;
+  function baseList(){ if(BASE&&BASE.length) return BASE; const T=window.HANDS_TARGETS; if(!T) return [];
+    const out=[]; const zs=(window.HANDS_ZONES||[]).map(z=>z.t);
+    Object.entries(T).forEach(([k,t])=>{ const zone=!!t.zone, info=t.info||{};
+      const d=String((zone&&t.zone.d)||info.d||'').replace(/【[^】]*】/g,'').replace(/\s+/g,' ').trim();
+      out.push({id:'B'+hsh(k),item:k,itemName:k,base:true,zone,tag:zone?'場所':(info.tag||''),desc:d,name:'配置案',text:'「'+k+'」の置き方・使い方の案',at:''}); });
+    const WALK=['入口','中央カウンター','広場','台形テーブル','本の通り','ハイデスク','ラボ','小上がり','プロジェクトルーム1','プロジェクトルーム2','プロジェクトルーム3'];
+    const wi=k=>{ const i=WALK.findIndex(w=>k.indexOf(w)===0); return i<0?99:i; };
+    out.sort((a,b)=>(b.zone-a.zone)||(a.zone?wi(a.item)-wi(b.item):((/新しく/.test(b.tag)?1:0)-(/新しく/.test(a.tag)?1:0))));
+    BASE=out; return BASE; }
+  let ALL=SEEDS.slice(), VOTES={}, loaded=false;          // VOTES[sid] = {voterId: 1|-1|0}
   const mine=()=>lget(MYV,{});                  // この端末の票（送信前に画面へ反映するため）
   const PKEY='shake3d-polis-pending';
   async function flush(){ const Q=lget(PKEY,{}); const ks=Object.keys(Q); if(!ks.length) return; for(const sid of ks){ try{ const r=await api.send({action:'vote',id:sid,voter:VOTER,vote:Q[sid]}); if(r&&r.ok){ const Q2=lget(PKEY,{}); if(Q2[sid]===Q[sid]){ delete Q2[sid]; lset(PKEY,Q2); } } }catch(_){ return; } } }
@@ -6989,7 +7024,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   };
   async function refresh(){
     try{ await flush(); }catch(_){}
-    try{ const r=await api.list(); ALL=(r.comments||[]).filter(c=>c && !c.hidden && !c.parent); VOTES=r.votes||{}; loaded=true;
+    try{ const r=await api.list(); ALL=baseList().concat(SEEDS,(r.comments||[]).filter(c=>c && !c.hidden && !c.parent)); VOTES=r.votes||{}; loaded=true;
       const M=mine(); Object.entries(M).forEach(([sid,v])=>{ (VOTES[sid]=VOTES[sid]||{})[VOTER]=v; });   // 自分の票は手元を優先
     }catch(e){ console.warn('comments',e); }
     analyze(); updateBadges(); renderList(); renderThread();
@@ -7051,47 +7086,103 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     return ra*pa>=rd*pd ? {s:ra*pa,dir:1,r:ra,p:pa,t} : {s:rd*pd,dir:-1,r:rd,p:pd,t}; }
   const divisive=sid=>{ const t=agg(sid); if(t.n<4) return 0; return Math.min(t.a,t.d)/t.n; };
 
-  /* ---- 見た目 ---- */
+  /* ---- 見た目（10/16 第2版：触りたくなる・見やすい） ---- */
   const st=document.createElement('style'); st.textContent=`
-  #hcard .cm{margin-top:12px;border-top:1px solid #E1E6DA;padding-top:10px}
-  #hcard .cm h4,#cmlist h4{margin:0 0 6px;font-size:14px;color:#26312A}
-  .pst{border:1px solid #E1E6DA;border-radius:12px;padding:9px 10px;margin:8px 0;background:#fff}
-  .pst .it{display:inline-block;font-size:11px;background:#EEF3E6;color:#2E7D32;border-radius:99px;padding:1px 8px;margin-bottom:4px;cursor:pointer;border:0}
-  .pst .tx{font-size:14px;line-height:1.6;color:#26312A;white-space:pre-wrap;word-break:break-word}
-  .pst .by{font-size:11px;color:#7A857C;margin-top:2px}
-  .pst .vt{display:flex;gap:6px;margin-top:8px}
-  .pst .vt button{flex:1;border:1.5px solid #CBD3C6;background:#fff;border-radius:10px;padding:7px 4px;font-size:13px;font-weight:700;cursor:pointer;color:#26312A}
-  .pst .vt button.a.on{background:#2E7D32;border-color:#2E7D32;color:#fff}
-  .pst .vt button.d.on{background:#C0392B;border-color:#C0392B;color:#fff}
-  .pst .vt button.p.on{background:#7A857C;border-color:#7A857C;color:#fff}
-  .pst .bar{display:flex;height:8px;border-radius:99px;overflow:hidden;margin-top:8px;background:#EEF1EA}
-  .pst .bar i{display:block}.pst .bar .ba{background:#2E7D32}.pst .bar .bd{background:#C0392B}.pst .bar .bp{background:#BFC7BC}
-  .pst .num{font-size:11.5px;color:#5C6B60;margin-top:3px}
-  .pst .gb{font-size:11px;color:#5C6B60;margin-top:3px}
-  .cmf{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-  .cmf input,.cmf textarea{font:inherit;font-size:13px;border:1px solid #CBD3C6;border-radius:8px;padding:6px 8px;resize:vertical}
-  .cmf .rw{display:flex;gap:6px;align-items:center}
-  .cmf button.snd{background:#2E7D32;color:#fff;border:0;border-radius:8px;padding:7px 14px;font-weight:700;cursor:pointer}
-  .cmf .me{flex:1;display:flex;align-items:center;gap:6px;font-size:12.5px;color:#26312A}
+  .pv *{box-sizing:border-box}
+  #hcard .cm{margin-top:14px;border-top:1px solid #E1E6DA;padding-top:12px}
+  .pv-h4{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:15px;font-weight:800;color:#1E2A22}
+  .pv-h4 .n{font-size:12px;font-weight:700;color:#fff;background:#2E7D32;border-radius:99px;padding:1px 8px}
+  .pst{position:relative;border-radius:16px;padding:14px 14px 12px;margin:10px 0;background:#fff;box-shadow:0 1px 0 #E4E9E0,0 6px 18px rgba(30,42,34,.08);border:1px solid #E7ECE3;transition:transform .25s,opacity .25s}
+  .pst.big{padding:20px 18px 16px;border-radius:20px}
+  .pst.gone{transform:translateX(40px);opacity:0}
+  .pst .it{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;background:#EEF4EA;color:#2E6B34;border-radius:99px;padding:3px 10px;margin-bottom:8px;cursor:pointer;border:0}
+  .pst .tx{font-size:15px;line-height:1.65;color:#1E2A22;font-weight:600;white-space:pre-wrap;word-break:break-word}
+  .pst.big .tx{font-size:19px;line-height:1.6}
+  .pst .by{font-size:11px;color:#8A948C;margin-top:4px}
+  .pst .vt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .pst .vt button{display:flex;flex-direction:column;align-items:center;gap:2px;border:2px solid transparent;border-radius:14px;padding:9px 4px 8px;font-size:13px;font-weight:800;cursor:pointer;transition:transform .12s,background .15s,box-shadow .15s}
+  .pst.big .vt button{padding:14px 4px 12px;font-size:15px}
+  .pst .vt button i{font-style:normal;font-size:22px;line-height:1}
+  .pst.big .vt button i{font-size:30px}
+  .pst .vt button:active{transform:scale(.95)}
+  .pst .vt .a{background:#E8F5E4;color:#21662A}.pst .vt .a:hover{background:#D5EEcf}
+  .pst .vt .d{background:#FBE9E7;color:#A93226}.pst .vt .d:hover{background:#F7D6D2}
+  .pst .vt .p{background:#F0F2EE;color:#56615A}.pst .vt .p:hover{background:#E4E8E1}
+  .pst .vt .a.on{background:#2E7D32;color:#fff;box-shadow:0 4px 12px rgba(46,125,50,.35)}
+  .pst .vt .d.on{background:#C0392B;color:#fff;box-shadow:0 4px 12px rgba(192,57,43,.35)}
+  .pst .vt .p.on{background:#6B766E;color:#fff}
+  .pst .res{margin-top:10px}
+  .pst .bar{display:flex;height:10px;border-radius:99px;overflow:hidden;background:#EEF1EA}
+  .pst .bar i{display:block;transition:width .4s}.pst .bar .ba{background:#2E7D32}.pst .bar .bd{background:#C0392B}.pst .bar .bp{background:#C3CBC0}
+  .pst .num{display:flex;gap:10px;font-size:12px;color:#56615A;margin-top:5px;font-weight:700}
+  .pst .num span:nth-child(1){color:#21662A}.pst .num span:nth-child(2){color:#A93226}
+  .pst .gb{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .pst .gb span{font-size:11px;background:#F4F6F2;border-radius:99px;padding:2px 8px;color:#3C4840}
+  .pst.base{border:2px solid #CFE3C9;background:linear-gradient(180deg,#F7FBF5,#fff)}
+  .pst .ds{font-size:13px;line-height:1.6;color:#3C4840;margin-top:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .pst .see{border:0;background:none;color:#2E6B34;font-weight:800;font-size:12.5px;padding:6px 0 0;cursor:pointer}
+  .pst .q{font-size:13px;font-weight:800;color:#1F4D2A;margin-top:10px}
+  .pst .hint{font-size:12px;color:#8A948C;margin-top:8px;text-align:center}
+  .pv-cta{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;border:2px dashed #B9D3B2;background:#F6FAF4;color:#2E6B34;border-radius:14px;padding:11px;font-weight:800;font-size:14px;cursor:pointer;margin-top:10px}
+  .pv-cta:hover{background:#ECF5E8}
+  .cmf{display:flex;flex-direction:column;gap:8px;margin-top:10px;background:#F6F8F4;border-radius:14px;padding:12px}
+  .cmf textarea{font:inherit;font-size:15px;border:1.5px solid #CBD3C6;border-radius:12px;padding:10px 12px;resize:none;min-height:70px;background:#fff}
+  .cmf textarea:focus,.cmf input:focus{outline:none;border-color:#2E7D32;box-shadow:0 0 0 3px rgba(46,125,50,.15)}
+  .cmf input{font:inherit;font-size:14px;border:1.5px solid #CBD3C6;border-radius:10px;padding:8px 10px;background:#fff}
+  .cmf .rw{display:flex;gap:8px;align-items:center}
+  .cmf button.snd{background:#2E7D32;color:#fff;border:0;border-radius:12px;padding:10px 18px;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 4px 12px rgba(46,125,50,.3)}
+  .cmf .me{flex:1;display:flex;align-items:center;gap:6px;font-size:13px;color:#1E2A22;min-width:0}
   .cmf .chn{border:0;background:none;color:#2E7D32;font-size:12px;cursor:pointer;padding:0;text-decoration:underline}
-  .cmf .anon{font-size:12px;color:#5C6B60;display:flex;align-items:center;gap:4px;cursor:pointer}
-  .cmf .nmh,.cmf .cnt{font-size:11.5px;color:#7A857C}
-  .cmempty{font-size:12.5px;color:#7A857C;padding:4px 0}
+  .cmf .anon{font-size:12.5px;color:#56615A;display:flex;align-items:center;gap:6px;cursor:pointer}
+  .cmf .cnt{font-size:11.5px;color:#8A948C;display:flex;justify-content:space-between}
+  .cmf .tps{display:flex;flex-wrap:wrap;gap:6px}
+  .cmf .tps button{border:1.5px solid #CBD3C6;background:#fff;border-radius:99px;padding:4px 10px;font-size:12px;cursor:pointer;color:#3C4840}
+  .cmf .tps button.on{background:#1E2A22;border-color:#1E2A22;color:#fff}
+  .cmempty{font-size:13px;color:#8A948C;padding:4px 0}
+  #b-voices{background:#2E7D32!important;color:#fff!important;border-color:#2E7D32!important;font-weight:800;box-shadow:0 4px 14px rgba(46,125,50,.35)}
+  #b-voices:hover{background:#25692A!important}
   #b-voices .bdg[hidden]{display:none}
-  #b-voices .bdg{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:99px;background:#D0427A;color:#fff;font-size:11px}
-  #cmlist{position:fixed;z-index:61;right:8px;top:calc(var(--topH,52px) + 12px);width:min(400px,calc(100vw - 16px));max-height:calc(100vh - var(--topH,52px) - 30px);overflow:auto;
-    background:#fff;border:1px solid #D8DDD2;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:12px 14px;display:none}
+  #b-voices .bdg{display:inline-block;min-width:18px;padding:0 6px;margin-left:5px;border-radius:99px;background:#FFD54A;color:#3A2E00!important;color:#fff;font-size:11px;font-weight:800;animation:pvp 2s infinite}
+  @keyframes pvp{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+  #cmlist{position:fixed;z-index:61;right:10px;top:calc(var(--topH,52px) + 12px);width:min(420px,calc(100vw - 20px));max-height:calc(100vh - var(--topH,52px) - 26px);overflow:auto;
+    background:#FBFCFA;border:1px solid #DDE3D8;border-radius:22px;box-shadow:0 18px 50px rgba(20,30,24,.25);padding:0;display:none}
   #cmlist.on{display:block}
-  #cmlist .x{position:absolute;right:8px;top:6px;border:0;background:none;font-size:22px;cursor:pointer;color:#5C6B60}
-  #cmlist .tabs{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 8px}
-  #cmlist .tabs button{border:1px solid #CBD3C6;background:#fff;border-radius:99px;padding:4px 10px;font-size:12px;cursor:pointer}
-  #cmlist .tabs button.on{background:#2E7D32;color:#fff;border-color:#2E7D32}
-  #cmlist .nt{font-size:11.5px;color:#7A857C;margin-bottom:6px;line-height:1.6}
-  #cmlist .box{background:#F6F7F3;border-radius:10px;padding:8px 10px;margin:6px 0 10px}
-  #cmlist .tps{font:inherit;font-size:12.5px;border:1px solid #CBD3C6;border-radius:6px;padding:3px 6px;margin-left:4px}
-  #cmlist .prog{font-size:12px;color:#5C6B60;margin:4px 0}
-  #cmlist .gcard{border-left:5px solid #999;padding:4px 0 4px 10px;margin:10px 0}
-  #cmlist .skip{border:0;background:none;color:#2E7D32;cursor:pointer;font-size:12.5px;text-decoration:underline;padding:0}`;
+  #cmlist .hd{position:sticky;top:0;z-index:2;background:linear-gradient(135deg,#1F4D2A,#2E7D32);color:#fff;padding:16px 18px 12px;border-radius:22px 22px 0 0}
+  #cmlist .hd .tt{font-size:18px;font-weight:900;letter-spacing:.02em}
+  #cmlist .hd .sub{font-size:12px;color:#CDE8C9;margin-top:2px}
+  #cmlist .hd .x{position:absolute;right:12px;top:10px;border:0;background:rgba(255,255,255,.15);color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer}
+  #cmlist .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  #cmlist .stats div{background:rgba(255,255,255,.12);border-radius:12px;padding:6px 8px;text-align:center}
+  #cmlist .stats b{display:block;font-size:20px;line-height:1.1}
+  #cmlist .stats small{font-size:10.5px;color:#D7EBD3}
+  #cmlist .prog{height:6px;border-radius:99px;background:rgba(255,255,255,.2);margin-top:10px;overflow:hidden}
+  #cmlist .prog i{display:block;height:100%;background:#8BD17C;transition:width .4s}
+  #cmlist .tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:10px 12px 0;position:sticky;top:0}
+  #cmlist .tabs button{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;border-radius:12px;padding:7px 2px 6px;font-size:11px;font-weight:800;color:#56615A;cursor:pointer}
+  #cmlist .tabs button i{font-style:normal;font-size:19px;line-height:1}
+  #cmlist .tabs button.on{background:#E8F2E5;color:#1F4D2A}
+  #cmlist .bd{padding:6px 14px 14px}
+  #cmlist .scp{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none}
+  #cmlist .scp button{flex:none;border:1.5px solid #CBD3C6;background:#fff;border-radius:99px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;color:#3C4840}
+  #cmlist .scp button.on{background:#1E2A22;border-color:#1E2A22;color:#fff}
+  #cmlist .lead{font-size:12.5px;color:#56615A;line-height:1.6;margin:6px 2px 2px}
+  #cmlist .skip{display:block;margin:2px auto 0;border:0;background:none;color:#56615A;cursor:pointer;font-size:12.5px;padding:6px}
+  #cmlist .done{text-align:center;padding:18px 8px}
+  #cmlist .done i{font-style:normal;font-size:44px;display:block}
+  #cmlist .done b{display:block;font-size:16px;margin:6px 0 4px;color:#1E2A22}
+  #cmlist .done span{font-size:12.5px;color:#56615A}
+  #cmlist .last{font-size:12px;color:#3C4840;background:#EEF4EA;border-radius:10px;padding:7px 10px;margin:8px 0 0}
+  #cmlist .gcard{border-radius:14px;padding:10px 12px;margin:10px 0;background:#fff;border:1px solid #E7ECE3}
+  #cmlist .gcard .gh{display:flex;align-items:center;gap:8px;font-weight:800}
+  #cmlist .gcard .gh i{width:12px;height:12px;border-radius:50%;display:inline-block}
+  #cmlist .gcard .ln{font-size:13px;margin:6px 0 0;display:flex;gap:6px;align-items:flex-start}
+  #cmlist .gcard .ln b{flex:none;font-size:11px;border-radius:6px;padding:1px 6px;color:#fff}
+  #cmlist .how{margin:14px 2px 0;font-size:12px;color:#56615A}
+  #cmlist .how summary{cursor:pointer;font-weight:700;color:#2E6B34}
+  #cmlist .how p{margin:6px 0;line-height:1.6}
+  #cmlist .lg{display:inline-flex;align-items:center;gap:4px;margin-right:8px}#cmlist .lg i{width:10px;height:10px;border-radius:50%;display:inline-block}
+  @media (max-width:700px){ #cmlist{left:8px;right:8px;width:auto;top:auto;bottom:8px;max-height:80vh;border-radius:22px} #cmlist .hd{padding:12px 14px 10px} #cmlist .hd .sub{display:none} #cmlist .stats{margin-top:8px;gap:6px} #cmlist .stats div{padding:4px 6px} #cmlist .stats b{font-size:16px} .pst.big .tx{font-size:17px} .pst.big .vt button{padding:10px 4px 9px} .pst.big .vt button i{font-size:24px} .pst .ds{font-size:12.5px} }
+  .pv-h4 .n{border:0!important}`;
   document.head.appendChild(st);
   const GCOL=['#2F86C3','#C9A030','#8E44AD','#16A085'];
 
@@ -7099,21 +7190,34 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   const TOPICS=['全体について','全体の方針・考え方','運用・ルール','予算','動画・3Dモデルについて','その他'];
   const ZNAMES=()=>(window.HANDS_ZONES||[]).map(z=>z.t);
   const kindOf=k=>TOPICS.includes(k)?'topic':(ZNAMES().includes(k)?'area':'item');
-  function stmt(c,showItem){ const t=agg(c.id), mv=myVote(c.id), seen=mv!==null;
+  const icon=k=>kindOf(k)==='topic'?'🗂':kindOf(k)==='area'?'📍':'🪑';
+  function stmt(c,showItem,big){ const t=agg(c.id), mv=myVote(c.id), seen=mv!==null;
     const pct=x=>t.n?Math.round(x*100/t.n):0;
-    let h=`<div class="pst" data-id="${esc(c.id)}">`+
-      (showItem?`<button class="it" data-item="${esc(c.item)}">${kindOf(c.item)==='topic'?'🗂 ':kindOf(c.item)==='area'?'📍 ':'🪑 '}${esc(c.itemName||c.item)}</button><br>`:'')+
-      `<div class="tx">${esc(c.text)}</div><div class="by">${esc(c.name||'匿名')}・${ago(c.at)}${c.via==='form'?'（フォームから）':''}</div>`+
-      `<div class="vt"><button class="a${mv===1?' on':''}" data-v="1">賛成</button><button class="d${mv===-1?' on':''}" data-v="-1">反対</button><button class="p${mv===0?' on':''}" data-v="0" title="わからない・どちらとも言えない">保留</button></div>`;
-    if(seen){ h+=`<div class="bar"><i class="ba" style="width:${pct(t.a)}%"></i><i class="bd" style="width:${pct(t.d)}%"></i><i class="bp" style="width:${pct(t.p)}%"></i></div>`+
-      `<div class="num">賛成 ${t.a}・反対 ${t.d}・保留 ${t.p}（${t.n}人が回答）</div>`;
-      if(AN.ok) h+='<div class="gb">'+AN.groups.map((g,i)=>{ const u=agg(c.id,g.members); return `<span style="color:${GCOL[i]}">●</span>${esc(g.name)} 賛成${u.n?Math.round(u.a*100/u.n):0}%`; }).join('　')+'</div>'; }
-    else h+=`<div class="num">答えると、みんなの結果が見られます</div>`;
+    let h=`<div class="pst${big?' big':''}${c.base?' base':''}" data-id="${esc(c.id)}">`;
+    if(c.base){
+      if(showItem) h+=`<span class="it" style="cursor:default">${c.zone?'📍 場所':'🪑 '+esc(c.tag||'家具')}・配置案</span><div class="tx">${esc(c.item)}</div>`+
+        (c.desc?`<div class="ds">${esc(c.desc)}</div>`:'')+`<button class="see" data-item="${esc(c.item)}">📍 3Dで見る・くわしい説明 ›</button>`;
+      else h+=`<div class="q" style="margin-top:0">この案（置き方・使い方）に、あなたは？</div>`;
+    } else h+=(showItem?`<button class="it" data-item="${esc(c.item)}">${icon(c.item)} ${esc(c.itemName||c.item)}</button>`:'')+
+      `<div class="tx">${esc(c.text)}</div><div class="by">${esc(c.name||'匿名')}${c.at?'・'+ago(c.at):''}${c.via==='form'?'（フォームから）':''}</div>`;
+    h+=
+      `<div class="vt"><button class="a${mv===1?' on':''}" data-v="1"><i>👍</i>賛成</button><button class="d${mv===-1?' on':''}" data-v="-1"><i>👎</i>反対</button><button class="p${mv===0?' on':''}" data-v="0" title="わからない・どちらとも言えない"><i>🤔</i>保留</button></div>`;
+    if(seen){ h+=`<div class="res"><div class="bar"><i class="ba" style="width:${pct(t.a)}%"></i><i class="bd" style="width:${pct(t.d)}%"></i><i class="bp" style="width:${pct(t.p)}%"></i></div>`+
+      `<div class="num"><span>賛成 ${pct(t.a)}%</span><span>反対 ${pct(t.d)}%</span><span>保留 ${pct(t.p)}%</span><span style="margin-left:auto;font-weight:600">${t.n}人</span></div>`;
+      if(AN.ok) h+='<div class="gb">'+AN.groups.map((g,i)=>{ const u=agg(c.id,g.members); return `<span><b style="color:${GCOL[i]}">●</b> ${esc(g.name)} 賛成${u.n?Math.round(u.a*100/u.n):0}%</span>`; }).join('')+'</div>';
+      h+='</div>'; }
+    else h+=`<div class="hint">答えると、みんなの結果が見られます</div>`;
+    if(c.base && reasonFor===c.id && (mv===-1||mv===0)) h+=`<div class="cmf rsn"><div style="font-weight:800;font-size:13px">💡 どうすればよくなる？（任意・一文）</div>`+formInner('例：ソファは窓のほうを向けたい')+`<button class="skip" data-noreason="1">書かずに進む ›</button></div>`;
     return h+'</div>'; }
   function wireVotes(root){
-    root.querySelectorAll('.pst .vt button').forEach(b=>b.onclick=async e=>{ e.stopPropagation(); const sid=b.closest('.pst').dataset.id, v=+b.dataset.v;
-      const M=mine(); M[sid]=v; lset(MYV,M); (VOTES[sid]=VOTES[sid]||{})[VOTER]=v; lastVoted=sid; analyze(); updateBadges(); renderList(); renderThread();
+    root.querySelectorAll('.pst .vt button').forEach(b=>b.onclick=async e=>{ e.stopPropagation(); const card=b.closest('.pst'), sid=card.dataset.id, v=+b.dataset.v;
+      const M=mine(); M[sid]=v; lset(MYV,M); (VOTES[sid]=VOTES[sid]||{})[VOTER]=v; lastVoted=sid; const cc=ALL.find(x=>x.id===sid); reasonFor=(cc&&cc.base&&v!==1)?sid:null;
+      const go=()=>{ analyze(); updateBadges(); renderList(); renderThread(); if(!reasonFor){ const bg=panel.querySelector('#cmlist .pst.big'); if(bg&&panel.classList.contains('on')) panel.scrollTop=Math.max(0,bg.offsetTop-150); } };
+      if(card.classList.contains('big') && !reasonFor){ card.classList.add('gone'); setTimeout(go,230); } else go();
       const Q=lget(PKEY,{}); Q[sid]=v; lset(PKEY,Q); flush(); });
+    root.querySelectorAll('.rsn').forEach(f=>{ const sid=f.closest('.pst').dataset.id, c=ALL.find(x=>x.id===sid);
+      bindForm(f,()=>({key:c.item,name:c.item}),()=>{ renderList(); renderThread(); },()=>{ reasonFor=null; });
+      const nr=f.querySelector('[data-noreason]'); if(nr) nr.onclick=e=>{ e.stopPropagation(); reasonFor=null; renderList(); renderThread(); const bg=panel.querySelector('.pst.big'); if(bg) panel.scrollTop=Math.max(0,bg.offsetTop-150); }; });
     root.querySelectorAll('.pst [data-item]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.item; if(kindOf(k)==='topic'){ tab='all'; renderList(); } else goto(k); });
   }
 
@@ -7121,82 +7225,91 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   const help=document.getElementById('b-help');
   const vb=document.createElement('button'); vb.className='btn small primary'; vb.id='b-voices'; vb.innerHTML='💬 みんなの声<span class="bdg" hidden>0</span>';
   if(help&&help.parentNode) help.parentNode.insertBefore(vb,help.nextSibling);
-  const panel=document.createElement('div'); panel.id='cmlist'; document.body.appendChild(panel);
-  let tab='answer', pTopic=TOPICS[0], skipped=new Set(), lastVoted=null;
+  const panel=document.createElement('div'); panel.id='cmlist'; panel.className='pv'; document.body.appendChild(panel);
+  let scope='all';
+  const SCOPES=[['all','ぜんぶ'],['zone','📍 場所'],['new','🆕 新しく買う家具'],['old','♻️ 今ある家具'],['opn','💬 方針・意見']];
+  const inScope=c=>scope==='all'||(scope==='zone'&&c.base&&c.zone)||(scope==='new'&&c.base&&!c.zone&&/新しく/.test(c.tag))||(scope==='old'&&c.base&&!c.zone&&!/新しく/.test(c.tag))||(scope==='opn'&&!c.base);
+  let tab='answer', pTopic=TOPICS[0], skipped=new Set(), lastVoted=null, compose=false, reasonFor=null;
   vb.onclick=e=>{ e.stopPropagation(); panel.classList.toggle('on'); if(panel.classList.contains('on')){ const c=document.getElementById('hcard'); if(c) c.classList.remove('on'); refresh(); } };
   // 答える順：自分がまだ答えていない意見のうち、回答の少ないものから（新しい意見にも票が集まるように）
-  const queue=()=>ALL.filter(c=>myVote(c.id)===null && !skipped.has(c.id)).sort((a,b)=>agg(a.id).n-agg(b.id).n || new Date(b.at)-new Date(a.at));
+  const queue=()=>{ const B=baseList(); const bi=c=>c.base?B.indexOf(c):1e4; return ALL.filter(c=>(myVote(c.id)===null||c.id===reasonFor) && !skipped.has(c.id) && inScope(c)).sort((a,b)=>(b.id===reasonFor)-(a.id===reasonFor)||bi(a)-bi(b)||agg(a.id).n-agg(b.id).n||new Date(b.at||0)-new Date(a.at||0)); };
+  const voterSet=()=>{ const S={}; ALL.forEach(c=>Object.keys(VOTES[c.id]||{}).forEach(u=>S[u]=1)); return S; };   // 今ある意見への回答者だけ数える
   function renderList(){
     const unanswered=ALL.filter(c=>myVote(c.id)===null).length;
     const b=vb.querySelector('.bdg'); b.hidden=!unanswered; b.textContent=unanswered; b.title='まだ答えていない意見';
     if(!panel.classList.contains('on')) return;
-    const keep=panel.querySelector('.cmf textarea')?panel.querySelector('.cmf textarea').value:'';
-    const T=(k,l)=>`<button data-tab="${k}" class="${tab===k?'on':''}">${l}</button>`;
+    const keep=panel.querySelector('.cmf:not(.rsn) textarea')?panel.querySelector('.cmf:not(.rsn) textarea').value:'';
+    const done=ALL.length-unanswered, people=Object.keys(voterSet()).length;
+    const T=(k,ic,l)=>`<button data-tab="${k}" class="${tab===k?'on':''}"><i>${ic}</i>${l}</button>`;
     let body='';
-    if(tab==='answer'){ const q=queue(), c=q[0], done=ALL.length-unanswered;
-      body=`<div class="nt">みんなの意見に、ひとつずつ「賛成・反対・保留」で答えてください。言い返す場所はありません。ちがう考えは、下の欄から<b>新しい意見</b>として出してください。</div>`+
-        `<div class="prog">${ALL.length}件のうち ${done}件に答えました</div>`+
-        (lastVoted&&ALL.find(x=>x.id===lastVoted)?(()=>{ const t=agg(lastVoted), c0=ALL.find(x=>x.id===lastVoted); return `<div class="nt" style="background:#F6F7F3;border-radius:8px;padding:6px 8px">いま答えた「${esc(c0.text.length>24?c0.text.slice(0,24)+'…':c0.text)}」は、賛成 ${t.a}・反対 ${t.d}・保留 ${t.p}</div>`; })():'')+
-        (c? stmt(c,true)+`<button class="skip" data-skip="${esc(c.id)}">あとで答える →</button>` : `<div class="cmempty">${ALL.length?'ぜんぶ答えました。ありがとうございます！「合意」「分かれている」「グループ」のタブで、みんなの見え方を確かめられます。':'まだ意見はありません。最初の意見をどうぞ。'}</div>`); }
-    else if(tab==='agree'){ const L=ALL.filter(c=>agg(c.id).n>=3).map(c=>[c,consensus(c.id)]).filter(([c,s])=>agg(c.id).a/agg(c.id).n>=0.6).sort((a,b)=>b[1]-a[1]).slice(0,12);
-      body=`<div class="nt">${AN.ok?'どの意見グループでも賛成が多い意見（グループをこえた合意）':'賛成が多い意見（3人以上が答えたもの）'}です。ここが、みんなで進めやすいところです。</div>`+(L.length?L.map(([c])=>stmt(c,true)).join(''):'<div class="cmempty">まだありません。回答が集まると出てきます。</div>'); }
+    if(tab==='answer'){ const q=queue(), c=q[0];
+      const last=lastVoted&&ALL.find(x=>x.id===lastVoted);
+      body=`<div class="scp">`+SCOPES.map(([k,l])=>`<button data-scope="${k}" class="${scope===k?'on':''}">${l}</button>`).join('')+`</div>`+(c? `<div class="lead" style="display:flex;justify-content:space-between"><span>${c.base?'🗺 配置案に答える':'💬 みんなの意見に答える'}</span><span>あと ${q.length}件</span></div>`+stmt(c,true,true)+`<button class="skip" data-skip="${esc(c.id)}">あとで答える ›</button>`
+             : `<div class="done"><i>${ALL.length?'🎉':'🌱'}</i><b>${ALL.length?'ぜんぶ答えました！':'まだ意見がありません'}</b><span>${ALL.length?'「合意」「分かれ目」「グループ」で、みんなの見え方を見てみましょう。':'最初の意見を出してみませんか。'}</span></div>`)+
+        (last?(()=>{ const t=agg(lastVoted); return `<div class="last">いま答えた「${esc(last.text.length>22?last.text.slice(0,22)+'…':last.text)}」は　<b style="color:#21662A">賛成${t.n?Math.round(t.a*100/t.n):0}%</b>・<b style="color:#A93226">反対${t.n?Math.round(t.d*100/t.n):0}%</b>（${t.n}人）</div>`; })():''); }
+    else if(tab==='agree'){ const L=ALL.filter(c=>agg(c.id).n>=3).map(c=>[c,consensus(c.id)]).filter(([c])=>agg(c.id).a/agg(c.id).n>=0.6).sort((a,b)=>b[1]-a[1]).slice(0,12);
+      body=`<div class="lead">🤝 ${AN.ok?'どのグループでも賛成が多い意見。':'賛成が多い意見。'}みんなで進めやすいところです。</div>`+(L.length?L.map(([c])=>stmt(c,true)).join(''):'<div class="done"><i>⏳</i><span>回答が集まると、ここに出てきます。</span></div>'); }
     else if(tab==='split'){ const L=ALL.map(c=>[c,divisive(c.id)]).filter(x=>x[1]>=0.25).sort((a,b)=>b[1]-a[1]).slice(0,12);
-      body=`<div class="nt">賛成と反対がどちらも多い意見です。ここは、話し合いが必要なところです。</div>`+(L.length?L.map(([c])=>stmt(c,true)).join(''):'<div class="cmempty">まだありません。回答が集まると出てきます。</div>'); }
+      body=`<div class="lead">⚖️ 賛成と反対がどちらも多い意見。話し合いたいところです。</div>`+(L.length?L.map(([c])=>stmt(c,true)).join(''):'<div class="done"><i>⏳</i><span>回答が集まると、ここに出てきます。</span></div>'); }
     else if(tab==='groups'){ body=groupsHTML(); }
-    else { const L=ALL.slice().sort((a,b)=>new Date(b.at)-new Date(a.at)); body=`<div class="nt">すべての意見（新しい順）</div>`+(L.length?L.map(c=>stmt(c,true)).join(''):'<div class="cmempty">まだ意見はありません。</div>'); }
-    panel.innerHTML='<button class="x" aria-label="閉じる">×</button><h4>💬 みんなの声（意見 '+ALL.length+'件・'+Object.keys(voterSet()).length+'人が回答）</h4>'+
-      '<div class="tabs">'+T('answer','🗳 答える')+T('agree','🤝 合意')+T('split','⚖️ 分かれている')+T('groups','👥 グループ')+T('all','すべて')+'</div>'+body+
-      '<div class="box"><div style="font-size:12.5px;font-weight:700;margin-bottom:4px">新しい意見を出す</div><div style="font-size:12px">テーマ：<select class="tps">'+TOPICS.map(t=>`<option${t===pTopic?' selected':''}>${esc(t)}</option>`).join('')+'</select></div>'+
-      '<div class="cmf">'+formHTML('家具や場所のことは、その家具・場所を押して書けます')+'</div></div>'+
-      '<div class="nt">3Dの吹き出し：<b style="color:#2E7D32">緑</b>＝賛成が多い意見がある／<b style="color:#D9822B">オレンジ</b>＝意見が分かれている／<b style="color:#D0427A">ピンク</b>＝これから。数字は意見の数。</div>'+
-      '<div class="nt">しくみ：台湾などで使われている「Polis（ポリス）」の考え方を借りています。答え方が似ている人どうしを自動でグループにして、グループをこえて合意できることを見つけます。だれがどう答えたかは表示されません。</div>'+
-      (COMMENTS_API?'':'<div class="nt">※いまはお試し中のため、この端末の中だけに保存されます。</div>');
+    else { const L=ALL.slice().sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)); body=`<div class="lead">すべての意見（${ALL.length}件）</div>`+(L.length?L.map(c=>stmt(c,true)).join(''):'<div class="cmempty">まだ意見はありません。</div>'); }
+    panel.innerHTML=`<div class="hd"><div class="tt">💬 みんなの声</div><div class="sub">配置案とみんなの意見に「賛成・反対・保留」で（10/18 17:00まで）</div><button class="x" aria-label="閉じる">×</button>`+
+      `<div class="stats"><div><b>${ALL.length}</b><small>案と意見</small></div><div><b>${people}</b><small>参加した人</small></div><div><b>${done}<span style="font-size:12px">/${ALL.length}</span></b><small>あなたの回答</small></div></div>`+
+      `<div class="prog"><i style="width:${ALL.length?Math.round(done*100/ALL.length):0}%"></i></div></div>`+
+      '<div class="tabs">'+T('answer','🗳','答える')+T('agree','🤝','合意')+T('split','⚖️','分かれ目')+T('groups','👥','グループ')+T('all','📋','すべて')+'</div>'+
+      '<div class="bd">'+body+
+      (compose? '<div class="cmf"><div style="font-weight:800;font-size:13px">✍️ 新しい意見を出す</div><div class="tps">'+TOPICS.map(t=>`<button data-tp="${esc(t)}" class="${t===pTopic?'on':''}">${esc(t)}</button>`).join('')+'</div>'+formInner('例：ソファは窓のほうを向けたい')+'</div>'
+               : '<button class="pv-cta" data-compose="1">✍️ 新しい意見を出す</button><div class="cmempty" style="text-align:center;font-size:11.5px">家具や場所への意見は、3Dでその家具・場所を押して出せます</div>')+
+      `<details class="how"><summary>しくみ・3Dの吹き出しの色</summary><p>台湾などで使われている「Polis（ポリス）」の考え方を借りています。返信や言い返しの欄はなく、意見に「賛成・反対・保留」で答えるだけ。答え方が似ている人を自動でグループにして、グループをこえて合意できることを見つけます。だれがどう答えたかは表示されません。</p><p><span class="lg"><i style="background:#2E7D32"></i>賛成が多い</span><span class="lg"><i style="background:#D9822B"></i>意見が分かれている</span><span class="lg"><i style="background:#D0427A"></i>これから</span>（数字は意見の数）</p></details>`+
+      (COMMENTS_API?'':'<div class="cmempty">※いまはお試し中のため、この端末の中だけに保存されます。</div>')+'</div>';
     panel.querySelector('.x').onclick=()=>panel.classList.remove('on');
     panel.querySelectorAll('[data-tab]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); tab=b.dataset.tab; renderList(); panel.scrollTop=0; });
+    panel.querySelectorAll('[data-scope]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); scope=b.dataset.scope; skipped.clear(); renderList(); });
     const sk=panel.querySelector('[data-skip]'); if(sk) sk.onclick=e=>{ e.stopPropagation(); skipped.add(sk.dataset.skip); renderList(); };
-    const sel=panel.querySelector('.tps'); sel.onchange=()=>{ pTopic=sel.value; }; sel.addEventListener('pointerdown',e=>e.stopPropagation());
-    bindForm(panel.querySelector('.cmf'),()=>({key:pTopic,name:pTopic}),renderList);
-    panel.querySelector('.cmf textarea').value=keep;
+    const cp=panel.querySelector('[data-compose]'); if(cp) cp.onclick=e=>{ e.stopPropagation(); compose=true; renderList(); const ta=panel.querySelector('.cmf:not(.rsn) textarea'); if(ta){ ta.focus(); ta.scrollIntoView({block:'center'}); } };
+    panel.querySelectorAll('[data-tp]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); pTopic=b.dataset.tp; renderList(); });
+    const f=panel.querySelector('.cmf:not(.rsn)'); if(f){ bindForm(f,()=>({key:pTopic,name:pTopic}),renderList,()=>{ compose=false; }); f.querySelector('textarea').value=keep; }
     wireVotes(panel);
+    const rs=panel.querySelector('.rsn'); if(rs) setTimeout(()=>rs.scrollIntoView({block:'center',behavior:'smooth'}),60);
   }
-  const voterSet=()=>{ const S={}; ALL.forEach(c=>Object.keys(VOTES[c.id]||{}).forEach(u=>S[u]=1)); return S; };   // 今ある意見への回答者だけ数える
   function groupsHTML(){
-    if(!AN.ok) return `<div class="nt">意見のグループは、<b>6人以上</b>がそれぞれ<b>${MINV}件以上</b>答えると表示されます（いま ${AN.P}人）。答えが集まるほど、はっきりします。</div>`;
+    if(!AN.ok) return `<div class="done"><i>👥</i><b>グループはまだ見えません</b><span><b>6人以上</b>がそれぞれ<b>${MINV}件以上</b>答えると、答え方の似た人のまとまりが地図で見えます（いま ${AN.P}人）。</span></div>`;
     const pts=Object.entries(AN.coords); const xs=pts.map(p=>p[1].x), ys=pts.map(p=>p[1].y);
-    const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys), W=340, H=170;
-    const sx=x=>14+(x-x0)/((x1-x0)||1)*(W-28), sy=y=>14+(y-y0)/((y1-y0)||1)*(H-28);
+    const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys), W=360, H=180;
+    const sx=x=>18+(x-x0)/((x1-x0)||1)*(W-36), sy=y=>18+(y-y0)/((y1-y0)||1)*(H-36);
     const me=AN.coords[VOTER];
-    let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;background:#F6F7F3;border-radius:10px">`+pts.map(([u,p])=>`<circle cx="${sx(p.x).toFixed(1)}" cy="${sy(p.y).toFixed(1)}" r="${u===VOTER?7:5}" fill="${GCOL[p.g]}" fill-opacity="${u===VOTER?1:.6}" ${u===VOTER?'stroke="#26312A" stroke-width="2"':''}/>`).join('')+
-      (me?`<text x="${(sx(me.x)+9).toFixed(1)}" y="${(sy(me.y)+4).toFixed(1)}" font-size="12" font-weight="700" fill="#26312A">あなた</text>`:'')+'</svg>';
-    let h=`<div class="nt">点は回答した人（${pts.length}人）。答え方が似ている人ほど近くに集まります。色がグループです。${me?'':'（あなたは、もう少し答えると地図に出ます）'}</div>`+svg;
+    let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;background:#fff;border:1px solid #E7ECE3;border-radius:14px;margin-top:6px">`+pts.map(([u,p])=>`<circle cx="${sx(p.x).toFixed(1)}" cy="${sy(p.y).toFixed(1)}" r="${u===VOTER?8:6}" fill="${GCOL[p.g]}" fill-opacity="${u===VOTER?1:.55}" ${u===VOTER?'stroke="#1E2A22" stroke-width="2.5"':''}/>`).join('')+
+      (me?`<text x="${(sx(me.x)+11).toFixed(1)}" y="${(sy(me.y)+4).toFixed(1)}" font-size="13" font-weight="800" fill="#1E2A22">あなた</text>`:'')+'</svg>';
+    let h=`<div class="lead">👥 点は参加した人（${pts.length}人）。答え方が似ている人ほど近くに集まります。${me?'':'もう少し答えると、あなたも地図に出ます。'}</div>`+svg;
     AN.groups.forEach((g,i)=>{ const L=ALL.filter(c=>agg(c.id,g.members).n>=2).map(c=>[c,repness(c.id,g)]).filter(([c,r])=>r.r>1.25&&r.p>0.55).sort((a,b)=>b[1].s-a[1].s).slice(0,3);
-      h+=`<div class="gcard" style="border-color:${GCOL[i]}"><b style="color:${GCOL[i]}">${esc(g.name)}</b>（${g.members.size}人）${me&&me.g===i?' ← あなた':''}<div class="nt" style="margin:2px 0">このグループらしい答え：</div>`+
-        (L.length?L.map(([c,r])=>`<div style="font-size:13px;margin:3px 0">${r.dir>0?'<b style="color:#2E7D32">賛成</b>':'<b style="color:#C0392B">反対</b>'} ${Math.round(r.p*100)}%：${esc(c.text)}</div>`).join(''):'<div class="cmempty">まだ特徴ははっきりしません。</div>')+'</div>'; });
+      h+=`<div class="gcard"><div class="gh"><i style="background:${GCOL[i]}"></i>${esc(g.name)}<span style="font-weight:600;color:#56615A;font-size:12px">${g.members.size}人${me&&me.g===i?'・あなたはここ':''}</span></div>`+
+        (L.length?L.map(([c,r])=>`<div class="ln"><b style="background:${r.dir>0?'#2E7D32':'#C0392B'}">${r.dir>0?'賛成':'反対'}${Math.round(r.p*100)}%</b><span>${esc(c.text)}</span></div>`).join(''):'<div class="cmempty">まだ特徴ははっきりしません。</div>')+'</div>'; });
     return h; }
 
   /* ---- 書きこみ欄（一文の意見） ---- */
   let editName=false;
-  function formHTML(ph){ const nm=lget(NKEY,'');
-    return `<textarea rows="2" maxlength="${MAXLEN}" placeholder="${esc(ph)}"></textarea><div class="cnt">一文で、ほかの人が賛成・反対で答えられる形で（${MAXLEN}字まで）。例：「ソファは窓のほうを向けたい」</div>`+
+  function formInner(ph){ const nm=lget(NKEY,'');
+    return `<textarea rows="2" maxlength="${MAXLEN}" placeholder="${esc(ph)}"></textarea><div class="cnt"><span>一文で、賛成・反対で答えられる形に</span><span class="cc">0/${MAXLEN}</span></div>`+
       ((nm && !editName)
-        ? `<div class="rw"><span class="me"><b>${esc(nm)}</b>さんとして出す　<button class="chn">名前を変える</button></span><button class="snd">出す</button></div><label class="anon"><input type="checkbox" class="anc">匿名で出す</label>`
-        : `<div class="rw"><input class="nmi" maxlength="30" placeholder="名前（ニックネームでOK）" value="${esc(nm)}" style="flex:1;min-width:0"><button class="snd">出す</button></div><label class="anon"><input type="checkbox" class="anc">匿名で出す</label><div class="nmh">名前は意見の下に小さく出ます。この端末では次から同じ名前で出せます。賛成・反対の回答は、名前と結びつかず、だれが答えたかは表示されません。</div>`); }
-  function bindForm(box,getTarget,rerender){
-    const ta=box.querySelector('textarea'); const cnt=box.querySelector('.cnt'); const base=cnt?cnt.textContent:'';
-    if(cnt) ta.addEventListener('input',()=>{ cnt.textContent=ta.value.length? `のこり ${MAXLEN-ta.value.length}字` : base; });
+        ? `<div class="rw"><span class="me">👤 <b>${esc(nm)}</b>さん　<button class="chn">変える</button></span><button class="snd">出す</button></div><label class="anon"><input type="checkbox" class="anc">匿名で出す</label>`
+        : `<div class="rw"><input class="nmi" maxlength="30" placeholder="名前（ニックネームでOK）" value="${esc(nm)}" style="flex:1;min-width:0"><button class="snd">出す</button></div><label class="anon"><input type="checkbox" class="anc">匿名で出す</label><div class="cmempty" style="font-size:11px">名前は意見の下に小さく出ます。賛成・反対の回答は名前と結びつきません。</div>`); }
+  function bindForm(box,getTarget,rerender,onSent){
+    const ta=box.querySelector('textarea'); const cc=box.querySelector('.cc');
+    ta.addEventListener('input',()=>{ if(cc) cc.textContent=ta.value.length+'/'+MAXLEN; });
     box.querySelectorAll('textarea,input,select').forEach(el=>{ el.addEventListener('keydown',e=>e.stopPropagation()); el.addEventListener('pointerdown',e=>e.stopPropagation()); });
     const chn=box.querySelector('.chn'); if(chn) chn.onclick=e=>{ e.stopPropagation(); editName=true; rerender(); };
     box.querySelector('.snd').onclick=async e=>{ e.stopPropagation(); const ni=box.querySelector('.nmi'); const name=ni? ni.value.trim() : lget(NKEY,'');
       const anon=box.querySelector('.anc')&&box.querySelector('.anc').checked;
       const text=ta.value.trim().slice(0,MAXLEN); if(!text){ ta.focus(); return; }
       if(anon){ if(!confirm('匿名で出します。\n\n匿名の意見も、ひとつずつ大切に読みます。\nただ、だれの意見かが分かると、shake handsのメンバーから「もう少し詳しく聞かせて」と声をかけたり、いっしょに形にしたりできます。\n\nこのまま匿名で出しますか？\n（「キャンセル」を押すと、名前を入れて出せます）')) { box.querySelector('.anc').checked=false; return; } }
-      else if(!name){ ni.style.borderColor='#D0427A'; ni.focus(); ni.placeholder='名前を入れてください（または「匿名で出す」にチェック）'; return; }
+      else if(!name){ ni.style.borderColor='#D0427A'; ni.focus(); ni.placeholder='名前を入れてください（または「匿名で出す」）'; return; }
       const sendName=anon?'匿名':name; if(!anon){ lset(NKEY,name); editName=false; }
       const t=getTarget(); const b=e.target; b.disabled=true; b.textContent='送信中…';
-      try{ await api.send({action:'add',item:t.key,itemName:t.name,name:sendName,text}); ta.value=''; await refresh(); }
+      try{ await api.send({action:'add',item:t.key,itemName:t.name,name:sendName,text}); ta.value=''; if(onSent) onSent(); await refresh(); }
       catch(err){ alert('送れませんでした。時間をおいてもう一度お試しください。'); }
       b.disabled=false; b.textContent='出す'; };
   }
+
   /* その家具・場所へ移動してカードを開く */
   function goto(key){ panel.classList.remove('on');
     const t=window.HANDS_TARGETS&&window.HANDS_TARGETS[key];
@@ -7206,18 +7319,21 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   }
 
   /* ---- カードの下：その家具・場所への意見 ---- */
-  let curKey=null, curName='';
-  window.HANDS_COMMENTS_FOR=function(key,name){ curKey=key; curName=name; renderThread(); if(!loaded) refresh(); };
+  let curKey=null, curName='', cardCompose=false;
+  window.HANDS_COMMENTS_FOR=function(key,name){ curKey=key; curName=name; cardCompose=false; renderThread(); if(!loaded) refresh(); };
   function renderThread(){
     const card=document.getElementById('hcard'); if(!card||!curKey||!card.classList.contains('on')) return;
-    let box=card.querySelector('.cm'); if(!box){ box=document.createElement('div'); box.className='cm'; const rot=card.querySelector('.rot'); card.insertBefore(box,rot||null); }
-    const L=ALL.filter(c=>c.item===curKey).sort((a,b)=>new Date(a.at)-new Date(b.at));
+    let box=card.querySelector('.cm'); if(!box){ box=document.createElement('div'); box.className='cm pv'; const rot=card.querySelector('.rot'); card.insertBefore(box,rot||null); }
+    const L=ALL.filter(c=>c.item===curKey).sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
     const keep=box.querySelector('textarea')?box.querySelector('textarea').value:'';
-    box.innerHTML=`<h4>💬 みんなの意見（${L.length}）</h4><div class="cmempty" style="padding:0 0 2px">賛成・反対・保留で答えてください。ちがう考えは、新しい意見として出せます。</div>`+
-      (L.length? L.map(c=>stmt(c,false)).join('') : '<div class="cmempty">まだ意見はありません。最初の意見をどうぞ。</div>')+
-      `<div class="cmf">`+formHTML('この'+(curName?'「'+curName+'」':'家具・場所')+'への意見を一文で')+`</div>`;
-    box.querySelector('.cmf textarea').value=keep;
-    bindForm(box.querySelector('.cmf'),()=>({key:curKey,name:curName}),renderThread);
+    const B=L.filter(c=>c.base), O=L.filter(c=>!c.base);
+    box.innerHTML=(B.length?`<div class="pv-h4">🗺 この配置案、どう思う？</div>`+B.map(c=>stmt(c,false)).join(''):'')+
+      `<div class="pv-h4" style="margin-top:12px">💬 みんなの意見 <span class="n" style="border:0;background:#2E7D32;color:#fff;border-radius:99px;padding:1px 8px;font-size:12px">${O.length}</span></div><div class="cmempty">${O.length?'ほかの人の意見にも、賛成・反対・保留で答えられます。':'「こうしたら？」という意見があれば、出してください。'}</div>`+
+      O.map(c=>stmt(c,false)).join('')+
+      (cardCompose? '<div class="cmf"><div style="font-weight:800;font-size:13px">✍️ '+esc(curName?'「'+curName+'」':'ここ')+'への意見</div>'+formInner('例：ここは窓のほうを向けたい')+'</div>'
+                  : '<button class="pv-cta" data-compose="1">✍️ ここへの意見を出す</button>');
+    const cp=box.querySelector('[data-compose]'); if(cp) cp.onclick=e=>{ e.stopPropagation(); cardCompose=true; renderThread(); const ta=box.querySelector('.cmf:not(.rsn) textarea'); if(ta) ta.focus(); };
+    const f=box.querySelector('.cmf:not(.rsn)'); if(f){ bindForm(f,()=>({key:curKey,name:curName}),renderThread,()=>{ cardCompose=false; }); f.querySelector('textarea').value=keep; }
     wireVotes(box);
   }
 
@@ -7228,7 +7344,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     x.fillStyle='#fff'; x.font='bold 40px sans-serif'; x.textAlign='center'; x.textBaseline='middle'; x.fillText('💬'+n,64,40); const t=new THREE.CanvasTexture(c); return t; }
   function updateBadges(){
     bubbles.forEach(b=>scene.remove(b)); bubbles.length=0;
-    const T=window.HANDS_TARGETS||{}; const by={}; ALL.forEach(c=>{ (by[c.item]=by[c.item]||[]).push(c); });
+    const T=window.HANDS_TARGETS||{}; const by={}; ALL.forEach(c=>{ if(c.base) return; (by[c.item]=by[c.item]||[]).push(c); });
     Object.entries(by).forEach(([k,L])=>{ const t=T[k]; if(!t) return; let p;
       if(t.g){ const bb=new THREE.Box3().setFromObject(t.g); p=new THREE.Vector3((bb.min.x+bb.max.x)/2,bb.max.y+18,(bb.min.z+bb.max.z)/2); }
       else if(t.zone){ const z=t.zone; p=new THREE.Vector3((z.x0+z.x1)/2+60,150,(z.z0+z.z1)/2); } else return;
