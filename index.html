@@ -7390,7 +7390,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       '<div class="tabs">'+T('answer','🗳','答える')+T('agree','🤝','合意')+T('split','⚖️','分かれ目')+T('groups','👥','グループ')+T('me','🙋','わたし')+T('all','📋','すべて')+'</div>'+
       '<div class="bd">'+body+
       (compose? '<div class="cmf"><div style="font-weight:800;font-size:13px">✍️ 新しい意見を出す</div><div style="font-size:12px;font-weight:700;color:#3C4840">これは何についての意見ですか？</div><div class="tps">'+TOPICS.map(t=>`<button data-tp="${esc(t)}" class="${t===pTopic?'on':''}">${esc(t)}</button>`).join('')+'</div>'+formInner('例：ソファは窓のほうに向けたい。外が見えると、ゆったり過ごせるから。')+'</div>'
-               : '<button class="pv-cta" data-compose="1">✍️ 新しい意見を出す</button><div class="cmempty" style="text-align:center;font-size:11.5px">家具や場所への意見は、3Dでその家具・場所を押して出せます</div>')+
+               : '<button class="pv-cta" data-compose="1">✍️ 新しい意見を出す</button><div class="cmempty" style="text-align:center;font-size:11.5px">家具や場所への意見は、その案で「反対」「保留」を選ぶと書けます</div>')+
       `<details class="how"><summary>しくみ・3Dの吹き出しの色</summary><p>台湾などで使われている「Polis（ポリス）」の考え方を借りています。返信や言い返しの欄はなく、意見に「賛成・反対・保留」で答えるだけ。答え方が似ている人を自動でグループにして、グループをこえて合意できることを見つけます。だれがどう答えたかは表示されません。</p><p><span class="lg"><i style="background:#2E7D32"></i>賛成が多い</span><span class="lg"><i style="background:#D9822B"></i>意見が分かれている</span><span class="lg"><i style="background:#D0427A"></i>これから</span>（数字は意見の数）</p></details>`+
       (COMMENTS_API?'':'<div class="cmempty">※いまはお試し中のため、この端末の中だけに保存されます。</div>')+'</div>';
     panel.querySelector('.x').onclick=()=>panel.classList.remove('on');
@@ -7537,13 +7537,9 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     const L=ALL.filter(c=>c.item===curKey).sort((a,b)=>new Date(a.at||0)-new Date(b.at||0));
     const keep=box.querySelector('textarea')?box.querySelector('textarea').value:'';
     const B=L.filter(c=>c.base), O=L.filter(c=>!c.base);
-    box.innerHTML=(B.length?`<div class="pv-h4">🗺 この配置案、どう思う？</div>`+B.map(c=>stmt(c,false)).join(''):'')+
-      `<div class="pv-h4" style="margin-top:12px">💬 みんなの意見 <span class="n" style="border:0;background:#2E7D32;color:#fff;border-radius:99px;padding:1px 8px;font-size:12px">${O.length}</span></div><div class="cmempty">${O.length?'ほかの人の意見にも、賛成・反対・保留で答えられます。':'「こうしたら？」という意見があれば、出してください。'}</div>`+
-      O.map(c=>stmt(c,false)).join('')+
-      (cardCompose? '<div class="cmf"><div style="font-weight:800;font-size:13px">✍️ '+esc(curName?'「'+curName+'」':'ここ')+'への意見</div>'+formInner('例：ここは通路側をもう少しあけたい。人が通りやすく、入りやすくなるから。')+'</div>'
-                  : '<button class="pv-cta" data-compose="1">✍️ ここへの意見を出す</button>');
-    const cp=box.querySelector('[data-compose]'); if(cp) cp.onclick=e=>{ e.stopPropagation(); cardCompose=true; renderThread(); const ta=box.querySelector('.cmf:not(.rsn):not(.ed) textarea'); if(ta) ta.focus(); };
-    const f=box.querySelector('.cmf:not(.rsn):not(.ed)'); if(f){ bindForm(f,()=>({key:curKey,name:curName}),renderThread,()=>{ cardCompose=false; }); f.querySelector('textarea').value=keep; }
+    // 家具・場所を押したときは「案に3択で答える」だけ。自由な書きこみ欄は出さない（理由は反対・保留を選んだときに書ける）10/16
+    box.innerHTML=(B.length?`<div class="pv-h4">🗳 この配置案に、賛成・反対・保留で答えてください</div>`+B.map(c=>stmt(c,false)).join('')+`<div class="cmempty">反対・保留を選ぶと、理由や「こうしたら？」も書けます（任意）。</div>`:'')+
+      (O.length?`<div class="pv-h4" style="margin-top:12px">💬 ここへのみんなの意見 <span class="n" style="border:0;background:#2E7D32;color:#fff;border-radius:99px;padding:1px 8px;font-size:12px">${O.length}</span></div><div class="cmempty">ほかの人の意見にも、賛成・反対・保留で答えられます。</div>`+O.map(c=>stmt(c,false)).join(''):'');
     wireVotes(box);
   }
 
