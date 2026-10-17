@@ -7009,7 +7009,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   const isReason=c=>!c.base && (/^【理由】/.test(c.item||'') || c.item===KEEP_TOPIC || OLD_REASONS.has(c.id));
   const reasonKey=c=>String(c.item||'').replace(/^【理由】/,'');
   const splitTags=t=>{ const m=/^［([^］]*)］\s*/.exec(t||''); return m?{tags:m[1].split('・').filter(Boolean),body:t.slice(m[0].length)}:{tags:[],body:t||''}; };
-  const RTAGS=['散らかりそう','通りにくそう','使わなさそう','もったいない','別の案がある'];
+  const RTAGS=['散らかりそう','通りにくそう','使わなさそう','別の案がある'];
   let REASONS=[];
   // 場所の案の「ねらい」（10/17 白川さん了承）
   const AIMS=[['入口','入ってきた人を、自然に奥へいざなう'],['中央カウンター','shakeの情報と相談が集まる「入口の窓口」になる'],['広場','手前は低く奥ほど高く、部屋全体を見渡せて入りやすくする'],['台形テーブル','人数や使い方に合わせて、島・会議・前向きに組み替える'],['本の通り','本を発想の出どころにしつつ、通路から中が見えて入れる道にする'],['ハイデスク','壁際・窓際から座れる、一人でも入りやすい席をつくる'],['ラボ','グループがプロジェクトを進められる島を、人数に合わせて組む'],['小上がり','くつろげる場所を、外から見えるひらいた形で用意する'],['プロジェクトルーム1','ラジオブースを中心にした部屋（必要なものを聞きたい）'],['プロジェクトルーム2','人が多いときに出すスツールの置き場（使い方は相談したい）'],['プロジェクトルーム3','物品置き場（使い方のルールを早めに決めたい）']];
@@ -7216,6 +7216,9 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   @media (max-width:420px){ #cmlist .tile b{font-size:12.5px} #cmlist .tile span{font-size:11px} }
   .pst .aim{display:flex;gap:8px;align-items:baseline;margin-top:6px;font-size:13.5px;font-weight:700;color:#1E4F8A;line-height:1.5}.pst .aim b{flex:none;font-size:10.5px;font-weight:900;color:#fff;background:#2F6FB0;border-radius:6px;padding:2px 6px;letter-spacing:.05em}
   .pst .myr{margin-top:6px;background:#FFF7EA;border-radius:10px;padding:7px 10px;font-size:12.5px;color:#3C2A10;line-height:1.55}.pst .myr b{font-size:11px;color:#8A4B00;margin-right:6px}.pst .myr em{font-style:normal;font-size:11px;font-weight:700;background:#FFE3BF;color:#8A4B00;border-radius:99px;padding:1px 7px;margin-right:4px}.pst .myr .rw2{display:inline-flex;gap:4px;margin-left:6px}
+  .cmf .rhint{font-size:12px;line-height:1.55;color:#1E4F8A;background:#EAF2FB;border-radius:10px;padding:7px 10px;margin:-2px 0 8px;animation:aiin .25s ease}
+  .pst .tkd{font-size:12.5px;line-height:1.6;color:#4B3A78;background:#F4F0FA;border-radius:10px;padding:7px 10px;margin-top:6px}
+  #cmlist .done .inv{display:block;margin-top:8px;font-weight:700;color:#2E6B34}
   .pst .dsh{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:10.5px;color:#9AA49C;margin-top:3px}.pst .dsh button{border:1px solid #CFE3C9;background:#F6FAF4;color:#2E6B34;border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:800;cursor:pointer;white-space:nowrap}
   #dspop{position:fixed;z-index:90;left:50%;top:12vh;transform:translateX(-50%);width:min(560px,calc(100vw - 24px));height:min(60vh,520px);min-width:260px;min-height:180px;max-width:calc(100vw - 8px);max-height:calc(100vh - 8px);resize:both;overflow:hidden;display:none;flex-direction:column;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:inherit}
   #dspop.on{display:flex} #dspop .ph{display:flex;align-items:center;gap:8px;padding:10px 12px 10px 16px;background:#2E6B34;color:#fff;cursor:move;user-select:none;touch-action:none} #dspop .ph b{flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} #dspop .ph button{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:99px;padding:5px 10px;font-size:13px;font-weight:800;cursor:pointer}
@@ -7339,7 +7342,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       else h+=`<div class="q" style="margin-top:0">この案（置き方・使い方）に、あなたは？</div>`;
     } else h+=(c.talk?`<span class="tk">これから話し合うこと</span>`:'')+(showItem?`<button class="it" data-item="${esc(c.item)}">${icon(c.item)} ${esc(c.itemName||c.item)}</button>`:'')+
       (editing===c.id? `<div class="cmf ed"><textarea maxlength="${MAXLEN}">${esc(c.text)}</textarea><div class="rw"><button class="snd" data-save="${esc(c.id)}">保存</button><button class="skip" data-cancel="1">やめる</button></div></div>`
-        : `<div class="tx">${esc(c.text)}</div>`)+
+        : `<div class="tx">${esc(c.text)}</div>`)+(c.talk?`<div class="tkd">「物の置き場がない」という声も、「もっと良い場所にしたい」という声も。そこから、使う人どうしで決めていく動き（shake hands）が始まっています。</div>`:'')+
       `<div class="by">${c.own?'🙋 あなたの意見':esc(c.name||'匿名')}${c.at?'・'+ago(c.at):''}${c.via==='form'?'（フォームから）':''}${c.own&&editing!==c.id?` <button class="mini" data-edit="${esc(c.id)}">✏️ 直す</button><button class="mini" data-del="${esc(c.id)}">取り下げる</button>`:''}</div>`;
     h+=
       `<div class="vt"><button class="a${mv===1||(pendingVote&&pendingVote.sid===c.id&&pendingVote.v===1)?' on':''}" data-v="1"><i>👍</i>賛成</button><button class="d${mv===-1||(pendingVote&&pendingVote.sid===c.id&&pendingVote.v===-1)?' on':''}" data-v="-1"><i>👎</i>反対</button><button class="p${mv===0||(pendingVote&&pendingVote.sid===c.id&&pendingVote.v===0)?' on':''}" data-v="0" title="わからない・どちらとも言えない"><i>🤔</i>保留</button></div>`;
@@ -7351,7 +7354,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       h+='</div>'; }
     else h+=`<div class="hint">答えると、みんなの結果が見られます</div>`;
     h+=reasonsHTML(c);
-    if(c.base && pendingReason && pendingReason.sid===c.id){ const L=pendingReason.v<0?['👎','反対']:['🤔','保留']; const mr=myReason(c); h+=`<div class="cmf rsn" data-vote="${pendingReason.v}"${mr?` data-edit-id="${esc(mr.id)}" data-prefill="${esc(mr.text)}"`:''}><div style="font-weight:800;font-size:13px">${L[0]} <b>${L[1]}</b> を選びました。気になるところは？（任意・いくつでも）</div><div class="rch">${RTAGS.map(t=>`<button data-rt="${t}">${t}</button>`).join('')}</div>`+formInner('ひとこと（任意・感じたままでOK）',true)+`<button class="skip" data-noreason="1">理由は書かずに答える ›</button></div>`; }
+    if(c.base && pendingReason && pendingReason.sid===c.id){ const L=pendingReason.v<0?['👎','反対']:['🤔','保留']; const mr=myReason(c); h+=`<div class="cmf rsn" data-vote="${pendingReason.v}"${mr?` data-edit-id="${esc(mr.id)}" data-prefill="${esc(mr.text)}"`:''}><div style="font-weight:800;font-size:13px">${L[0]} <b>${L[1]}</b> を選びました。近いものがあれば（任意）</div><div class="rch">${RTAGS.map(t=>`<button data-rt="${t}">${t}</button>`).join('')}</div><div class="rhint" hidden>片付けや並べ方は、使う人どうしで決めていく動きが始まっています（shake hands）。あなたの声もその材料になります。</div>`+formInner('ひとこと（任意・感じたままでOK）',true)+`<button class="skip" data-noreason="1">理由は書かずに答える ›</button></div>`; }
     return h+'</div>'; }
   let pendingVote=null, pendingReason=null, afterJoin=null;
   const myReason=c=>REASONS.filter(r=>r.own&&reasonKey(r)===c.item).sort((a,b)=>new Date(b.at||0)-new Date(a.at||0))[0];
@@ -7385,8 +7388,14 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     root.querySelectorAll('[data-del]').forEach(b=>b.onclick=async e=>{ e.stopPropagation(); if(!confirm('この意見を取り下げますか？（ほかの人の回答も見えなくなります）')) return;
       try{ await api.send({action:'remove',id:b.dataset.del,voter:VOTER}); ALL=ALL.filter(x=>x.id!==b.dataset.del); await refresh(); }catch(_){ alert('取り下げられませんでした。'); } });
     root.querySelectorAll('.rsn').forEach(f=>{ const sid=f.closest('.pst').dataset.id, c=ALL.find(x=>x.id===sid);
-      f.dataset.reason='1'; f.querySelectorAll('[data-rt]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); b.classList.toggle('on'); });
-      if(f.dataset.prefill&&!f.dataset.filled){ f.dataset.filled='1'; const x=splitTags(f.dataset.prefill); f.querySelectorAll('[data-rt]').forEach(b=>{ if(x.tags.includes(b.dataset.rt)) b.classList.add('on'); }); const ta=f.querySelector('textarea'); if(ta) ta.value=x.body; }
+      const rh=()=>{ const h=f.querySelector('.rhint'); if(h) h.hidden=!f.querySelector('[data-rt="散らかりそう"].on'); };
+      const pr=(pendingReason&&pendingReason.sid===sid)?pendingReason:null;
+      if(pr&&pr.tags){ f.dataset.filled='1'; f.querySelectorAll('[data-rt]').forEach(b=>b.classList.toggle('on',pr.tags.includes(b.dataset.rt))); const ta0=f.querySelector('textarea'); if(ta0) ta0.value=pr.text||''; }
+      const keepState=()=>{ if(!pr) return; pr.tags=[...f.querySelectorAll('[data-rt].on')].map(b=>b.dataset.rt); const ta1=f.querySelector('textarea'); pr.text=ta1?ta1.value:''; };
+      f.dataset.reason='1'; f.querySelectorAll('[data-rt]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); b.classList.toggle('on'); rh(); keepState(); });
+      const ta2=f.querySelector('textarea'); if(ta2) ta2.addEventListener('input',keepState);
+      if(f.dataset.prefill&&!f.dataset.filled){ f.dataset.filled='1'; const x=splitTags(f.dataset.prefill); f.querySelectorAll('[data-rt]').forEach(b=>{ if(x.tags.includes(b.dataset.rt)) b.classList.add('on'); }); const ta=f.querySelector('textarea'); if(ta) ta.value=x.body; keepState(); }
+      rh();
       bindForm(f,()=>({key:'【理由】'+c.item,name:c.item}),()=>{ renderList(); renderThread(); },()=>{},()=>{ const v=+f.dataset.vote; pendingReason=null; castVote(sid,v,null); });
       const nr=f.querySelector('[data-noreason]'); if(nr) nr.onclick=e=>{ e.stopPropagation(); const v=+f.dataset.vote; pendingReason=null; pendingVote={sid,v}; renderList(); renderThread(); }; });
     root.querySelectorAll('.pst [data-item]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.item; if(kindOf(k)==='topic'){ tab='all'; renderList(); } else goto(k); });
@@ -7434,7 +7443,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
         stmt(c,true,true)+
         `<div class="nav2"><button data-mv="-1" ${i<=0?'disabled':''}>‹ 前の案</button><span>キーボードの ← → でも移動できます</span><button data-mv="1" ${i>=D.length-1?'disabled':''}>次の案 ›</button></div>`
         : `<div class="done"><i>🌱</i><b>この範囲には、まだありません</b></div>`)+
-        (left===0&&D.length?`<div class="done" style="padding:8px"><i>🎉</i><b>この範囲は、ぜんぶ答えました！</b><span>「合意」「分かれ目」で、みんなの見え方を見てみましょう。答えは押し直せば変えられます。</span></div>`:'')+
+        (left===0&&D.length?`<div class="done" style="padding:8px"><i>🎉</i><b>この範囲は、ぜんぶ答えました！</b><span>「合意」「分かれ目」で、みんなの見え方を見てみましょう。答えは押し直せば変えられます。</span><span class="inv">「もっと良くしたい」を一緒に形にする話し合いにも、学生・卒業生・学外の人、だれでも加われます。</span></div>`:'')+
         (last?(()=>{ const t=agg(lastVoted); return `<div class="last">いま答えた「${esc(last.text.length>22?last.text.slice(0,22)+'…':last.text)}」は　<b style="color:#21662A">賛成${t.n?Math.round(t.a*100/t.n):0}%</b>・<b style="color:#A93226">反対${t.n?Math.round(t.d*100/t.n):0}%</b>（${t.n}人）</div>`; })():''); }
     else if(tab==='agree'){ const L=ALL.filter(c=>agg(c.id).n>=3).map(c=>[c,consensus(c.id)]).filter(([c])=>agg(c.id).a/agg(c.id).n>=0.6).sort((a,b)=>b[1]-a[1]).slice(0,12);
       body=`<div class="lead">🤝 ${AN.ok?'どのグループでも賛成が多い意見。':'賛成が多い意見。'}みんなで進めやすいところです。</div>`+(L.length?L.map(([c])=>stmt(c,true)).join(''):'<div class="done"><i>⏳</i><span>回答が集まると、ここに出てきます。</span></div>'); }
