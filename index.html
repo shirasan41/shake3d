@@ -7215,6 +7215,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   #cmlist .go1{width:100%;margin-top:12px;background:#2E7D32;color:#fff;border:0;border-radius:14px;padding:13px;font-size:16px;font-weight:900;cursor:pointer}
   @media (max-width:420px){ #cmlist .tile b{font-size:12.5px} #cmlist .tile span{font-size:11px} }
   .pst .aim{display:flex;gap:8px;align-items:baseline;margin-top:6px;font-size:13.5px;font-weight:700;color:#1E4F8A;line-height:1.5}.pst .aim b{flex:none;font-size:10.5px;font-weight:900;color:#fff;background:#2F6FB0;border-radius:6px;padding:2px 6px;letter-spacing:.05em}
+  .pst .myr{margin-top:6px;background:#FFF7EA;border-radius:10px;padding:7px 10px;font-size:12.5px;color:#3C2A10;line-height:1.55}.pst .myr b{font-size:11px;color:#8A4B00;margin-right:6px}.pst .myr em{font-style:normal;font-size:11px;font-weight:700;background:#FFE3BF;color:#8A4B00;border-radius:99px;padding:1px 7px;margin-right:4px}.pst .myr .rw2{display:inline-flex;gap:4px;margin-left:6px}
   .pst .dsh{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:10.5px;color:#9AA49C;margin-top:3px}.pst .dsh button{border:1px solid #CFE3C9;background:#F6FAF4;color:#2E6B34;border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:800;cursor:pointer;white-space:nowrap}
   #dspop{position:fixed;z-index:90;left:50%;top:12vh;transform:translateX(-50%);width:min(560px,calc(100vw - 24px));height:min(60vh,520px);min-width:260px;min-height:180px;max-width:calc(100vw - 8px);max-height:calc(100vh - 8px);resize:both;overflow:hidden;display:none;flex-direction:column;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:inherit}
   #dspop.on{display:flex} #dspop .ph{display:flex;align-items:center;gap:8px;padding:10px 12px 10px 16px;background:#2E6B34;color:#fff;cursor:move;user-select:none;touch-action:none} #dspop .ph b{flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} #dspop .ph button{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:99px;padding:5px 10px;font-size:13px;font-weight:800;cursor:pointer}
@@ -7345,14 +7346,15 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     if(pendingVote&&pendingVote.sid===c.id){ const L={1:['👍','賛成','a'],'-1':['👎','反対','d'],0:['🤔','保留','p']}[pendingVote.v];
       h+=`<div class="pvc ${L[2]}"><div>${L[0]} <b>${L[1]}</b> でいいですか？</div><div class="rw"><button data-pv-ok="1">はい、これで答える</button><button data-pv-no="1">えらびなおす</button></div></div>`; }
     if(seen){ h+=`<div class="res"><div class="bar"><i class="ba" style="width:${pct(t.a)}%"></i><i class="rd" style="width:${pct(t.d)}%"></i><i class="bp" style="width:${pct(t.p)}%"></i></div>`+
-      `<div class="num"><span>賛成 ${pct(t.a)}%</span><span>反対 ${pct(t.d)}%</span><span>保留 ${pct(t.p)}%</span><span style="margin-left:auto;font-weight:600">${t.n}人</span></div><div class="mine">あなたの回答：<b>${mv===1?'賛成':mv===-1?'反対':'保留'}</b>（押し直すと変えられます）</div>`;
+      `<div class="num"><span>賛成 ${pct(t.a)}%</span><span>反対 ${pct(t.d)}%</span><span>保留 ${pct(t.p)}%</span><span style="margin-left:auto;font-weight:600">${t.n}人</span></div><div class="mine">あなたの回答：<b>${mv===1?'賛成':mv===-1?'反対':'保留'}</b>（押し直すと変えられます）</div>`+((c.base&&myReason(c))?(()=>{ const r=myReason(c), x=splitTags(r.text); return `<div class="myr"><b>あなたの理由</b>${x.tags.map(t=>`<em>${esc(t)}</em>`).join('')}${esc(x.body)}<span class="rw2"><button class="mini" data-redit="${esc(c.id)}">直す</button><button class="mini" data-del="${esc(r.id)}">取り下げる</button></span></div>`; })():'');
       if(AN.ok) h+='<div class="gb">'+AN.groups.map((g,i)=>{ const u=agg(c.id,g.members); return `<span><b style="color:${GCOL[i]}">●</b> ${esc(g.name)} 賛成${u.n?Math.round(u.a*100/u.n):0}%</span>`; }).join('')+'</div>';
       h+='</div>'; }
     else h+=`<div class="hint">答えると、みんなの結果が見られます</div>`;
     h+=reasonsHTML(c);
-    if(c.base && pendingReason && pendingReason.sid===c.id){ const L=pendingReason.v<0?['👎','反対']:['🤔','保留']; h+=`<div class="cmf rsn" data-vote="${pendingReason.v}"><div style="font-weight:800;font-size:13px">${L[0]} <b>${L[1]}</b> を選びました。気になるところは？（任意・いくつでも）</div><div class="rch">${RTAGS.map(t=>`<button data-rt="${t}">${t}</button>`).join('')}</div>`+formInner('ひとこと（任意・感じたままでOK）',true)+`<button class="skip" data-noreason="1">理由は書かずに答える ›</button></div>`; }
+    if(c.base && pendingReason && pendingReason.sid===c.id){ const L=pendingReason.v<0?['👎','反対']:['🤔','保留']; const mr=myReason(c); h+=`<div class="cmf rsn" data-vote="${pendingReason.v}"${mr?` data-edit-id="${esc(mr.id)}" data-prefill="${esc(mr.text)}"`:''}><div style="font-weight:800;font-size:13px">${L[0]} <b>${L[1]}</b> を選びました。気になるところは？（任意・いくつでも）</div><div class="rch">${RTAGS.map(t=>`<button data-rt="${t}">${t}</button>`).join('')}</div>`+formInner('ひとこと（任意・感じたままでOK）',true)+`<button class="skip" data-noreason="1">理由は書かずに答える ›</button></div>`; }
     return h+'</div>'; }
   let pendingVote=null, pendingReason=null, afterJoin=null;
+  const myReason=c=>REASONS.filter(r=>r.own&&reasonKey(r)===c.item).sort((a,b)=>new Date(b.at||0)-new Date(a.at||0))[0];
   let hintShown=false; const hintOnce=()=>{ if(hintShown) return false; hintShown=true; return true; };
   // 案の下にたたんで並べる「理由」。賛成・反対・保留のボタンは付けない
   function reasonsHTML(c){ const key=c.base?c.item:(c.talk?KEEP_TOPIC:null); if(!key) return '';
@@ -7374,6 +7376,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       const cb=ALL.find(x=>x.id===sid); if(cb&&cb.base&&v!==1){ pendingVote=null; pendingReason={sid,v}; } else { pendingReason=null; pendingVote={sid,v}; } renderList(); renderThread(); });
     root.querySelectorAll('[data-pv-no]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); pendingVote=null; pendingReason=null; renderList(); renderThread(); });
     root.querySelectorAll('[data-pv-ok]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); if(!pendingVote) return; const {sid,v}=pendingVote; pendingVote=null; castVote(sid,v,b.closest('.pst')); });
+    root.querySelectorAll('[data-redit]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const sid=b.dataset.redit; const v=myVote(sid); pendingVote=null; pendingReason={sid,v:(v===-1||v===0)?v:0}; renderList(); renderThread(); });
     root.querySelectorAll('[data-edit]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); editing=b.dataset.edit; renderList(); renderThread(); });
     root.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); editing=null; renderList(); renderThread(); });
     root.querySelectorAll('.cmf.ed textarea').forEach(t=>{ t.addEventListener('keydown',e=>e.stopPropagation()); t.addEventListener('pointerdown',e=>e.stopPropagation()); });
@@ -7383,6 +7386,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       try{ await api.send({action:'remove',id:b.dataset.del,voter:VOTER}); ALL=ALL.filter(x=>x.id!==b.dataset.del); await refresh(); }catch(_){ alert('取り下げられませんでした。'); } });
     root.querySelectorAll('.rsn').forEach(f=>{ const sid=f.closest('.pst').dataset.id, c=ALL.find(x=>x.id===sid);
       f.dataset.reason='1'; f.querySelectorAll('[data-rt]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); b.classList.toggle('on'); });
+      if(f.dataset.prefill&&!f.dataset.filled){ f.dataset.filled='1'; const x=splitTags(f.dataset.prefill); f.querySelectorAll('[data-rt]').forEach(b=>{ if(x.tags.includes(b.dataset.rt)) b.classList.add('on'); }); const ta=f.querySelector('textarea'); if(ta) ta.value=x.body; }
       bindForm(f,()=>({key:'【理由】'+c.item,name:c.item}),()=>{ renderList(); renderThread(); },()=>{},()=>{ const v=+f.dataset.vote; pendingReason=null; castVote(sid,v,null); });
       const nr=f.querySelector('[data-noreason]'); if(nr) nr.onclick=e=>{ e.stopPropagation(); const v=+f.dataset.vote; pendingReason=null; pendingVote={sid,v}; renderList(); renderThread(); }; });
     root.querySelectorAll('.pst [data-item]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.item; if(kindOf(k)==='topic'){ tab='all'; renderList(); } else goto(k); });
@@ -7614,7 +7618,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     const chn=box.querySelector('.chn'); if(chn) chn.onclick=e=>{ e.stopPropagation(); openPanel('join'); };
     const send=async(btn,text,anon)=>{ const p=profile(); const sendName=anon?'匿名':`${p.name}（${p.aff}）`;
       const t=getTarget(); btn.disabled=true; btn.textContent='送信中…';
-      try{ await api.send({action:'add',item:t.key,itemName:t.name,name:sendName,text,voter:VOTER}); ta.value=''; if(onSent) onSent(); await refresh(); }
+      try{ if(box.dataset.editId) await api.send({action:'edit',id:box.dataset.editId,voter:VOTER,text}); else await api.send({action:'add',item:t.key,itemName:t.name,name:sendName,text,voter:VOTER}); ta.value=''; if(onSent) onSent(); await refresh(); }
       catch(err){ alert('送れませんでした。時間をおいてもう一度お試しください。'); btn.disabled=false; btn.textContent='はい、これで出す'; } };
     box.querySelector('.snd').onclick=e=>{ e.stopPropagation();
       if(e.target.dataset.needjoin){ openPanel('join'); return; }

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>みんなの声 管理画面｜shake 3D配置案</title>
+<style>
+:root{--ink:#1E2A22;--sub:#56615A;--mute:#8A948C;--line:#E3E8DF;--bg:#F4F6F1;--card:#fff;--g:#2E7D32;--r:#C0392B;--p:#9AA59A;--b:#2F6FB0;--o:#C97A1E}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;font-size:14px;line-height:1.55}
+header{background:linear-gradient(135deg,#2E6B34,#1E4A24);color:#fff;padding:18px 20px 16px}
+header h1{margin:0;font-size:20px;font-weight:900}header .s{font-size:12.5px;color:#CFE3C9;margin-top:2px}
+header .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+button,select{font:inherit}.btn{border:0;border-radius:99px;padding:6px 13px;font-size:12.5px;font-weight:800;cursor:pointer;background:rgba(255,255,255,.16);color:#fff}.btn:hover{background:rgba(255,255,255,.26)}
+.upd{font-size:11.5px;color:#CFE3C9}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:-30px}
+.kpi div{background:var(--card);border-radius:14px;padding:12px 14px;box-shadow:0 4px 14px rgba(0,0,0,.06)}.kpi b{display:block;font-size:26px;font-weight:900;line-height:1.1}.kpi small{color:var(--sub);font-size:12px}.kpi em{font-style:normal;font-size:11.5px;color:var(--mute);display:block;margin-top:2px}
+h2{font-size:16px;margin:26px 0 10px;display:flex;align-items:center;gap:8px}h2 small{font-weight:600;color:var(--mute);font-size:12px}
+.hl{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.box{background:var(--card);border-radius:14px;padding:12px 14px;border:1px solid var(--line)}
+.box h3{margin:0 0 8px;font-size:13.5px;display:flex;align-items:center;gap:6px}.box h3 i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.mini{display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid #F0F2EE;font-size:12.5px;cursor:pointer}.mini:first-of-type{border-top:0}.mini .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mini .v{font-weight:800;font-variant-numeric:tabular-nums}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.chip{border:1.5px solid #CBD3C6;background:#fff;border-radius:99px;padding:5px 11px;font-size:12.5px;font-weight:700;cursor:pointer;color:#3C4840}.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.ctl select{border:1.5px solid #CBD3C6;border-radius:10px;padding:5px 8px;background:#fff;font-size:12.5px}
+.ctl .lb{font-size:12px;color:var(--sub);font-weight:700;margin-left:6px}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+th{font-size:11.5px;color:var(--sub);text-align:left;padding:8px 10px;background:#F7F9F5;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid #F0F2EE;vertical-align:middle;font-size:13px}tr.row{cursor:pointer}tr.row:hover td{background:#FAFCF8}
+.tg{display:inline-block;font-size:10.5px;font-weight:800;border-radius:99px;padding:1px 7px;margin-right:4px;background:#EEF4EA;color:#2E6B34;white-space:nowrap}.tg.n{background:#E6EFF8;color:#1E4F8A}.tg.o{background:#F2EFE6;color:#6A5A2A}.tg.q{background:#EFEAF7;color:#4B3A78}
+.bar{display:flex;height:12px;border-radius:99px;overflow:hidden;background:#EEF1EA;min-width:120px}.bar i{display:block;height:100%}.bar .a{background:var(--g)}.bar .d{background:var(--r)}.bar .p{background:var(--p)}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap;font-size:12.5px}.num b{font-weight:800}
+.rz em{font-style:normal;font-size:10.5px;font-weight:700;background:#FFF1DE;color:#8A4B00;border-radius:99px;padding:1px 7px;margin:0 3px 2px 0;display:inline-block}
+.det td{background:#FBFCFA;padding:12px 14px}.det .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.rb{background:#fff;border:1px solid var(--line);border-radius:12px 12px 12px 4px;padding:7px 10px;margin:6px 0;font-size:12.5px}.rb .by{font-size:10.5px;color:var(--mute);margin-top:2px}
+.sub{font-size:12px;color:var(--sub)}.empty{color:var(--mute);font-size:12.5px;padding:8px 0}
+.cats div{display:flex;align-items:center;gap:8px;font-size:12px;margin:4px 0}.cats span{width:52px;flex:none;color:var(--sub);font-weight:700}.cats .bar{flex:1;height:9px}
+.tagbars div{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:12.5px}.tagbars span{width:96px;flex:none}.tagbars i{display:block;height:12px;background:var(--o);border-radius:99px}.tagbars b{font-variant-numeric:tabular-nums}
+.grp{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.note{font-size:11.5px;color:var(--mute);margin-top:6px}
+.legend{display:flex;gap:12px;font-size:11.5px;color:var(--sub)}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+@media (max-width:760px){ .hide-sm{display:none} td,th{padding:7px 6px} .bar{min-width:80px} header h1{font-size:18px} }
+@media print{ header .tools,.ctl{display:none} body{background:#fff} .kpi{margin-top:0} }
+</style></head><body>
+<header><h1>みんなの声　管理画面</h1><div class="s">shake 3D配置案｜賛成・反対・保留の集まり具合と、反対・保留の理由（名前・学籍番号は表示しません）</div>
+<div class="tools"><button class="btn" id="rf">↻ 更新</button><button class="btn" id="csv1">CSV：案ごとの結果</button><button class="btn" id="csv2">CSV：理由・声</button><button class="btn" onclick="print()">印刷</button><span class="upd" id="upd">読み込み中…</span></div></header>
+<main>
+<div class="kpi" id="kpi"></div>
+<h2>注目 <small>3人以上が答えたもの</small></h2><div class="hl" id="hl"></div>
+<h2>案ごとの結果 <small id="cnt"></small></h2>
+<div class="ctl" id="ctl"></div>
+<div class="legend"><span><i style="background:var(--g)"></i>賛成</span><span><i style="background:var(--r)"></i>反対</span><span><i style="background:var(--p)"></i>保留</span><span>（行を押すと、理由と所属別の内訳）</span></div>
+<div style="overflow-x:auto;margin-top:6px"><table><thead><tr><th>案</th><th class="hide-sm">回答</th><th>賛成・反対・保留</th><th class="hide-sm">割合</th><th>理由</th></tr></thead><tbody id="tb"></tbody></table></div>
+<h2>反対・保留の理由：多かったもの</h2><div class="hl"><div class="box"><h3>気になるところ（チップ）</h3><div class="tagbars" id="tags"></div></div><div class="box"><h3>片付け・管理の声</h3><div id="keep"></div></div></div>
+<h2>答え方のグループ <small>6人以上が3件以上答えると出ます</small></h2><div class="grp" id="grp"></div>
+<div class="note">データは3Dモデル「みんなの声」と同じスプレッドシートから読み込みます。60秒ごとに自動で更新します。</div>
+</main>
+<script>
+const API='https://script.google.com/macros/s/AKfycbyRuORVVgsWallk8rlNljpedJeqhnmB2PLUznZvqtWrK4YqQaDNm9GBNXC6d_3GbU3q/exec';
+const BASE=[{"id": "Bmc84k4", "item": "入口（アイデアエクスチェンジスペース）", "zone": true, "tag": "場所"}, {"id": "Bz0iugr", "item": "中央カウンター", "zone": true, "tag": "場所"}, {"id": "B3qz82", "item": "広場", "zone": true, "tag": "場所"}, {"id": "B11lw66", "item": "台形テーブルのエリア", "zone": true, "tag": "場所"}, {"id": "B12t9qs7", "item": "本の通り", "zone": true, "tag": "場所"}, {"id": "Bhkd59", "item": "ハイデスクのエリア（ラボの手前）", "zone": true, "tag": "場所"}, {"id": "Bc2heya", "item": "ラボ（＝ワーキングスペース奥）", "zone": true, "tag": "場所"}, {"id": "B16nd6sm", "item": "小上がり", "zone": true, "tag": "場所"}, {"id": "Bryg1ep", "item": "プロジェクトルーム1", "zone": true, "tag": "場所"}, {"id": "Bryg1eq", "item": "プロジェクトルーム2", "zone": true, "tag": "場所"}, {"id": "B1lb3zh9", "item": "プロジェクトルーム3（物品置き場）", "zone": true, "tag": "場所"}, {"id": "Bpt4pii", "item": "企画展示の壁（コクヨ Any Wall）", "zone": false, "tag": "新しく買う"}, {"id": "B1fc42bw", "item": "折りたたみの丸テーブル（KingCamp）", "zone": false, "tag": "新しく買う"}, {"id": "Bwghrcc", "item": "本棚（内田洋行 多目的書架ST 3段・キャスター付き ST-TS15）", "zone": false, "tag": "新しく買う"}, {"id": "B1szzk9z", "item": "本棚の間のベンチ（内田洋行 Puller［プラー］ベンチ 棚付）", "zone": false, "tag": "新しく買う"}, {"id": "B1bc5rlg", "item": "ソファ（コクヨ Any Sofa）", "zone": false, "tag": "新しく買う"}, {"id": "B1bktdqd", "item": "小上がり（キャスター付きの畳の台）", "zone": false, "tag": "新しく買う"}, {"id": "Bff5frs", "item": "ハイカウンター（コクヨ Any Table ハイカウンター）", "zone": false, "tag": "新しく買う"}, {"id": "B1hif555", "item": "緑を置けるワゴン（コクヨ Any Wagon）", "zone": false, "tag": "新しく買う"}, {"id": "Bu4eaw7", "item": "小上がりの小さな丸テーブル", "zone": false, "tag": "新しく買う"}, {"id": "B1c7srgz", "item": "台形テーブル（内田洋行 NEUT フラップ 台形）", "zone": false, "tag": "新しく買う"}, {"id": "Bi3x099", "item": "台形テーブルの椅子（愛知 Navette）", "zone": false, "tag": "新しく買う"}, {"id": "B2u4knp", "item": "ラボ（＝ワーキングスペース奥）のテーブル（コクヨ Any Table 角形 900×600・4キャスター）", "zone": false, "tag": "新しく買う"}, {"id": "Bwt8p0q", "item": "shakeのポスタースタンド（今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "Bkjik3x", "item": "電子黒板（今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "B1sutq8c", "item": "ラボ（＝ワーキングスペース奥）の看板の左右のホワイトボード", "zone": false, "tag": "今あるもの"}, {"id": "B1soruyy", "item": "ラグマット（丸い敷物）", "zone": false, "tag": "あればよいもの"}, {"id": "Bg4jxrb", "item": "イベントカレンダー（柱に貼る）", "zone": false, "tag": "仕掛け"}, {"id": "B13mj769", "item": "写真の壁「shakeのこれまで」", "zone": false, "tag": "仕掛け"}, {"id": "B4c4b8r", "item": "みんなの伝言板（横型ホワイトボード＋コルクボード）", "zone": false, "tag": "今あるもの＋あとで買う"}, {"id": "Bnuhmcs", "item": "積んだハイチェア（イベントの予備）", "zone": false, "tag": "今あるもの"}, {"id": "Bqyacbr", "item": "パンフレットスタンド（今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "Bzbs6ms", "item": "チラシ・募集のボード（中央カウンター・今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "B1grhbxh", "item": "チラシ・募集のボード（ラボの看板・今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "B1sgx4zz", "item": "演台（今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "B1wizvz7", "item": "折りたたみラック（今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "B1sbtm6j", "item": "バケツ型のスツール（オリバー BT STOOL・今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "Bh2k57x", "item": "ラボの椅子（天白から持ってくる木製チェア）", "zone": false, "tag": "今あるもの（天白から）"}, {"id": "Bqxvpk3", "item": "ラジオブースのホワイトボード（プロジェクトルーム1・今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "B1kg8tiy", "item": "ホワイトボード（今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "Bte0z38", "item": "たたんだ小さい2連スクリーン（今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "Bxsduyp", "item": "ビーズクッション（今あるYogibo・青）", "zone": false, "tag": "今あるもの"}, {"id": "Bgabxyu", "item": "スピーカーマイクのロッカー（天白から）", "zone": false, "tag": "天白からもらう"}, {"id": "B1nvyy9p", "item": "今あるハイデスク（窓際の一人席／ワーキングスペース内）", "zone": false, "tag": "今あるもの"}, {"id": "B1p7p8fx", "item": "窓際の一人席のハイチェア（今あるもの・白）", "zone": false, "tag": "今あるもの"}, {"id": "Buxx1ae", "item": "キューブ型のスツール（今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "B60q191", "item": "中央カウンター（今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "B1088iqc", "item": "中央カウンターのハイチェア（今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "B1b7h94n", "item": "ハイデスクのエリアのハイチェア（今あるもの・黒）", "zone": false, "tag": "今あるもの"}, {"id": "Bs22pel", "item": "「ラボ（＝ワーキングスペース奥）」と「ハイデスクのエリア」のあいだのホワイトボード：今ある2連スクリーン（折りたたみホワイトボード）2台", "zone": false, "tag": "今あるもの"}, {"id": "Bt3n93p", "item": "窓際の一人席の仕切り（2連スクリーン・今あるもの）", "zone": false, "tag": "今あるもの"}, {"id": "Bvwri76", "item": "4面パネル（デジタルサイネージ・今あるもの）", "zone": false, "tag": "今あるもの"}];
+const SEEDS=[['Q01','全体の方針・考え方','ハイチェアを主役にせず、いろいろな高さの席を混ぜる方針がよい'],['Q02','全体の方針・考え方','家具は、できるだけキャスター付きで動かせるものにするのがよい'],['Q03','運用・ルール','ホワイトボードの置き場所は、決めておいたほうがよい'],['Q06','運用・ルール','片付けや並べ方のルールは、使う人どうしで話し合って決めていきたい'],['Q05','予算','新しく買う家具は「動かせること」と「使い方の幅」で選ぶのがよい'],['Q04','運用・ルール','（旧案・取り下げ）掲示の貼り替えや家具の片づけは、shake handsで分担して考えたい']];
+const KEEP='片付け・管理のこと', OLD=new Set(['19597d30','df251c88','40081d9d']);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const isR=c=>/^【理由】/.test(c.item||'')||c.item===KEEP||OLD.has(c.id), rkey=c=>String(c.item||'').replace(/^【理由】/,'');
+const tags=t=>{ const m=/^［([^］]*)］\s*/.exec(t||''); return m?{t:m[1].split('・').filter(Boolean),b:t.slice(m[0].length)}:{t:[],b:t||''}; };
+let ST=[], VOTES={}, RS=[], SUM=null, scope='all', sort='walk', who='all', open=new Set();
+function agg(sid,mem){ const V=VOTES[sid]||{}; let a=0,d=0,p=0; for(const [u,v] of Object.entries(V)){ if(mem&&!mem.has(u)) continue; if(v>0)a++; else if(v<0)d++; else p++; } return {a,d,p,n:a+d+p}; }
+function aggW(sid){ if(who==='all'||!SUM) return agg(sid); const x=(SUM.bySid[sid]||{})[who]||[0,0,0]; return {a:x[0],d:x[1],p:x[2],n:x[0]+x[1]+x[2]}; }
+const pc=(x,n)=>n?Math.round(x*100/n):0;
+let AN={ok:false,groups:[]}; let SEED=1; const rnd=()=>{ SEED=(SEED*16807)%2147483647; return (SEED-1)/2147483646; };
+function analyze(){ AN={groups:[],ok:false,P:0}; SEED=12345; const sids=ST.map(c=>c.id).filter(s=>agg(s).n>=2);
+  const vc={}; sids.forEach(s=>Object.keys(VOTES[s]||{}).forEach(u=>vc[u]=(vc[u]||0)+1)); const P=Object.keys(vc).filter(u=>vc[u]>=3); AN.P=P.length;
+  if(P.length<6||sids.length<3) return;
+  const X=P.map(u=>sids.map(s=>{ const v=(VOTES[s]||{})[u]; return v>0?1:v<0?-1:0; })); const m=sids.map((_,j)=>X.reduce((t,r)=>t+r[j],0)/P.length); X.forEach(r=>r.forEach((_,j)=>r[j]-=m[j]));
+  const pcomp=k0=>{ let w=sids.map(()=>rnd()-.5); for(let it=0;it<60;it++){ const s=X.map(r=>r.reduce((t,x,j)=>t+x*w[j],0)); const nw=sids.map((_,j)=>X.reduce((t,r,i)=>t+r[j]*s[i],0)); k0.forEach(c=>{ const d=nw.reduce((t,x,j)=>t+x*c[j],0); nw.forEach((_,j)=>nw[j]-=d*c[j]); }); const n=Math.hypot(...nw)||1; w=nw.map(x=>x/n); } return w; };
+  const c1=pcomp([]), c2=pcomp([c1]); const Y=X.map(r=>[r.reduce((t,x,j)=>t+x*c1[j],0),r.reduce((t,x,j)=>t+x*c2[j],0)]); const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+  const km=k=>{ let best=null; for(let rep=0;rep<12;rep++){ let C=[]; const idx=[...Y.keys()].map(i=>[rnd(),i]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); for(let i=0;i<k;i++) C.push(Y[idx[i]].slice());
+      let L=[]; for(let it=0;it<40;it++){ L=Y.map(y=>{ let bi=0,bd=1e9; C.forEach((c,i)=>{ const d=dist(y,c); if(d<bd){bd=d;bi=i;} }); return bi; }); C=C.map((c,i)=>{ const pts=Y.filter((_,j)=>L[j]===i); return pts.length?[pts.reduce((t,p)=>t+p[0],0)/pts.length,pts.reduce((t,p)=>t+p[1],0)/pts.length]:c; }); }
+      if(new Set(L).size<k) continue; const minSz=Math.max(3,Math.ceil(Y.length*0.12)); if([...Array(k).keys()].some(g=>L.filter(x=>x===g).length<minSz)) continue;
+      const sil=Y.reduce((t,y,i)=>{ const own=Y.filter((_,j)=>L[j]===L[i]&&j!==i); if(!own.length) return t; const a=own.reduce((s,z)=>s+dist(y,z),0)/own.length; let b=1e9; for(let g=0;g<k;g++){ if(g===L[i]) continue; const o=Y.filter((_,j)=>L[j]===g); if(o.length) b=Math.min(b,o.reduce((s,z)=>s+dist(y,z),0)/o.length); } return t+(b-a)/Math.max(a,b,1e-9); },0)/Y.length;
+      if(!best||sil>best.sil) best={L,sil,k}; } return best; };
+  let best=null; for(let k=2;k<=Math.min(4,Math.floor(P.length/3));k++){ const r=km(k); if(r&&(!best||r.sil>best.sil+0.02)) best=r; } if(!best) return;
+  const order=[...Array(best.k).keys()].map(g=>[g,best.L.filter(x=>x===g).length]).sort((a,b)=>b[1]-a[1]||a[0]-b[0]).map(x=>x[0]);
+  AN.groups=order.map((g,i)=>({name:'グループ'+'ABCD'[i],members:new Set(P.filter((_,j)=>best.L[j]===g))})); AN.ok=true; }
+function repness(sid,g){ const t=agg(sid,g.members); const rest=new Set(); AN.groups.forEach(h=>{ if(h!==g) h.members.forEach(u=>rest.add(u)); }); const o=agg(sid,rest);
+  const pa=(t.a+1)/(t.n+2), pd=(t.d+1)/(t.n+2), ra=pa/((o.a+1)/(o.n+2)), rd=pd/((o.d+1)/(o.n+2)); return ra*pa>=rd*pd?{s:ra*pa,dir:1,r:ra,p:pa}:{s:rd*pd,dir:-1,r:rd,p:pd}; }
+const div=t=>t.n<4?0:Math.min(t.a,t.d)/t.n;
+const kind=c=>c.base?(c.zone?'zone':/新しく/.test(c.tag)?'new':'old'):'opn';
+const tagHTML=c=>c.base?(c.zone?'<span class="tg">場所</span>':/新しく/.test(c.tag)?'<span class="tg n">新しく買う</span>':'<span class="tg o">今ある</span>'):'<span class="tg q">'+(c.seed?'方針':'意見')+'</span>';
+const title=c=>c.base?c.item:c.text;
+const reasonsOf=c=>RS.filter(r=>c.base?rkey(r)===c.item:(c.id==='Q06'&&r.item===KEEP));
+const barH=t=>`<div class="bar"><i class="a" style="width:${pc(t.a,t.n)}%"></i><i class="d" style="width:${pc(t.d,t.n)}%"></i><i class="p" style="width:${pc(t.p,t.n)}%"></i></div>`;
+async function load(){ document.getElementById('upd').textContent='読み込み中…';
+  try{ const [l,s]=await Promise.all([fetch(API+'?action=list&voter=admin&t='+Date.now()).then(r=>r.json()), fetch(API+'?action=summary&t='+Date.now()).then(r=>r.json()).catch(()=>null)]);
+    const CM=(l.comments||[]).filter(c=>c&&!c.hidden&&!c.parent); RS=CM.filter(isR);
+    VOTES={}; (l.votes||[]).forEach(([u,sid,v])=>{ (VOTES[sid]=VOTES[sid]||{})[u]=+v; });
+    ST=BASE.map(b=>Object.assign({base:true},b)).concat(SEEDS.map(([id,item,text])=>({id,item,text,seed:true})).filter(c=>c.id!=='Q04'||agg('Q04').n),CM.filter(c=>!isR(c)));
+    SUM=(s&&s.ok&&s.bySid)?s:null; analyze(); render();
+    document.getElementById('upd').textContent='最終更新 '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+(SUM?'':'（所属別の集計は準備中）');
+  }catch(e){ document.getElementById('upd').textContent='読み込みに失敗しました。少し待って「更新」を押してください。'; } }
+function render(){
+  const voters=new Set(); ST.forEach(c=>Object.keys(VOTES[c.id]||{}).forEach(u=>voters.add(u))); const total=ST.reduce((t,c)=>t+agg(c.id).n,0);
+  const reg=SUM&&SUM.registered; const regN=reg?Object.values(reg).reduce((a,b)=>a+b,0):null;
+  document.getElementById('kpi').innerHTML=`<div><b>${voters.size}</b><small>答えた人</small>${reg?`<em>登録 ${regN}人（学生${reg['学生']}・卒業生${reg['卒業生']}・一般${reg['一般']}）</em>`:''}</div><div><b>${total}</b><small>回答の数（のべ）</small><em>1人あたり ${voters.size?Math.round(total/voters.size):0}件</em></div><div><b>${ST.filter(c=>!c.base&&!c.seed).length}</b><small>新しく出た意見</small></div><div><b>${RS.length}</b><small>反対・保留の理由・声</small></div>`;
+  const pool=ST.map(c=>[c,agg(c.id)]).filter(([c,t])=>t.n>=3);
+  const top=(f,s,lab,col)=>{ const L=pool.map(([c,t])=>[c,t,f(t)]).filter(x=>x[2]>0).sort((a,b)=>b[2]-a[2]).slice(0,5);
+    return `<div class="box"><h3><i style="background:${col}"></i>${lab}</h3>`+(L.length?L.map(([c,t,v])=>`<div class="mini" data-go="${esc(c.id)}"><span class="nm">${tagHTML(c)}${esc(title(c))}</span><span class="v" style="color:${col}">${s(t,v)}</span></div>`).join(''):'<div class="empty">まだありません</div>')+'</div>'; };
+  document.getElementById('hl').innerHTML=top(t=>t.a/t.n>=.6?t.a/t.n+t.n/1000:0,(t)=>`賛成${pc(t.a,t.n)}%（${t.n}人）`,'みんなが賛成しやすい','var(--g)')+top(t=>t.d/t.n>=.3?t.d/t.n+t.n/1000:0,(t)=>`反対${pc(t.d,t.n)}%（${t.n}人）`,'反対が多い','var(--r)')+top(t=>div(t)>=.2?div(t):0,(t)=>`賛${pc(t.a,t.n)}／反${pc(t.d,t.n)}`,'意見が分かれている','var(--o)')+top(t=>t.p/t.n>=.3?t.p/t.n+t.n/1000:0,(t)=>`保留${pc(t.p,t.n)}%`,'保留が多い（迷い・説明不足？）','#7A857C');
+  const S=[['all','ぜんぶ'],['zone','場所'],['new','新しく買う'],['old','今ある'],['opn','方針・意見']];
+  const SO=[['walk','配置の順'],['n','回答が多い順'],['a','賛成が多い順'],['d','反対が多い順'],['p','保留が多い順'],['div','分かれている順'],['r','理由が多い順']];
+  const W=[['all','全員'],['学生','学生'],['卒業生','卒業生'],['一般','一般']];
+  document.getElementById('ctl').innerHTML=S.map(([k,l])=>`<button class="chip${scope===k?' on':''}" data-sc="${k}">${l}</button>`).join('')+`<span class="lb">並べ方</span><select id="so">${SO.map(([k,l])=>`<option value="${k}"${sort===k?' selected':''}>${l}</option>`).join('')}</select>`+(SUM?`<span class="lb">だれの回答</span><select id="who">${W.map(([k,l])=>`<option value="${k}"${who===k?' selected':''}>${l}</option>`).join('')}</select>`:'');
+  let L=ST.filter(c=>scope==='all'||kind(c)===scope).map(c=>[c,aggW(c.id)]);
+  const key={n:([c,t])=>t.n,a:([c,t])=>t.n?t.a/t.n:-1,d:([c,t])=>t.n?t.d/t.n:-1,p:([c,t])=>t.n?t.p/t.n:-1,div:([c,t])=>div(t),r:([c])=>reasonsOf(c).length}[sort];
+  if(key) L.sort((x,y)=>key(y)-key(x));
+  document.getElementById('cnt').textContent=L.length+'件'+(who!=='all'?'（'+who+'の回答だけ）':'');
+  document.getElementById('tb').innerHTML=L.map(([c,t])=>{ const R=reasonsOf(c); const cnt={}; R.forEach(r=>tags(r.text).t.forEach(x=>cnt[x]=(cnt[x]||0)+1)); const tt=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,2);
+    let h=`<tr class="row" data-id="${esc(c.id)}"><td>${tagHTML(c)}${esc(title(c))}</td><td class="hide-sm num"><b>${t.n}</b>人</td><td>${t.n?barH(t):'<span class="sub">まだ</span>'}</td><td class="hide-sm num">${t.n?`<b style="color:var(--g)">${pc(t.a,t.n)}</b>／<b style="color:var(--r)">${pc(t.d,t.n)}</b>／${pc(t.p,t.n)}%`:''}</td><td class="rz">${R.length?`<b>${R.length}</b>件 `+tt.map(([x,n])=>`<em>${esc(x)}×${n}</em>`).join(''):''}</td></tr>`;
+    if(open.has(c.id)){ const cats=SUM?['学生','卒業生','一般','その他'].map(k=>{ const x=(SUM.bySid[c.id]||{})[k]; if(!x) return ''; const u={a:x[0],d:x[1],p:x[2],n:x[0]+x[1]+x[2]}; return `<div><span>${k}</span>${barH(u)}<b class="num">${u.n}人 賛${pc(u.a,u.n)}%</b></div>`; }).join(''):'';
+      const gp=AN.ok?AN.groups.map((g,i)=>{ const u=agg(c.id,g.members); return u.n?`<div><span>${g.name}</span>${barH(u)}<b class="num">${u.n}人</b></div>`:''; }).join(''):'';
+      h+=`<tr class="det"><td colspan="5"><div class="grid"><div><b>反対・保留の理由（${R.length}件）</b>${R.length?R.map(r=>{ const x=tags(r.text); return `<div class="rb">${x.t.map(z=>`<span class="rz"><em>${esc(z)}</em></span>`).join('')}${esc(x.b)}<div class="by">${esc(r.name||'匿名')}${r.at?'・'+new Date(r.at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):''}</div></div>`; }).join(''):'<div class="empty">まだありません</div>'}</div>`+
+        `<div>${cats?`<b>所属別</b><div class="cats">${cats}</div>`:''}${gp?`<b style="display:block;margin-top:8px">答え方のグループ別</b><div class="cats">${gp}</div>`:''}${!c.base&&!c.seed?`<div class="sub" style="margin-top:8px">出した人：${esc(c.name||'匿名')}</div>`:''}</div></div></td></tr>`; }
+    return h; }).join('');
+  const all={}; RS.forEach(r=>tags(r.text).t.forEach(x=>all[x]=(all[x]||0)+1)); const mx=Math.max(1,...Object.values(all));
+  document.getElementById('tags').innerHTML=Object.keys(all).length?Object.entries(all).sort((a,b)=>b[1]-a[1]).map(([x,n])=>`<div><span>${esc(x)}</span><i style="width:${Math.round(n/mx*100)}%"></i><b>${n}</b></div>`).join(''):'<div class="empty">まだありません</div>';
+  const K=RS.filter(r=>r.item===KEEP); document.getElementById('keep').innerHTML=K.length?K.map(r=>`<div class="rb">${esc(r.text)}<div class="by">${esc(r.name||'匿名')}</div></div>`).join(''):'<div class="empty">まだありません</div>';
+  document.getElementById('grp').innerHTML=AN.ok?AN.groups.map(g=>{ const R=ST.filter(c=>agg(c.id,g.members).n>=2).map(c=>[c,repness(c.id,g)]).filter(([c,r])=>r.r>1.25&&r.p>.55).sort((a,b)=>b[1].s-a[1].s).slice(0,5);
+    return `<div class="box"><h3>${g.name}<span class="sub">${g.members.size}人</span></h3>${R.length?R.map(([c,r])=>`<div class="mini"><span class="nm">${esc(title(c))}</span><span class="v" style="color:${r.dir>0?'var(--g)':'var(--r)'}">${r.dir>0?'賛成':'反対'}${Math.round(r.p*100)}%</span></div>`).join(''):'<div class="empty">まだ特徴ははっきりしません</div>'}</div>`; }).join(''):`<div class="box"><div class="empty">いま ${AN.P||0}人。6人以上がそれぞれ3件以上答えると、答え方の似た人のまとまりが出ます。</div></div>`;
+  bind(); }
+function bind(){ document.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{ scope=b.dataset.sc; render(); });
+  const so=document.getElementById('so'); if(so) so.onchange=()=>{ sort=so.value; render(); }; const w=document.getElementById('who'); if(w) w.onchange=()=>{ who=w.value; render(); };
+  document.querySelectorAll('tr.row').forEach(r=>r.onclick=()=>{ const id=r.dataset.id; open.has(id)?open.delete(id):open.add(id); render(); });
+  document.querySelectorAll('[data-go]').forEach(m=>m.onclick=()=>{ const id=m.dataset.go; scope='all'; open.add(id); render(); const r=document.querySelector(`tr.row[data-id="${CSS.escape(id)}"]`); if(r) r.scrollIntoView({block:'center',behavior:'smooth'}); }); }
+function dl(name,rows){ const csv='﻿'+rows.map(r=>r.map(x=>'"'+String(x==null?'':x).replace(/"/g,'""')+'"').join(',')).join('\r\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=name; a.click(); }
+document.getElementById('csv1').onclick=()=>dl('みんなの声_案ごとの結果.csv',[['種類','案','回答数','賛成','反対','保留','賛成%','反対%','保留%','理由の数']].concat(ST.map(c=>{ const t=agg(c.id); return [c.base?(c.zone?'場所':c.tag):(c.seed?'方針':'意見'),title(c),t.n,t.a,t.d,t.p,pc(t.a,t.n),pc(t.d,t.n),pc(t.p,t.n),reasonsOf(c).length]; })));
+document.getElementById('csv2').onclick=()=>dl('みんなの声_理由と声.csv',[['対象','気になるところ','ひとこと','名前','日時']].concat(RS.map(r=>{ const x=tags(r.text); return [rkey(r),x.t.join('・'),x.b,r.name||'匿名',r.at||'']; })));
+document.getElementById('rf').onclick=load; load(); setInterval(load,60000);
+</script></body></html>
