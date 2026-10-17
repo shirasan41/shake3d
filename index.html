@@ -6999,9 +6999,21 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     ['全体の方針・考え方','ハイチェアを主役にせず、いろいろな高さの席を混ぜる方針がよい'],
     ['全体の方針・考え方','家具は、できるだけキャスター付きで動かせるものにするのがよい'],
     ['運用・ルール','ホワイトボードの置き場所は、決めておいたほうがよい'],
-    ['運用・ルール','掲示の貼り替えや家具の片づけは、shake handsで分担して考えたい'],
+    ['運用・ルール','片付けや並べ方のルールは、使う人どうしで話し合って決めていきたい'],
     ['予算','新しく買う家具は「動かせること」と「使い方の幅」で選ぶのがよい']
-  ].map(([item,text],i)=>({id:'Q'+String(i+1).padStart(2,'0'),item,itemName:item,name:'配置案より',text,at:'',seed:true}));
+  ].map(([item,text],i)=>({id:i===3?'Q06':'Q'+String(i+1).padStart(2,'0'),item,itemName:item,name:'配置案より',text,at:'',seed:true,talk:i===3}));
+  /* 「理由」＝反対・保留の理由や、片付け・管理の自由な声。賛成・反対・保留では答えない（10/17）。
+     スプレッドシート「声」の「什器・場所」の先頭に【理由】と書くと、理由として扱う */
+  const KEEP_TOPIC='片付け・管理のこと';
+  const OLD_REASONS=new Set(['19597d30','df251c88','40081d9d']);   // 理由の仕組みを入れる前に出た3件（反対・保留の理由として書かれたもの）
+  const isReason=c=>!c.base && (/^【理由】/.test(c.item||'') || c.item===KEEP_TOPIC || OLD_REASONS.has(c.id));
+  const reasonKey=c=>String(c.item||'').replace(/^【理由】/,'');
+  const splitTags=t=>{ const m=/^［([^］]*)］\s*/.exec(t||''); return m?{tags:m[1].split('・').filter(Boolean),body:t.slice(m[0].length)}:{tags:[],body:t||''}; };
+  const RTAGS=['散らかりそう','通りにくそう','使わなさそう','もったいない','別の案がある'];
+  let REASONS=[];
+  // 場所の案の「ねらい」（10/17 白川さん了承）
+  const AIMS=[['入口','入ってきた人を、自然に奥へいざなう'],['中央カウンター','shakeの情報と相談が集まる「入口の窓口」になる'],['広場','手前は低く奥ほど高く、部屋全体を見渡せて入りやすくする'],['台形テーブル','人数や使い方に合わせて、島・会議・前向きに組み替える'],['本の通り','本を発想の出どころにしつつ、通路から中が見えて入れる道にする'],['ハイデスク','壁際・窓際から座れる、一人でも入りやすい席をつくる'],['ラボ','グループがプロジェクトを進められる島を、人数に合わせて組む'],['小上がり','くつろげる場所を、外から見えるひらいた形で用意する'],['プロジェクトルーム1','ラジオブースを中心にした部屋（必要なものを聞きたい）'],['プロジェクトルーム2','人が多いときに出すスツールの置き場（使い方は相談したい）'],['プロジェクトルーム3','物品置き場（使い方のルールを早めに決めたい）']];
+  const aimOf=k=>{ const m=AIMS.find(([z])=>String(k||'').indexOf(z)===0); return m?m[1]:''; };
 
   /* 家具・エリアごとの「案」＝白川さんの配置案（shake hands などの声をまとめたもの）。これに賛成・反対・保留で答えるのが基本 */
   const hsh=t=>{ let h=5381; for(const ch of String(t)) h=((h*33)^ch.charCodeAt(0))>>>0; return h.toString(36); };
@@ -7043,6 +7055,11 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     const votes={};
     for(let u=0;u<N;u++){ const x=r(); const gi=x<G[0].w?0:x<G[0].w+G[1].w?1:2; const act=.45+r()*.5; const pass=gi===2?.35:.12;
       ids.forEach(id=>{ if(r()>act) return; const y=r(); const v= y<pass?0 : (r()<(lean[id][gi]+1)/2?1:-1); (votes[id]=votes[id]||{})['sample'+u]=v; }); }
+    // 理由（反対・保留の理由と、片付け・管理の声）のサンプル
+    const B=baseList(); const pick=re=>{ const c=B.find(x=>re.test(x.item)); return c?c.item:null; };
+    const RS=[[/^本の通り/,'［散らかりそう］動かすたびに、本棚の列がくずれそう','学生D（法学部）'],[/^本の通り/,'［散らかりそう・別の案がある］床に目印があれば戻せると思う','匿名'],[/^小上がり/,'［使わなさそう］寝ている人がいると入りにくい','匿名'],
+      [/^広場/,'［通りにくそう］イベントのとき、通路がせまくなりそう','学生E（経済学部）'],[/^入口/,'［別の案がある］入口から中の様子がもっと見えるとよい','シェア本棚オーナー'],[null,'家具を動かしたら、元の場所がわかる目印がほしい','学生F（都市情報学部）'],[null,'閉める前に5分だけ、みんなで戻す時間があるといい','匿名']];
+    RS.forEach(([re,text,name],i)=>{ const it=re?pick(re):'片付け・管理のこと'; if(!it) return; ops.push({id:'R'+i,item:re?'【理由】'+it:it,itemName:it,name,text,at:new Date(Date.now()-(i+2)*3.1e6).toISOString(),sample:true}); });
     return {comments:ops, votes};
   }
   const api={
@@ -7066,7 +7083,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   };
   async function refresh(){
     try{ await flush(); }catch(_){}
-    try{ const r=await api.list(); ALL=baseList().concat(SEEDS,(r.comments||[]).filter(c=>c && !c.hidden && !c.parent)); VOTES=r.votes||{}; loaded=true;
+    try{ const r=await api.list(); const CM=(r.comments||[]).filter(c=>c && !c.hidden && !c.parent); REASONS=CM.filter(isReason); ALL=baseList().concat(SEEDS,CM.filter(c=>!isReason(c))); VOTES=r.votes||{}; loaded=true;
       const M=mine(); Object.entries(M).forEach(([sid,v])=>{ (VOTES[sid]=VOTES[sid]||{})[VOTER]=v; });   // 自分の票は手元を優先
     }catch(e){ console.warn('comments',e); }
     analyze(); updateBadges(); renderList(); renderThread();
@@ -7166,12 +7183,44 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   #cmlist .mescp{flex-wrap:wrap;overflow:visible;position:sticky;top:0;z-index:2;background:#FAFBF8;padding:6px 0}#cmlist .mescp em{font-style:normal;margin-left:4px;font-size:11px;opacity:.75;background:rgba(0,0,0,.07);border-radius:99px;padding:0 6px}#cmlist .mescp button.on em{background:rgba(255,255,255,.25)}
   #cmlist .vflt{display:flex;gap:6px;margin:2px 0 8px}#cmlist .vflt button{flex:1;border:1px solid #DDE3D8;background:#fff;border-radius:10px;padding:6px 2px;font-size:12px;font-weight:700;cursor:pointer;color:#3C4840}#cmlist .vflt button.on{background:#1E2A22;color:#fff;border-color:#1E2A22}
   #cmlist .smpl{margin-top:8px;background:#FFE9A8;color:#5A4300;border-radius:12px;padding:7px 10px;font-size:12px;line-height:1.5}#cmlist .smpl button{margin-left:6px;border:0;background:#5A4300;color:#fff;border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:800;cursor:pointer}
+  .pst .tk{display:inline-block;font-size:11px;font-weight:800;background:#E8E2F4;color:#4B3A78;border-radius:99px;padding:2px 9px;margin:0 6px 6px 0}
+  .pst .rsl{margin-top:10px;border-top:1px dashed #DCE3D6;padding-top:8px}
+  .pst .rsl summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px;color:#3C4840}
+  .pst .rsl summary::-webkit-details-marker{display:none}.pst .rsl summary:after{content:'›';margin-left:auto;transition:transform .2s;color:#8A948C}.pst .rsl[open] summary:after{transform:rotate(90deg)}
+  .pst .rsl .rn{font-weight:800;color:#56615A}.pst .rsl summary em,.rb .rt em,.cfm em.tg{font-style:normal;font-size:11px;font-weight:700;background:#FFF1DE;color:#8A4B00;border-radius:99px;padding:1px 8px;margin-right:4px}
+  .rb{background:#F6F7F4;border-radius:12px 12px 12px 4px;padding:8px 11px;margin-top:7px}.rb .rt{font-size:13px;line-height:1.6;color:#2A332D;white-space:pre-wrap;word-break:break-word}.rb .rby{font-size:10.5px;color:#8A948C;margin-top:3px}.rb.solo .rk{font-size:11px;font-weight:800;color:#2E6B34;margin-bottom:2px}
+  .cmf .rch{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.cmf .rch button{border:1.5px solid #E2CDB0;background:#fff;color:#7A4A10;border-radius:99px;padding:6px 11px;font-size:12.5px;font-weight:700;cursor:pointer}.cmf .rch button.on{background:#C97A1E;border-color:#C97A1E;color:#fff}
+  .cmf .xo{display:grid;grid-template-columns:1fr 1.6fr;gap:6px;margin:8px 0}.cmf .xo>div{border-radius:10px;padding:7px 9px;font-size:12px;line-height:1.5;position:relative}.cmf .xo b{font-size:15px;margin-right:4px}.cmf .xo small{display:block;font-size:10px;font-weight:700;margin-top:2px}
+  .cmf .xo .x1{background:#F7EDED;color:#8A3A32}.cmf .xo .o1{background:#E9F4E6;color:#21662A}
+  .cmf .kp{font-size:12px;color:#5A4300;background:#FFF5D8;border-radius:10px;padding:7px 10px;margin:8px 0}
+  .aic{display:none;font-size:12px;border-radius:10px;padding:6px 10px;margin-top:6px;line-height:1.5;animation:aiin .25s ease}.aic.on{display:block}
+  .aic.wait{background:#F2F4F0;color:#6A746C}.aic.ok{background:#E9F4E6;color:#21662A;font-weight:700}.aic.ng{background:#FFF3DF;color:#7A4A10}
+  .aic .aisg{border:0;background:#C97A1E;color:#fff;border-radius:99px;padding:2px 10px;font-size:11.5px;font-weight:800;cursor:pointer;margin-left:4px}
+  .sgb .sgl{font-size:12px;font-weight:700;color:#7A4A10}.sgb .sg{background:#fff;border:1.5px solid #E9C48F;border-radius:10px;padding:8px 10px;margin:6px 0;font-size:13.5px;font-weight:700;color:#1E2A22;line-height:1.55}
+  .sgb .rw{display:flex;gap:6px;flex-wrap:wrap}.sgb .rw button{border:0;border-radius:99px;padding:6px 12px;font-size:12px;font-weight:800;cursor:pointer}.sgb .use{background:#C97A1E;color:#fff}.sgb .keep,.sgb .edit{background:#F0E6D6;color:#7A4A10}
+  .sgb.in{background:#FFF7EA;border-radius:12px;padding:9px 10px;margin:8px 0;animation:aiin .3s ease}
+  .aiok{font-size:12px;font-weight:800;color:#21662A;background:#E9F4E6;border-radius:10px;padding:6px 10px;margin:8px 0;animation:aiin .3s ease}
+  .aiw{margin:8px 0;font-size:12px;color:#6A746C}.aiw .aib{height:4px;border-radius:99px;background:#E7ECE3;overflow:hidden;margin-bottom:5px}.aiw .aib i{display:block;height:100%;width:40%;background:linear-gradient(90deg,#8BD17C,#2E7D32);border-radius:99px;animation:aibar 1.1s ease-in-out infinite}
+  .dots{display:inline-flex;gap:3px;margin-right:6px;vertical-align:middle}.dots i{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.3;animation:dot 1s infinite}.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+  @keyframes dot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-2px)}}
+  @keyframes aibar{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+  @keyframes aiin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  #cmlist .intro{padding:4px 2px 10px}#cmlist .intro .ih{font-size:17px;font-weight:900;color:#1E2A22;margin:4px 0 10px}
+  #cmlist .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  #cmlist .tile{background:#fff;border:1px solid #E3E8DF;border-top:4px solid;border-radius:12px;padding:9px 9px 10px;display:flex;flex-direction:column;gap:4px}
+  #cmlist .tile b{font-size:13.5px;color:#1E2A22;line-height:1.3}#cmlist .tile span{font-size:11.5px;color:#56615A;line-height:1.5}
+  #cmlist .tile.t1{border-top-color:#2E7D32}#cmlist .tile.t2{border-top-color:#2F6FB0}#cmlist .tile.t3{border-top-color:#B8862A}
+  #cmlist .intro .more{margin-top:8px;font-size:12.5px;color:#3C4840}#cmlist .intro .more summary{cursor:pointer;color:#2E6B34;font-weight:800;font-size:12.5px}#cmlist .intro .more p{margin:6px 0;line-height:1.7}
+  #cmlist .intro .ask{margin-top:10px;background:#1E2A22;color:#fff;border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.5}#cmlist .intro .ask small{display:block;color:#C9D8C4;font-size:11.5px;margin-top:2px}
+  #cmlist .go1{width:100%;margin-top:12px;background:#2E7D32;color:#fff;border:0;border-radius:14px;padding:13px;font-size:16px;font-weight:900;cursor:pointer}
+  @media (max-width:420px){ #cmlist .tile b{font-size:12.5px} #cmlist .tile span{font-size:11px} }
+  .pst .aim{display:flex;gap:8px;align-items:baseline;margin-top:6px;font-size:13.5px;font-weight:700;color:#1E4F8A;line-height:1.5}.pst .aim b{flex:none;font-size:10.5px;font-weight:900;color:#fff;background:#2F6FB0;border-radius:6px;padding:2px 6px;letter-spacing:.05em}
   .pst .dsh{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:10.5px;color:#9AA49C;margin-top:3px}.pst .dsh button{border:1px solid #CFE3C9;background:#F6FAF4;color:#2E6B34;border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:800;cursor:pointer;white-space:nowrap}
   #dspop{position:fixed;z-index:90;left:50%;top:12vh;transform:translateX(-50%);width:min(560px,calc(100vw - 24px));height:min(60vh,520px);min-width:260px;min-height:180px;max-width:calc(100vw - 8px);max-height:calc(100vh - 8px);resize:both;overflow:hidden;display:none;flex-direction:column;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.35);font-family:inherit}
   #dspop.on{display:flex} #dspop .ph{display:flex;align-items:center;gap:8px;padding:10px 12px 10px 16px;background:#2E6B34;color:#fff;cursor:move;user-select:none;touch-action:none} #dspop .ph b{flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} #dspop .ph button{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:99px;padding:5px 10px;font-size:13px;font-weight:800;cursor:pointer}
   #dspop .pb{flex:1;overflow:auto;padding:14px 18px 20px;font-size:15.5px;line-height:1.85;color:#2A332D;white-space:pre-wrap} #dspop .pf{font-size:11px;color:#9AA49C;text-align:right;padding:0 22px 6px}
   @media (max-width:700px){ #dspop{left:8px;right:8px;top:8vh;transform:none;width:auto;height:72vh;resize:vertical} }
-  .pst .st{position:absolute;right:12px;top:12px;font-size:11px;font-weight:800;border-radius:99px;padding:2px 9px}
+  .pst .st{float:right;position:relative;margin:-2px -4px 6px 10px;font-size:11px;font-weight:800;border-radius:99px;padding:2px 9px}
   .pst .st.ok{background:#2E7D32;color:#fff}.pst .st.no{background:#FFF3C4;color:#7A5A00}
   #cmlist .nav{display:flex;align-items:center;gap:8px;margin:10px 0 0}
   #cmlist .nav button{width:44px;height:44px;border-radius:50%;border:0;background:#1E2A22;color:#fff;font-size:18px;cursor:pointer;flex:none}
@@ -7275,7 +7324,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   const GCOL=['#2F86C3','#C9A030','#8E44AD','#16A085'];
 
   /* ---- 意見カード（賛成・反対・保留） ---- */
-  const TOPICS=['全体について','全体の方針・考え方','運用・ルール','予算','動画・3Dモデルについて','その他'];
+  const TOPICS=['全体について','全体の方針・考え方','運用・ルール','片付け・管理のこと','予算','動画・3Dモデルについて','その他'];
   const ZNAMES=()=>(window.HANDS_ZONES||[]).map(z=>z.t);
   const kindOf=k=>TOPICS.includes(k)?'topic':(ZNAMES().includes(k)?'area':'item');
   const icon=k=>kindOf(k)==='topic'?'🗂':kindOf(k)==='area'?'📍':'🪑';
@@ -7284,10 +7333,10 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     let h=`<div class="pst${big?' big':''}${c.base?' base':''}" data-id="${esc(c.id)}">`;
     h+=seen?`<span class="st ok">✓ 回答済</span>`:`<span class="st no">未回答</span>`;
     if(c.base){
-      if(showItem) h+=`<span class="it" style="cursor:default">${c.zone?'📍 場所':'🪑 '+esc(c.tag||'家具')}・配置案</span><div class="tx">${esc(c.item)}</div>`+
-        (c.desc?`<div class="ds">${esc(c.desc)}</div><div class="dsh"><span>↕ 枠の中でスクロール／右下の角をドラッグで広げられます</span><button class="dsx" data-t="${esc(c.title||c.item||'')}">⤢ 大きく読む</button></div>`:'')+`<button class="see" data-item="${esc(c.item)}">📍 3Dで見る・くわしい説明 ›</button>`;
+      if(showItem) h+=`<span class="it" style="cursor:default">${c.zone?'📍 場所':'🪑 '+esc(c.tag||'家具')}・配置案</span><div class="tx">${esc(c.item)}</div>`+(c.zone&&aimOf(c.item)?`<div class="aim"><b>ねらい</b>${esc(aimOf(c.item))}</div>`:'')+
+        (c.desc?`<div class="ds">${esc(c.desc)}</div><div class="dsh"><span>${hintOnce()?'↕ 枠の中でスクロールできます':''}</span><button class="dsx" data-t="${esc(c.title||c.item||'')}">⤢ 大きく読む</button></div>`:'')+`<button class="see" data-item="${esc(c.item)}">📍 3Dで見る・くわしい説明 ›</button>`;
       else h+=`<div class="q" style="margin-top:0">この案（置き方・使い方）に、あなたは？</div>`;
-    } else h+=(showItem?`<button class="it" data-item="${esc(c.item)}">${icon(c.item)} ${esc(c.itemName||c.item)}</button>`:'')+
+    } else h+=(c.talk?`<span class="tk">これから話し合うこと</span>`:'')+(showItem?`<button class="it" data-item="${esc(c.item)}">${icon(c.item)} ${esc(c.itemName||c.item)}</button>`:'')+
       (editing===c.id? `<div class="cmf ed"><textarea maxlength="${MAXLEN}">${esc(c.text)}</textarea><div class="rw"><button class="snd" data-save="${esc(c.id)}">保存</button><button class="skip" data-cancel="1">やめる</button></div></div>`
         : `<div class="tx">${esc(c.text)}</div>`)+
       `<div class="by">${c.own?'🙋 あなたの意見':esc(c.name||'匿名')}${c.at?'・'+ago(c.at):''}${c.via==='form'?'（フォームから）':''}${c.own&&editing!==c.id?` <button class="mini" data-edit="${esc(c.id)}">✏️ 直す</button><button class="mini" data-del="${esc(c.id)}">取り下げる</button>`:''}</div>`;
@@ -7300,9 +7349,18 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       if(AN.ok) h+='<div class="gb">'+AN.groups.map((g,i)=>{ const u=agg(c.id,g.members); return `<span><b style="color:${GCOL[i]}">●</b> ${esc(g.name)} 賛成${u.n?Math.round(u.a*100/u.n):0}%</span>`; }).join('')+'</div>';
       h+='</div>'; }
     else h+=`<div class="hint">答えると、みんなの結果が見られます</div>`;
-    if(c.base && pendingReason && pendingReason.sid===c.id){ const L=pendingReason.v<0?['👎','反対']:['🤔','保留']; h+=`<div class="cmf rsn" data-vote="${pendingReason.v}"><div style="font-weight:800;font-size:13px">${L[0]} <b>${L[1]}</b> を選びました。💡 どうすればよくなる？（任意）</div>`+formInner('例：本棚の間をもう少し広くしたい。車いすやベビーカーでも通りやすくなるから。')+`<button class="skip" data-noreason="1">コメントなしで答える ›</button></div>`; }
+    h+=reasonsHTML(c);
+    if(c.base && pendingReason && pendingReason.sid===c.id){ const L=pendingReason.v<0?['👎','反対']:['🤔','保留']; h+=`<div class="cmf rsn" data-vote="${pendingReason.v}"><div style="font-weight:800;font-size:13px">${L[0]} <b>${L[1]}</b> を選びました。気になるところは？（任意・いくつでも）</div><div class="rch">${RTAGS.map(t=>`<button data-rt="${t}">${t}</button>`).join('')}</div>`+formInner('ひとこと（任意・感じたままでOK）',true)+`<button class="skip" data-noreason="1">理由は書かずに答える ›</button></div>`; }
     return h+'</div>'; }
   let pendingVote=null, pendingReason=null, afterJoin=null;
+  let hintShown=false; const hintOnce=()=>{ if(hintShown) return false; hintShown=true; return true; };
+  // 案の下にたたんで並べる「理由」。賛成・反対・保留のボタンは付けない
+  function reasonsHTML(c){ const key=c.base?c.item:(c.talk?KEEP_TOPIC:null); if(!key) return '';
+    const L=REASONS.filter(r=>reasonKey(r)===key).sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)); if(!L.length) return '';
+    const cnt={}; L.forEach(r=>splitTags(r.text).tags.forEach(t=>cnt[t]=(cnt[t]||0)+1));
+    const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([t,n])=>`<em>${esc(t)} ×${n}</em>`).join('');
+    return `<details class="rsl"><summary><b>${c.base?'反対・保留の理由':'片付け・管理の声'}</b><span class="rn">${L.length}件</span>${top}</summary>`+
+      L.map(r=>{ const {tags,body}=splitTags(r.text); return `<div class="rb"><div class="rt">${tags.map(t=>`<em>${esc(t)}</em>`).join('')}${esc(body)}</div><div class="rby">${r.own?'あなた':esc(r.name||'匿名')}${r.at?'・'+ago(r.at):''}${r.own?` <button class="mini" data-del="${esc(r.id)}">取り下げる</button>`:''}</div></div>`; }).join('')+`</details>`; }
   function castVote(sid,v,card){
     const M=mine(); M[sid]=v; lset(K(MYV),M); (VOTES[sid]=VOTES[sid]||{})[VOTER]=v; lastVoted=sid; const cc=ALL.find(x=>x.id===sid); reasonFor=null; pendingReason=null;
     const go=()=>{ analyze(); updateBadges(); renderList(); renderThread(); if(!reasonFor){ const bg=panel.querySelector('#cmlist .pst.big'); if(bg&&panel.classList.contains('on')) panel.scrollTop=Math.max(0,bg.offsetTop-150); } };
@@ -7324,7 +7382,8 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     root.querySelectorAll('[data-del]').forEach(b=>b.onclick=async e=>{ e.stopPropagation(); if(!confirm('この意見を取り下げますか？（ほかの人の回答も見えなくなります）')) return;
       try{ await api.send({action:'remove',id:b.dataset.del,voter:VOTER}); ALL=ALL.filter(x=>x.id!==b.dataset.del); await refresh(); }catch(_){ alert('取り下げられませんでした。'); } });
     root.querySelectorAll('.rsn').forEach(f=>{ const sid=f.closest('.pst').dataset.id, c=ALL.find(x=>x.id===sid);
-      bindForm(f,()=>({key:c.item,name:c.item}),()=>{ renderList(); renderThread(); },()=>{},()=>{ const v=+f.dataset.vote; pendingReason=null; castVote(sid,v,null); });
+      f.dataset.reason='1'; f.querySelectorAll('[data-rt]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); b.classList.toggle('on'); });
+      bindForm(f,()=>({key:'【理由】'+c.item,name:c.item}),()=>{ renderList(); renderThread(); },()=>{},()=>{ const v=+f.dataset.vote; pendingReason=null; castVote(sid,v,null); });
       const nr=f.querySelector('[data-noreason]'); if(nr) nr.onclick=e=>{ e.stopPropagation(); const v=+f.dataset.vote; pendingReason=null; pendingVote={sid,v}; renderList(); renderThread(); }; });
     root.querySelectorAll('.pst [data-item]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.item; if(kindOf(k)==='topic'){ tab='all'; renderList(); } else goto(k); });
   }
@@ -7352,6 +7411,10 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     const b=vb.querySelector('.bdg'); b.hidden=!unanswered; b.textContent=unanswered; b.title='まだ答えていない意見';
     if(!panel.classList.contains('on')) return;
     panel.classList.toggle('ans',tab==='answer');
+    if(profile()&&!joinView&&(introView||!lget(INTROK,0))){ panel.classList.remove('ans');
+      panel.innerHTML=`<div class="hd"><div class="tt">💬 みんなの声</div><button class="x" aria-label="閉じる">×</button></div><div class="bd">`+introHTML()+`<button class="go1">わかった、案に答える</button></div>`;
+      panel.querySelector('.x').onclick=()=>panel.classList.remove('on');
+      panel.querySelector('.go1').onclick=e=>{ e.stopPropagation(); lset(INTROK,1); introView=false; renderList(); }; return; }
     if(!profile()||joinView){ panel.classList.remove('ans');
       panel.innerHTML=`<div class="hd"><div class="tt">💬 みんなの声</div><div class="sub">配置案に「賛成・反対・保留」で答えてください（10/18 19:00まで）</div><button class="x" aria-label="閉じる">×</button></div><div class="bd">`+joinHTML()+(profile()?'<button class="skip" data-back="1">もどる</button>':'')+`</div>`;
       panel.querySelector('.x').onclick=()=>panel.classList.remove('on'); const bk=panel.querySelector('[data-back]'); if(bk) bk.onclick=e=>{ e.stopPropagation(); joinView=false; renderList(); };
@@ -7383,19 +7446,21 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
         `<div class="scp mescp">`+MS.map(([k,l])=>`<button data-mes="${k}" class="${meScope===k?'on':''}">${l}<em>${cnt(k)}</em></button>`).join('')+`</div>`+
         (meScope!=='own'?`<div class="vflt">`+VF.map(([k,l])=>`<button data-mev="${k}" class="${meVote===k?'on':''}">${l}</button>`).join('')+`</div>`:'')+
         (L.length?L.map(c=>stmt(c,true)).join(''):`<div class="cmempty">${meScope==='own'?'まだ意見を出していません。':'ここにはまだ回答がありません。'}</div>`); }
-    else { const L=ALL.slice().sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)); body=`<div class="lead">すべての意見（${ALL.length}件）</div>`+(L.length?L.map(c=>stmt(c,true)).join(''):'<div class="cmempty">まだ意見はありません。</div>'); }
-    panel.innerHTML=`<div class="hd"><div class="tt">💬 みんなの声</div><div class="sub">ようこそ、<b style="color:#fff">${esc(profile().name)}</b>さん（${esc(profile().aff)}）<button class="chg" data-chg="1">変更</button><br>配置案に「賛成・反対・保留」で答えてください（10/18 19:00まで）</div><button class="x" aria-label="閉じる">×</button>`+(SAMPLE()?`<div class="smpl">🧪 <b>サンプルモード</b>：架空の100人が答えた状態です。ここでの回答・意見は本番には送られません。<button data-smpl-off="1">本番にもどる</button></div>`:'')+
+    else { const L=ALL.slice().sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)); body=`<div class="lead">すべての意見（${ALL.length}件）</div>`+(L.length?L.map(c=>stmt(c,true)).join(''):'<div class="cmempty">まだ意見はありません。</div>')+
+      (REASONS.length?`<div class="pv-h4" style="margin-top:14px">理由・自由な声（${REASONS.length}件）</div>`+REASONS.slice().sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)).map(r=>{ const {tags,body}=splitTags(r.text); return `<div class="rb solo"><div class="rk">${esc(reasonKey(r))}</div><div class="rt">${tags.map(t=>`<em>${esc(t)}</em>`).join('')}${esc(body)}</div><div class="rby">${r.own?'あなた':esc(r.name||'匿名')}${r.at?'・'+ago(r.at):''}${r.own?` <button class="mini" data-del="${esc(r.id)}">取り下げる</button>`:''}</div></div>`; }).join(''):''); }
+    panel.innerHTML=`<div class="hd"><div class="tt">💬 みんなの声</div><div class="sub">ようこそ、<b style="color:#fff">${esc(profile().name)}</b>さん（${esc(profile().aff)}）<button class="chg" data-chg="1">変更</button><button class="chg" data-intro="1">shakeって？</button><br>配置案に「賛成・反対・保留」で答えてください（10/18 19:00まで）</div><button class="x" aria-label="閉じる">×</button>`+(SAMPLE()?`<div class="smpl">🧪 <b>サンプルモード</b>：架空の100人が答えた状態です。ここでの回答・意見は本番には送られません。<button data-smpl-off="1">本番にもどる</button></div>`:'')+
       `<div class="stats"><div><b>${ALL.length}</b><small>案と意見</small></div><div><b>${people}</b><small>参加した人</small></div><div><b>${done}<span style="font-size:12px">/${ALL.length}</span></b><small>あなたの回答</small></div></div>`+
       `<div class="prog"><i style="width:${ALL.length?Math.round(done*100/ALL.length):0}%"></i></div></div>`+
       '<div class="tabs">'+T('answer','🗳','答える')+T('agree','🤝','合意')+T('split','⚖️','分かれ目')+T('groups','👥','グループ')+T('me','🙋','わたし')+T('all','📋','すべて')+'</div>'+
       '<div class="bd">'+body+
-      (compose? '<div class="cmf"><div style="font-weight:800;font-size:13px">✍️ 新しい意見を出す</div><div style="font-size:12px;font-weight:700;color:#3C4840">これは何についての意見ですか？</div><div class="tps">'+TOPICS.map(t=>`<button data-tp="${esc(t)}" class="${t===pTopic?'on':''}">${esc(t)}</button>`).join('')+'</div>'+formInner('例：ソファは窓のほうに向けたい。外が見えると、ゆったり過ごせるから。')+'</div>'
+      (compose? '<div class="cmf"><div style="font-weight:800;font-size:13px">✍️ 新しい意見を出す</div><div style="font-size:12px;font-weight:700;color:#3C4840">これは何についての意見ですか？</div><div class="tps">'+TOPICS.map(t=>`<button data-tp="${esc(t)}" class="${t===pTopic?'on':''}">${esc(t)}</button>`).join('')+'</div>'+(pTopic===KEEP_TOPIC?'<div class="kp">片付けや管理への不安・アイデアを、自由に書いてください。賛成・反対で答える意見ではなく、「声」として届きます。</div>':'<div class="xo"><div class="x1"><b>×</b>ソファ素敵です<small>感想</small></div><div class="o1"><b>○</b>ソファは窓に向けたほうがいい。外が見えて落ち着くから<small>答えられる</small></div></div>')+formInner(pTopic===KEEP_TOPIC?'例：家具を動かしたら、元の場所がわかる目印がほしい':'例：ソファは窓のほうに向けたほうがいい。外が見えると、ゆったり過ごせるから。')+'</div>'
                : '<button class="pv-cta" data-compose="1">✍️ 新しい意見を出す</button><div class="cmempty" style="text-align:center;font-size:11.5px">家具や場所への意見は、その案で「反対」「保留」を選ぶと書けます</div>')+
       `<details class="how"><summary>しくみ・3Dの吹き出しの色</summary><p>台湾などで使われている「Polis（ポリス）」の考え方を借りています。返信や言い返しの欄はなく、意見に「賛成・反対・保留」で答えるだけ。答え方が似ている人を自動でグループにして、グループをこえて合意できることを見つけます。だれがどう答えたかは表示されません。</p><p><span class="lg"><i style="background:#2E7D32"></i>賛成が多い</span><span class="lg"><i style="background:#D9822B"></i>意見が分かれている</span><span class="lg"><i style="background:#D0427A"></i>これから</span>（数字は意見の数）</p></details>`+
       (COMMENTS_API?'':'<div class="cmempty">※いまはお試し中のため、この端末の中だけに保存されます。</div>')+'</div>';
     panel.querySelector('.x').onclick=()=>panel.classList.remove('on');
     const cg=panel.querySelector('[data-chg]'); if(cg) cg.onclick=e=>{ e.stopPropagation(); joinView=true; renderList(); };
     panel.querySelectorAll('[data-tab]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); tab=b.dataset.tab; renderList(); panel.scrollTop=0; });
+    panel.querySelectorAll('[data-intro]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); introView=true; renderList(); });
     panel.querySelectorAll('[data-smpl-off]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); try{ localStorage.removeItem(NKEY); localStorage.removeItem(AKEY); }catch(_){} joinView=true; renderList(); refresh(); });
     panel.querySelectorAll('[data-mes]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); meScope=b.dataset.mes; renderList(); panel.scrollTop=0; });
     panel.querySelectorAll('[data-mev]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); meVote=b.dataset.mev; renderList(); });
@@ -7454,7 +7519,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   function joinHTML(){ const n=lget(NKEY,''); const d=JD; const ch=(k,v,l)=>`<button class="ch${d[k]===v?' on':''}" data-jk="${k}" data-jv="${esc(v)}">${l}</button>`;
     const facSel=(k)=>`<select class="js" data-jk="${k}"><option value="">学部を選ぶ</option>${Object.keys(FAC).map(f=>`<option${d[k]===f?' selected':''}>${f}</option>`).join('')}<option${d[k]==='その他'?' selected':''}>その他</option></select>`;
     const depSel=(fk,k)=>d[fk]&&FAC[d[fk]]?`<select class="js" data-jk="${k}"><option value="">学科を選ぶ</option>${FAC[d[fk]].map(x=>`<option${d[k]===x?' selected':''}>${x}</option>`).join('')}</select>`:'';
-    let h=`<div class="join"><div class="jt">👋 ようこそ！</div><div class="jl">はじめに、あなたのことを教えてください。</div>`+
+    let h=introHTML()+`<div class="join"><div class="jl" style="font-weight:800;color:#1E2A22;font-size:15px">はじめに、あなたのことを教えてください</div>`+
       `<label>お名前<input class="jn" maxlength="30" placeholder="例：白川 陽一（ニックネームでもOK）" value="${esc(n)}"></label>`+
       `<div class="jq">あなたは？</div><div class="chs">${ch('type','stu','🎓 名城大学の学生')}${ch('type','out','🙋 名城生以外')}</div>`;
     if(d.type==='stu') h+=`<label>学籍番号<input class="jf" data-jk="sid" maxlength="12" inputmode="numeric" placeholder="例：123456789" value="${esc(d.sid||'')}"></label><div class="jq">学部・学科</div><div class="sel">${facSel('fac')}${depSel('fac','dep')}</div>`;
@@ -7463,7 +7528,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       if(d.out==='gen'){ const g=d.gens||[]; const mc=(v,l)=>`<button class="ch${g.includes(v)?' on':''}" data-gm="${v}">${g.includes(v)?'✓ ':''}${l}</button>`;
         h+=`<div class="jq">あてはまるもの（いくつでも）</div><div class="chs c3">${mc('shelf','📚 シェア本棚オーナー')}${mc('partner','🤝 shakeパートナーシップ団体')}${mc('other','その他')}</div>`;
         if(g.includes('other')) h+=`<label>所属（任意）<input class="jf" data-jk="free" maxlength="40" placeholder="例：〇〇株式会社／〇〇の団体／社会連携センター" value="${esc(d.free||'')}"></label>`; } }
-    return h+`<button class="go">はじめる →</button><div class="jn2">お名前・所属・学籍番号は、集計のために白川（社会連携センター）だけが確認します。画面には、あなたが意見を出したときに「お名前（所属）」だけが表示されます（意見ごとに「今回は匿名で」も選べます）。賛成・反対・保留の回答に、名前は表示されません。</div></div>`; }
+    return h+`<button class="go">はじめる（約3分）</button><div class="jn2">お名前・所属・学籍番号は、集計のために白川（社会連携センター）だけが確認します。画面には、あなたが意見を出したときに「お名前（所属）」だけが表示されます（意見ごとに「今回は匿名で」も選べます）。賛成・反対・保留の回答に、名前は表示されません。</div></div>`; }
   function affOf(d){ if(d.type==='stu') return (d.fac&&d.fac!=='その他'?d.fac.replace('大学院','大学院'):'名城大学')+(d.dep&&d.dep!=='（研究科）'?d.dep.replace('（旧）',''):'')+'・学生';
     if(d.type==='out'&&d.out==='alum') return '卒業生'+(d.afac&&d.afac!=='その他'?'・'+d.afac+(d.adep?d.adep.replace('（旧）',''):''):'');
     if(d.type==='out'&&d.out==='gen'){ const g=d.gens||[]; const L=[]; if(g.includes('shelf')) L.push('シェア本棚オーナー'); if(g.includes('partner')) L.push('shakeパートナーシップ団体'); if(g.includes('other')) L.push(d.free||'一般'); return L.join('・')||'一般'; }
@@ -7486,21 +7551,64 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       if(d.out==='alum'&&!d.afac) return need('在学していたときの学部を選んでください。');
       if(d.out==='gen'&&!(d.gens&&d.gens.length)) return need('あてはまるものを1つ以上選んでください。');
       const a=affOf(d);
-      const wasS=SAMPLE(); lset(NKEY,n); lset(AKEY,a); lset(DKEY,d); editName=false; joinView=false; if(wasS) refresh();
+      const wasS=SAMPLE(); lset(NKEY,n); lset(AKEY,a); lset(DKEY,d); lset(INTROK,1); editName=false; joinView=false; if(wasS) refresh();
       try{ api.send({action:'join',voter:VOTER,name:n,aff:a,detail:JSON.stringify(d)}); }catch(_){}
       if(afterJoin){ pendingVote=afterJoin; afterJoin=null; }
       renderList(); renderThread(); }; }
   function openPanel(view){ panel.classList.add('on'); const c=document.getElementById('hcard'); if(c&&view!=='keepcard') c.classList.remove('on'); if(view==='join') joinView=true; refresh(); renderList(); }
-  let joinView=false;
+  let joinView=false, introView=false;
+  const INTROK='shake3d-intro-v1';
+  /* はじめての人向け：shakeってどんな場所？（2026年度 見学会説明ポイントの文言） */
+  function introHTML(){
+    return `<div class="intro"><div class="ih">shake（シェイク）ってどんな場所？</div><div class="tiles">`+
+      `<div class="tile t1"><b>誰でもふらっと</b><span>学内外に開かれた、オープンなスペース</span></div>`+
+      `<div class="tile t2"><b>共創と学び</b><span>垣根をこえたプロジェクトと、出会いから生まれる学び</span></div>`+
+      `<div class="tile t3"><b>使う人がつくる場</b><span>片付けも並べ方も、使う人どうしで決めていく</span></div></div>`+
+      `<details class="more"><summary>くわしく ›</summary><p>いろいろな人が自由にふらっと訪れて使えるオープンなパブリックスペース。名城大生や教職員だけではなく、学外の人（企業、自治体、NPO、地域の人など）にも広く開放。使い方は人それぞれ。たとえば、いろいろな人たちとの交流、ミーティングや会議などの話し合い、仲間との勉強会、1人で読書、授業終わりや仕事帰りにふらっと、など。</p>`+
+      `<p><b>共創空間</b>　「なんとかしたい」「でもどうすればいい？」と思えること（社会課題）の解決のため、年齢・分野・立場などの垣根を越えたプロジェクトを生み出すこと。</p>`+
+      `<p><b>学びの空間</b>　授業や部活などの学習活動では得られない、多様な人たちとの出会いの中から生まれる「学び」をつくること。</p>`+
+      `<p><b>使う人がつくる場</b>　shakeは「管理される場」ではなく「使う人がつくる場」。常駐スタッフはいません。予約不要で、レイアウト変更も自由です。だからこそ、片付けや並べ方も使う人どうしで決めていく前提で、配置案を見てください。</p></details>`+
+      `<div class="ask">新しい家具の置き方の案に、<b>賛成・反対・保留</b>で答えてください<small>締切 10/18（日）19:00</small></div></div>`; }
 
   /* ---- 書きこみ欄（一文の意見）。出す前に「これでいいですか？」 ---- */
-  function formInner(ph){ const p=profile();
-    return `<textarea rows="3" maxlength="${MAXLEN}" placeholder="${esc(ph)}"></textarea><div class="cnt"><span>要点をしぼって書いてください。ほかの人が「賛成・反対」で答えられる形で書き終えてください。</span><span class="cc">0/${MAXLEN}</span></div>`+
+  function formInner(ph,reason){ const p=profile();
+    if(reason) return `<textarea rows="2" maxlength="${MAXLEN}" placeholder="${esc(ph)}"></textarea><div class="cnt"><span></span><span class="cc">0/${MAXLEN}</span></div>`+
+      (p ? `<div class="rw"><span class="me">👤 <b class="nmv">${esc(p.name)}（${esc(p.aff)}）</b>　<label class="anon"><input type="checkbox" class="anc">匿名で</label></span><button class="snd">答える</button></div>`
+         : `<div class="rw"><span class="me" style="color:#A93226">まず名前と所属を入れてください</span><button class="snd" data-needjoin="1">名前を入れる</button></div>`);
+    return `<textarea rows="3" maxlength="${MAXLEN}" placeholder="${esc(ph)}"></textarea><div class="aic"></div><div class="cnt"><span>一つのことだけ。感想や不安は、各案で反対・保留を選ぶと書けます。</span><span class="cc">0/${MAXLEN}</span></div>`+
       (p ? `<div class="rw"><span class="me">👤 <b class="nmv">${esc(p.name)}（${esc(p.aff)}）</b>として　<label class="anon"><input type="checkbox" class="anc">今回は匿名で</label>　<button class="chn">名前を変える</button></span><button class="snd">出す</button></div>`
          : `<div class="rw"><span class="me" style="color:#A93226">まず名前と所属を入れてください</span><button class="snd" data-needjoin="1">名前を入れる</button></div>`); }
+  /* AIの「答えやすい形か」チェック（Apps Script経由でGemini。キーはApps Scriptの中だけ）。
+     待ち時間を感じさせない工夫：①書く手が止まったら先回りしてチェック ②確認画面は待たずにすぐ出す
+     ③結果はあとから静かに差し込む ④7秒で返らなければ黙って省く（出すのは止めない） */
+  const AIC=new Map();
+  function aiCheck(text,item){ const k=item+'\n'+text; if(AIC.has(k)) return AIC.get(k);
+    const o={r:null}; o.p=(async()=>{ if(!COMMENTS_API){ o.r={skip:true}; return o.r; }
+      try{ const ctl=new AbortController(); const tm=setTimeout(()=>ctl.abort(),7000);
+        const r=await fetch(COMMENTS_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'check',text,item}),signal:ctl.signal}); clearTimeout(tm);
+        const j=JSON.parse(await r.text()); o.r=(j&&!j.skip&&typeof j.ok==='boolean'&&('suggest' in j))?j:{skip:true}; }catch(_){ o.r={skip:true}; } return o.r; })();
+    AIC.set(k,o); return o; }
+  const DOTS='<span class="dots"><i></i><i></i><i></i></span>';
   function bindForm(box,getTarget,rerender,onSent,beforeSend){
-    const ta=box.querySelector('textarea'); const cc=box.querySelector('.cc');
-    ta.addEventListener('input',()=>{ if(cc) cc.textContent=ta.value.length+'/'+MAXLEN; });
+    const ta=box.querySelector('textarea'); const cc=box.querySelector('.cc'); const aic=box.querySelector('.aic');
+    const reason=()=>box.dataset.reason==='1'||getTarget().key===KEEP_TOPIC;
+    const useAI=()=>!reason() && !!aic;
+    const tagsOf=()=>[...box.querySelectorAll('[data-rt].on')].map(b=>b.dataset.rt);
+    const fullText=()=>{ const b=ta.value.trim(), t=tagsOf(); return ((t.length?'［'+t.join('・')+'］':'')+b).slice(0,MAXLEN); };
+    // 書いている途中のひとこと表示（手が止まって1.2秒後に先回りチェック）
+    let tmr=null;
+    const showLive=(text,r)=>{ if(!aic||ta.value.trim()!==text) return;
+      if(!r||r.skip){ aic.className='aic'; aic.innerHTML=''; return; }
+      if(r.ok){ aic.className='aic on ok'; aic.innerHTML='✓ 答えやすい形です'; return; }
+      if(!r.suggest){ aic.className='aic on ng'; aic.innerHTML=`△ ${esc(r.why||'答えにくいかも')}。<b>どうしたいか</b>を一言足すと、答えてもらいやすくなります（例：「〜したほうがいい」）`; return; }
+      aic.className='aic on ng'; aic.innerHTML=`△ ${esc(r.why||'答えにくいかも')}　<button class="aisg">書き直し案を見る</button>`;
+      aic.querySelector('.aisg').onclick=e=>{ e.stopPropagation(); aic.innerHTML=`<div class="sgb"><div class="sgl">こう書くと、答えてもらいやすくなります</div><div class="sg">${esc(r.suggest||'')}</div><div class="rw"><button class="use">この文にする</button><button class="keep">自分の文のままでいい</button></div></div>`;
+        aic.querySelector('.use').onclick=ev=>{ ev.stopPropagation(); ta.value=r.suggest||ta.value; ta.dispatchEvent(new Event('input')); ta.focus(); };
+        aic.querySelector('.keep').onclick=ev=>{ ev.stopPropagation(); aic.className='aic'; aic.innerHTML=''; }; }; };
+    ta.addEventListener('input',()=>{ if(cc) cc.textContent=ta.value.length+'/'+MAXLEN; if(!useAI()) return;
+      clearTimeout(tmr); const text=ta.value.trim(); if(text.length<8){ aic.className='aic'; aic.innerHTML=''; return; }
+      if(!aic.querySelector('.sgb')){ aic.className='aic on wait'; aic.innerHTML=DOTS+'書き終わったら、答えやすい形かAIが見ます'; }
+      tmr=setTimeout(()=>{ const o=aiCheck(text,getTarget().key); if(o.r) showLive(text,o.r); else { if(ta.value.trim()===text){ aic.className='aic on wait'; aic.innerHTML=DOTS+'AIが読んでいます'; } o.p.then(r=>showLive(text,r)); } },1200); });
     box.querySelectorAll('textarea,input,select').forEach(el=>{ el.addEventListener('keydown',e=>e.stopPropagation()); el.addEventListener('pointerdown',e=>e.stopPropagation()); });
     const anc=box.querySelector('.anc'); if(anc) anc.onchange=()=>box.classList.toggle('anon-on',anc.checked);
     const chn=box.querySelector('.chn'); if(chn) chn.onclick=e=>{ e.stopPropagation(); openPanel('join'); };
@@ -7511,13 +7619,29 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     box.querySelector('.snd').onclick=e=>{ e.stopPropagation();
       if(e.target.dataset.needjoin){ openPanel('join'); return; }
       const anon=box.querySelector('.anc')&&box.querySelector('.anc').checked;
-      const text=ta.value.trim().slice(0,MAXLEN); if(!text){ ta.focus(); return; }
+      const text=fullText(); if(!text){ ta.focus(); return; }
       let cf=box.querySelector('.cfm'); if(cf) cf.remove();
       cf=document.createElement('div'); cf.className='pvc p cfm';
-      cf.innerHTML=`<div>この内容で出していいですか？</div><div style="margin:6px 0;font-weight:700;color:#1E2A22">「${esc(text)}」</div>${box.dataset.vote!=null?`<div style="font-size:13px;margin-bottom:4px">あなたの回答：<b>${+box.dataset.vote<0?'👎 反対':'🤔 保留'}</b></div>`:''}<div style="font-size:12px;color:#56615A">名前の表示：${anon?'匿名':esc(label())}</div><div class="rw"><button data-cf-ok="1">はい、これで出す</button><button data-cf-no="1">直す</button></div>`;
+      const vline=box.dataset.vote!=null?`<div style="font-size:13px;margin-bottom:4px">あなたの回答：<b>${+box.dataset.vote<0?'👎 反対':'🤔 保留'}</b></div>`:'';
+      const {tags,body}=splitTags(text);
+      cf.innerHTML=`<div>${reason()?'この内容で答えていいですか？':'この内容で出していいですか？'}</div><div style="margin:6px 0;font-weight:700;color:#1E2A22">${tags.map(t=>`<em class="tg">${esc(t)}</em>`).join('')}${body?'「'+esc(body)+'」':''}</div>${vline}<div style="font-size:12px;color:#56615A">名前の表示：${anon?'匿名':esc(label())}</div><div class="aicf"></div><div class="rw"><button data-cf-ok="1">はい、これで出す</button><button data-cf-no="1">直す</button></div>`;
       box.appendChild(cf); cf.scrollIntoView({block:'nearest',behavior:'smooth'});
+      const okb=cf.querySelector('[data-cf-ok]');
       cf.querySelector('[data-cf-no]').onclick=ev=>{ ev.stopPropagation(); cf.remove(); ta.focus(); };
-      cf.querySelector('[data-cf-ok]').onclick=ev=>{ ev.stopPropagation(); if(beforeSend){ try{ beforeSend(); }catch(_){} } send(ev.target,text,anon); }; };
+      okb.onclick=ev=>{ ev.stopPropagation(); if(beforeSend){ try{ beforeSend(); }catch(_){} } send(ev.target,text,anon); };
+      if(useAI()){ const slot=cf.querySelector('.aicf'); const o=aiCheck(text,getTarget().key);
+        const put=r=>{ if(!cf.isConnected) return;
+          if(!r||r.skip){ slot.innerHTML=''; return; }
+          if(r.ok){ slot.innerHTML='<div class="aiok">✓ 答えやすい形です</div>'; return; }
+          if(!r.suggest){ slot.innerHTML=`<div class="sgb in"><div class="sgl">△ ${esc(r.why||'答えにくいかも')}。<b>どうしたいか</b>を一言足すと、答えてもらいやすくなります（例：「〜したほうがいい」）</div><div class="rw"><button class="edit">書き足す</button></div></div>`;
+            okb.textContent='このまま出す';
+            slot.querySelector('.edit').onclick=ev=>{ ev.stopPropagation(); cf.remove(); ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length); }; return; }
+          slot.innerHTML=`<div class="sgb in"><div class="sgl">△ ${esc(r.why||'答えにくいかも')}。こう書くと、答えてもらいやすくなります</div><div class="sg">${esc(r.suggest||'')}</div><div class="rw"><button class="use">書き直し案で出す</button><button class="edit">書き直し案を手直しする</button></div></div>`;
+          okb.textContent='自分の文のまま出す';
+          slot.querySelector('.use').onclick=ev=>{ ev.stopPropagation(); if(beforeSend){ try{ beforeSend(); }catch(_){} } send(ev.target,String(r.suggest||text).slice(0,MAXLEN),anon); };
+          slot.querySelector('.edit').onclick=ev=>{ ev.stopPropagation(); ta.value=r.suggest||text; ta.dispatchEvent(new Event('input')); cf.remove(); ta.focus(); }; };
+        if(o.r) put(o.r);
+        else { slot.innerHTML=`<div class="aiw"><div class="aib"><i></i></div><span>${DOTS}答えやすい形か、AIが見ています（このまま出してもOK）</span></div>`; o.p.then(put); } } };
   }
   /* その家具・場所へ移動してカードを開く */
   function goto(key){ panel.classList.remove('on');
