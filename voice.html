@@ -82,7 +82,7 @@ a{color:var(--ink)}
 </style>
 </head>
 <body>
-<header><div class="in"><div class="logo">shake <span>Re:born</span></div><div class="prog"><i id="pg" style="width:0"></i></div><div class="pc" id="pc"></div></div></header>
+<header><div class="in"><div class="logo">shake <span>Re:born</span></div><div class="prog"><i id="pg" style="width:0"></i></div><div class="pc" id="pc"></div><button id="mineBtn" style="border:0;background:var(--soft);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:800">自分の提案</button></div></header>
 <div class="wrap" id="app"></div>
 <div class="votes" id="vbar" hidden><div class="in">
   <div class="vb"><button class="a" data-v="1">賛成</button><button class="d" data-v="-1">反対</button><button class="p" data-v="0">保留<small>わからない</small></button></div>
@@ -153,7 +153,7 @@ async function send(o){ for(let k=0;k<3;k++){ try{ const r=await fetch(API,{meth
 async function flush(){ const Q=lget(PKEY,{}); for(const sid of Object.keys(Q)){ try{ const r=await send({action:'vote',id:sid,voter:VOTER,vote:Q[sid]}); if(r&&r.ok){ const Q2=lget(PKEY,{}); if(Q2[sid]===Q[sid]){ delete Q2[sid]; lset(PKEY,Q2); } } }catch(_){ return; } } }
 async function refresh(){ try{ await flush(); }catch(_){}
   try{ const j=await list(); const V={}; (j.votes||[]).forEach(([u,s,v])=>{ (V[s]=V[s]||{})[u]=+v; });
-    const user=(j.comments||[]).filter(c=>c&&!c.hidden&&!c.parent&&c.item===USER_ITEM).map(c=>({id:c.id,cat:'みんなの提案',text:c.text,by:dispName(c.name),at:c.at,user:true}));
+    const user=(j.comments||[]).filter(c=>c&&!c.hidden&&!c.parent&&c.item===USER_ITEM).map(c=>({id:c.id,cat:'みんなの提案',text:c.text,by:dispName(c.name),at:c.at,user:true,own:!!c.own}));
     ALL=SEEDS.concat(user); VOTES=V; loaded=true; }catch(e){ console.warn(e); }
   const M=mine(); Object.entries(M).forEach(([s,v])=>{ (VOTES[s]=VOTES[s]||{})[VOTER]=v; }); }
 function agg(sid){ const V=VOTES[sid]||{}; let a=0,d=0,p=0; Object.values(V).forEach(v=>{ if(v>0)a++; else if(v<0)d++; else p++; }); return {a,d,p,n:a+d+p}; }
@@ -276,9 +276,13 @@ function write(){ if(!aff()){ after=write; return join(); }
     if(checked!==tx){ b.disabled=true; b.textContent='読みやすさを確認中…'; checked=tx; let r=null;
       try{ const ctl=new AbortController(); const tm=setTimeout(()=>ctl.abort(),7000); const x=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'check',text:tx,item:USER_ITEM}),signal:ctl.signal}); clearTimeout(tm); r=JSON.parse(await x.text()); }catch(_){}
       b.disabled=false; b.textContent='提案を出す';
-      if(r&&r.ok===false&&r.suggest){ const box=el.querySelector('#aic'); box.innerHTML=`<div class="sg"><b>こう書くと、答えてもらいやすくなります</b>${esc(r.suggest)}<div class="row2" style="margin-top:10px"><button class="btn ghost" id="kp" style="font-size:14px;padding:10px">このままでいい</button><button class="btn" id="us" style="font-size:14px;padding:10px">この文にする</button></div></div>`;
-        box.querySelector('#us').onclick=()=>{ ta.value=r.suggest; checked=r.suggest; ta.oninput(); box.innerHTML=''; };
-        box.querySelector('#kp').onclick=()=>{ box.innerHTML=''; };
+      if(r&&r.ok===false){ const box=el.querySelector('#aic'); const sug=(r.suggest||'').trim();
+        box.innerHTML=`<div class="sg"><b>🤖 AIより：${esc(r.why||'このままだと、賛成・反対で答えにくいかもしれません')}</b>`+
+          (sug?`こう書くと、答えてもらいやすくなります<div style="font-weight:800;margin:6px 0">「${esc(sug)}」</div><div class="row2" style="margin-top:10px"><button class="btn ghost" id="kp" style="font-size:14px;padding:10px">このまま出す</button><button class="btn" id="us" style="font-size:14px;padding:10px">この文にする</button></div>`
+              :`<strong>どうしたいか</strong>を一言足すと、答えてもらいやすくなります（例：「〜を置いたほうがいい」「〜は〜にするのがよい」）<div class="row2" style="margin-top:10px"><button class="btn ghost" id="kp" style="font-size:14px;padding:10px">このまま出す</button><button class="btn" id="fx" style="font-size:14px;padding:10px">書き直す</button></div>`)+`</div>`;
+        const us=box.querySelector('#us'); if(us) us.onclick=()=>{ ta.value=sug; checked=sug; ta.oninput(); box.innerHTML=''; };
+        const fx=box.querySelector('#fx'); if(fx) fx.onclick=()=>{ box.innerHTML=''; checked=''; ta.focus(); };
+        box.querySelector('#kp').onclick=()=>{ box.innerHTML=''; el.querySelector('#ps').click(); };
         return; } }
     b.disabled=true; b.textContent='送信中…';
     try{ const anon=el.querySelector('#an').checked; await send({action:'add',item:USER_ITEM,itemName:USER_ITEM,name:anon?'匿名':aff(),text:tx,voter:VOTER});
@@ -304,6 +308,14 @@ function done(){ view='done'; $('#vbar').hidden=true; const M=mine();
 $('#vbar').querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>vote(+b.dataset.v));
 $('#skip').onclick=()=>{ if(!cur) return; const S=lget(SKIPK,[]); S.push(cur.id); lset(SKIPK,S); next(); };
 $('#wr').onclick=write;
+$('#mineBtn').onclick=()=>{ const L=ALL.filter(c=>c.user&&c.own); const el=document.createElement('div'); el.className='sheet';
+  const draw=()=>{ const L=ALL.filter(c=>c.user&&c.own); el.innerHTML=`<div class="in fade"><button class="x" aria-label="閉じる">×</button><h2 style="margin-top:0">あなたが出した提案</h2>`+
+    (L.length?L.map(c=>`<div class="ri"><div class="t">${esc(c.text)}</div>${barHTML(agg(c.id))}<div style="text-align:right;margin-top:8px"><button class="btn ghost" data-rm="${esc(c.id)}" style="display:inline-block;width:auto;font-size:13px;padding:6px 14px">取り下げる</button></div></div>`).join(''):'<p class="lead">この端末から出した提案は、まだありません。</p>')+
+    `<button class="btn or" id="w3" style="margin-top:12px">✏️ 提案を書く</button></div>`;
+    el.querySelector('.x').onclick=()=>el.remove(); el.querySelector('#w3').onclick=()=>{ el.remove(); write(); };
+    el.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{ if(!confirm('この提案を取り下げますか？')) return; b.disabled=true; b.textContent='取り下げ中…';
+      try{ await send({action:'remove',id:b.dataset.rm,voter:VOTER}); ALL=ALL.filter(x=>x.id!==b.dataset.rm); toast('取り下げました'); draw(); progress(); }catch(_){ toast('取り下げられませんでした'); b.disabled=false; b.textContent='取り下げる'; } }); };
+  el.onclick=e=>{ if(e.target===el) el.remove(); }; draw(); document.body.appendChild(el); };
 
 intro(); refresh().then(()=>{ if(view==='intro'||view==='done') progress(); if(view==='done') done(); });
 })();
