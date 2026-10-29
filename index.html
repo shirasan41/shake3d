@@ -6121,7 +6121,7 @@ const HANDS_SRC={
 
   const card=document.createElement('div'); card.id='hcard'; document.body.appendChild(card);
   const ban=document.createElement('div'); ban.id='hbanner';
-  ban.innerHTML='<div class="hi">shakeの新しい配置案へ、ようこそ</div><div class="st3">'+
+  ban.innerHTML='<div class="hi">3Dのshakeへ、ようこそ<span style="display:block;font-size:11.5px;font-weight:600;opacity:.85;margin-top:2px">家具の並びは配置の一例です（決まったものではありません）</span></div><div class="st3">'+
     '<div><i>👆</i><span><b>押すと説明</b><small>家具・床・ⓘの札</small></span></div>'+
     '<div><i>🗳</i><span><b>意見に答える</b><small>賛成・反対・保留で</small></span></div>'+
     '<div><i>✋</i><span><b>動かしてみる</b><small>左の「家具は固定中」を外す</small></span></div></div>'+
@@ -7017,6 +7017,8 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
      スプレッドシート「声」の「什器・場所」の先頭に【理由】と書くと、理由として扱う */
   const KEEP_TOPIC='片付け・管理のこと';
   const FESTIVAL=true;   // 10/30〜 丸天産業の案が来るまで：家具ごとの案は出さず、方針と意見の文だけに賛成・反対・保留で答える
+  const PLACE={Q01:'台形テーブルのエリア',Q02:'広場',Q07:'小上がり',Q08:'ラボ（＝ワーキングスペース奥）',Q09:'今あるハイデスク（窓際の一人席／ワーキングスペース内）',Q10:'入口（アイデアエクスチェンジスペース）',Q11:'広場',Q12:'本の通り',Q13:'イベントカレンダー（柱に貼る）',Q14:'写真の壁「shakeのこれまで」',Q15:'入口（アイデアエクスチェンジスペース）',Q16:'チラシ・募集のボード（中央カウンター・今あるもの）',Q17:'台形テーブルのエリア',Q18:'ハイデスクのエリア（ラボの手前）',Q19:'小上がり',Q20:'広場'};   // 方針の文を出したとき、カメラを寄せる場所
+  if(FESTIVAL){ try{ const n=document.createElement('div'); n.id='festNote'; n.textContent='いま3Dで見えている家具の並びは、配置の一例です（決まったものではありません）'; n.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 6px);z-index:5;background:rgba(255,255,255,.92);color:#173B45;font-size:11.5px;font-weight:700;padding:4px 12px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.15);pointer-events:none;max-width:94vw;text-align:center;line-height:1.4'; document.body.appendChild(n); }catch(_){} }
   const OLD_REASONS=new Set(['19597d30','df251c88','40081d9d']);   // 理由の仕組みを入れる前に出た3件（反対・保留の理由として書かれたもの）
   const isReason=c=>!c.base && (/^【理由】/.test(c.item||'') || c.item===KEEP_TOPIC || OLD_REASONS.has(c.id));
   const reasonKey=c=>String(c.item||'').replace(/^【理由】/,'');
@@ -7496,7 +7498,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     panel.querySelectorAll('[data-tp]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); pTopic=b.dataset.tp; renderList(); });
     const f=panel.querySelector('.cmf:not(.rsn):not(.ed)'); if(f){ bindForm(f,()=>({key:pTopic,name:pTopic}),renderList,()=>{ compose=false; }); f.querySelector('textarea').value=keep; }
     wireVotes(panel);
-    if(tab==='answer'){ const big=panel.querySelector('.pst.big'); const cur=big&&ALL.find(x=>x.id===big.dataset.id); if(cur&&flown!==cur.id){ flown=cur.id; flyToKey(cur.item); } }
+    if(tab==='answer'){ const big=panel.querySelector('.pst.big'); const cur=big&&ALL.find(x=>x.id===big.dataset.id); if(cur&&flown!==cur.id){ flown=cur.id; flyToKey(PLACE[cur.id]||cur.item); } }
     const pv=panel.querySelector('.pvc:not(.cfm)'); if(pv) setTimeout(()=>pv.scrollIntoView({block:'center',behavior:'smooth'}),40);
     const rs=panel.querySelector('.rsn'); if(rs) setTimeout(()=>rs.scrollIntoView({block:'center',behavior:'smooth'}),60);
   }
