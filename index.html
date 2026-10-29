@@ -6984,7 +6984,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   const MAXLEN=140;
   /* サンプルモード：名前を「サンプル」にして入ると、本番のスプレッドシートには何も送らず、
      この端末の中だけで「100人が答えた状態」を試せる（白川さんの説明・練習用 10/16） */
-  const SAMPLE_NAME='サンプル', SAMPLE_AFF='サンプルモード';
+  const SAMPLE_NAME='サンプル', SAMPLE_AFF='サンプルモード', dispName=s=>{ if(!s) return '匿名'; const m=String(s).match(/（([^（）]*)）\s*$/); return m? m[1] : s; };
   const SAMPLE=()=>{ try{ return JSON.parse(localStorage.getItem('shake3d-comment-name')||'null')===SAMPLE_NAME && JSON.parse(localStorage.getItem('shake3d-comment-aff')||'null')===SAMPLE_AFF; }catch(_){ return false; } };
   const K=k=>SAMPLE()?k+'-sample':k;
   const API=()=>SAMPLE()?'':COMMENTS_API;
@@ -7343,7 +7343,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     } else h+=(c.talk?`<span class="tk">これから話し合うこと</span>`:'')+(showItem?`<button class="it" data-item="${esc(c.item)}">${icon(c.item)} ${esc(c.itemName||c.item)}</button>`:'')+
       (editing===c.id? `<div class="cmf ed"><textarea maxlength="${MAXLEN}">${esc(c.text)}</textarea><div class="rw"><button class="snd" data-save="${esc(c.id)}">保存</button><button class="skip" data-cancel="1">やめる</button></div></div>`
         : `<div class="tx">${esc(c.text)}</div>`)+(c.talk?`<div class="tkd">「物の置き場がない」という声も、「もっと良い場所にしたい」という声も。そこから、使う人どうしで決めていく動き（shake hands）が始まっています。</div>`:'')+
-      `<div class="by">${c.own?'🙋 あなたの意見':esc(c.name||'匿名')}${c.at?'・'+ago(c.at):''}${c.via==='form'?'（フォームから）':''}${c.own&&editing!==c.id?` <button class="mini" data-edit="${esc(c.id)}">✏️ 直す</button><button class="mini" data-del="${esc(c.id)}">取り下げる</button>`:''}</div>`;
+      `<div class="by">${c.own?'🙋 あなたの意見':esc(dispName(c.name))}${c.at?'・'+ago(c.at):''}${c.via==='form'?'（フォームから）':''}${c.own&&editing!==c.id?` <button class="mini" data-edit="${esc(c.id)}">✏️ 直す</button><button class="mini" data-del="${esc(c.id)}">取り下げる</button>`:''}</div>`;
     h+=
       `<div class="vt"><button class="a${mv===1||(pendingVote&&pendingVote.sid===c.id&&pendingVote.v===1)?' on':''}" data-v="1"><i>👍</i>賛成</button><button class="d${mv===-1||(pendingVote&&pendingVote.sid===c.id&&pendingVote.v===-1)?' on':''}" data-v="-1"><i>👎</i>反対</button><button class="p${mv===0||(pendingVote&&pendingVote.sid===c.id&&pendingVote.v===0)?' on':''}" data-v="0" title="わからない・どちらとも言えない"><i>🤔</i>保留</button></div>`;
     if(pendingVote&&pendingVote.sid===c.id){ const L={1:['👍','賛成','a'],'-1':['👎','反対','d'],0:['🤔','保留','p']}[pendingVote.v];
@@ -7365,7 +7365,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     const cnt={}; L.forEach(r=>splitTags(r.text).tags.forEach(t=>cnt[t]=(cnt[t]||0)+1));
     const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([t,n])=>`<em>${esc(t)} ×${n}</em>`).join('');
     return `<details class="rsl"><summary><b>${c.base?'反対・保留の理由':'片付け・管理の声'}</b><span class="rn">${L.length}件</span>${top}</summary>`+
-      L.map(r=>{ const {tags,body}=splitTags(r.text); return `<div class="rb"><div class="rt">${tags.map(t=>`<em>${esc(t)}</em>`).join('')}${esc(body)}</div><div class="rby">${r.own?'あなた':esc(r.name||'匿名')}${r.at?'・'+ago(r.at):''}${r.own?` <button class="mini" data-del="${esc(r.id)}">取り下げる</button>`:''}</div></div>`; }).join('')+`</details>`; }
+      L.map(r=>{ const {tags,body}=splitTags(r.text); return `<div class="rb"><div class="rt">${tags.map(t=>`<em>${esc(t)}</em>`).join('')}${esc(body)}</div><div class="rby">${r.own?'あなた':esc(dispName(r.name))}${r.at?'・'+ago(r.at):''}${r.own?` <button class="mini" data-del="${esc(r.id)}">取り下げる</button>`:''}</div></div>`; }).join('')+`</details>`; }
   function castVote(sid,v,card){
     const M=mine(); M[sid]=v; lset(K(MYV),M); (VOTES[sid]=VOTES[sid]||{})[VOTER]=v; lastVoted=sid; const cc=ALL.find(x=>x.id===sid); reasonFor=null; pendingReason=null;
     const go=()=>{ analyze(); updateBadges(); renderList(); renderThread(); if(!reasonFor){ const bg=panel.querySelector('#cmlist .pst.big'); if(bg&&panel.classList.contains('on')) panel.scrollTop=Math.max(0,bg.offsetTop-150); } };
@@ -7460,8 +7460,8 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
         (meScope!=='own'?`<div class="vflt">`+VF.map(([k,l])=>`<button data-mev="${k}" class="${meVote===k?'on':''}">${l}</button>`).join('')+`</div>`:'')+
         (L.length?L.map(c=>stmt(c,true)).join(''):`<div class="cmempty">${meScope==='own'?'まだ意見を出していません。':'ここにはまだ回答がありません。'}</div>`); }
     else { const L=ALL.slice().sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)); body=`<div class="lead">すべての意見（${ALL.length}件）</div>`+(L.length?L.map(c=>stmt(c,true)).join(''):'<div class="cmempty">まだ意見はありません。</div>')+
-      (REASONS.length?`<div class="pv-h4" style="margin-top:14px">理由・自由な声（${REASONS.length}件）</div>`+REASONS.slice().sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)).map(r=>{ const {tags,body}=splitTags(r.text); return `<div class="rb solo"><div class="rk">${esc(reasonKey(r))}</div><div class="rt">${tags.map(t=>`<em>${esc(t)}</em>`).join('')}${esc(body)}</div><div class="rby">${r.own?'あなた':esc(r.name||'匿名')}${r.at?'・'+ago(r.at):''}${r.own?` <button class="mini" data-del="${esc(r.id)}">取り下げる</button>`:''}</div></div>`; }).join(''):''); }
-    panel.innerHTML=`<div class="hd"><div class="tt">💬 みんなの声</div><div class="sub">ようこそ、<b style="color:#fff">${esc(profile().name)}</b>さん（${esc(profile().aff)}）<button class="chg" data-chg="1">変更</button><button class="chg" data-intro="1">shakeって？</button><br>配置案に「賛成・反対・保留」で答えてください</div><button class="x" aria-label="閉じる">×</button>`+(SAMPLE()?`<div class="smpl">🧪 <b>サンプルモード</b>：架空の100人が答えた状態です。ここでの回答・意見は本番には送られません。<button data-smpl-off="1">本番にもどる</button></div>`:'')+
+      (REASONS.length?`<div class="pv-h4" style="margin-top:14px">理由・自由な声（${REASONS.length}件）</div>`+REASONS.slice().sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)).map(r=>{ const {tags,body}=splitTags(r.text); return `<div class="rb solo"><div class="rk">${esc(reasonKey(r))}</div><div class="rt">${tags.map(t=>`<em>${esc(t)}</em>`).join('')}${esc(body)}</div><div class="rby">${r.own?'あなた':esc(dispName(r.name))}${r.at?'・'+ago(r.at):''}${r.own?` <button class="mini" data-del="${esc(r.id)}">取り下げる</button>`:''}</div></div>`; }).join(''):''); }
+    panel.innerHTML=`<div class="hd"><div class="tt">💬 みんなの声</div><div class="sub">ようこそ（<b style="color:#fff">${esc(profile().aff)}</b>）<button class="chg" data-chg="1">変更</button><button class="chg" data-intro="1">shakeって？</button><br>配置案に「賛成・反対・保留」で答えてください</div><button class="x" aria-label="閉じる">×</button>`+(SAMPLE()?`<div class="smpl">🧪 <b>サンプルモード</b>：架空の100人が答えた状態です。ここでの回答・意見は本番には送られません。<button data-smpl-off="1">本番にもどる</button></div>`:'')+
       `<div class="stats"><div><b>${ALL.length}</b><small>案と意見</small></div><div><b>${people}</b><small>参加した人</small></div><div><b>${done}<span style="font-size:12px">/${ALL.length}</span></b><small>あなたの回答</small></div></div>`+
       `<div class="prog"><i style="width:${ALL.length?Math.round(done*100/ALL.length):0}%"></i></div></div>`+
       '<div class="tabs">'+T('answer','🗳','答える')+T('agree','🤝','合意')+T('split','⚖️','分かれ目')+T('groups','👥','グループ')+T('me','🙋','わたし')+T('all','📋','すべて')+'</div>'+
@@ -7524,48 +7524,45 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   /* ---- 参加者（名前と所属）---- */
   const AKEY='shake3d-comment-aff';
   const profile=()=>{ const n=lget(NKEY,''), a=lget(AKEY,''); return (n&&a)?{name:n,aff:a}:null; };
-  const label=()=>{ const p=profile(); return p? `${p.name}（${p.aff}）` : ''; };
+  const label=()=>{ const p=profile(); return p? p.aff : ''; };
   const FAC={'法学部':['法学科'],'経営学部':['経営学科','国際経営学科'],'経済学部':['経済学科','産業社会学科'],'外国語学部':['国際英語学科','国際キャリア学科'],'人間学部':['人間学科'],'都市情報学部':['都市情報学科'],'情報工学部':['情報工学科'],
     '理工学部':['数学科','電気電子工学科','応用化学科','材料機能工学科','機械工学科','交通機械工学科','メカトロニクス工学科','社会基盤デザイン工学科','環境創造工学科','建築学科','情報工学科（旧）'],'農学部':['生物資源学科','応用生物化学科','生物環境科学科'],'薬学部':['薬学科'],'大学院':['（研究科）']};
   const DKEY='shake3d-comment-detail';
   let JD=lget(DKEY,{})||{};
-  function joinHTML(){ const n=lget(NKEY,''); const d=JD; const ch=(k,v,l)=>`<button class="ch${d[k]===v?' on':''}" data-jk="${k}" data-jv="${esc(v)}">${l}</button>`;
-    const facSel=(k)=>`<select class="js" data-jk="${k}"><option value="">学部を選ぶ</option>${Object.keys(FAC).map(f=>`<option${d[k]===f?' selected':''}>${f}</option>`).join('')}<option${d[k]==='その他'?' selected':''}>その他</option></select>`;
-    const depSel=(fk,k)=>d[fk]&&FAC[d[fk]]?`<select class="js" data-jk="${k}"><option value="">学科を選ぶ</option>${FAC[d[fk]].map(x=>`<option${d[k]===x?' selected':''}>${x}</option>`).join('')}</select>`:'';
-    let h=introHTML()+`<div class="join"><div class="jl" style="font-weight:800;color:#1E2A22;font-size:15px">はじめに、あなたのことを教えてください</div>`+
-      `<label>お名前<input class="jn" maxlength="30" placeholder="例：白川 陽一（ニックネームでもOK）" value="${esc(n)}"></label>`+
-      `<div class="jq">あなたは？</div><div class="chs">${ch('type','stu','🎓 名城大学の学生')}${ch('type','out','🙋 名城生以外')}</div>`;
-    if(d.type==='stu') h+=`<label>学籍番号<input class="jf" data-jk="sid" maxlength="12" inputmode="numeric" placeholder="例：123456789" value="${esc(d.sid||'')}"></label><div class="jq">学部・学科</div><div class="sel">${facSel('fac')}${depSel('fac','dep')}</div>`;
-    if(d.type==='out'){ h+=`<div class="chs">${ch('out','alum','🎓 卒業生')}${ch('out','gen','🌏 一般')}</div>`;
-      if(d.out==='alum') h+=`<div class="jq">在学していたときの学部・学科</div><div class="sel">${facSel('afac')}${depSel('afac','adep')}</div>`;
-      if(d.out==='gen'){ const g=d.gens||[]; const mc=(v,l)=>`<button class="ch${g.includes(v)?' on':''}" data-gm="${v}">${g.includes(v)?'✓ ':''}${l}</button>`;
-        h+=`<div class="jq">あてはまるもの（いくつでも）</div><div class="chs c3">${mc('shelf','📚 シェア本棚オーナー')}${mc('partner','🤝 shakeパートナーシップ団体')}${mc('other','その他')}</div>`;
-        if(g.includes('other')) h+=`<label>所属（任意）<input class="jf" data-jk="free" maxlength="40" placeholder="例：〇〇株式会社／〇〇の団体／社会連携センター" value="${esc(d.free||'')}"></label>`; } }
-    return h+`<button class="go">はじめる（約3分）</button><div class="jn2">お名前・所属・学籍番号は、集計のために白川（社会連携センター）だけが確認します。画面には、あなたが意見を出したときに「お名前（所属）」だけが表示されます（意見ごとに「今回は匿名で」も選べます）。賛成・反対・保留の回答に、名前は表示されません。</div></div>`; }
-  function affOf(d){ if(d.type==='stu') return (d.fac&&d.fac!=='その他'?d.fac.replace('大学院','大学院'):'名城大学')+(d.dep&&d.dep!=='（研究科）'?d.dep.replace('（旧）',''):'')+'・学生';
-    if(d.type==='out'&&d.out==='alum') return '卒業生'+(d.afac&&d.afac!=='その他'?'・'+d.afac+(d.adep?d.adep.replace('（旧）',''):''):'');
-    if(d.type==='out'&&d.out==='gen'){ const g=d.gens||[]; const L=[]; if(g.includes('shelf')) L.push('シェア本棚オーナー'); if(g.includes('partner')) L.push('shakeパートナーシップ団体'); if(g.includes('other')) L.push(d.free||'一般'); return L.join('・')||'一般'; }
+  function joinHTML(){ const d=JD; const ch=(k,v,l)=>`<button class="ch${d[k]===v?' on':''}" data-jk="${k}" data-jv="${esc(v)}">${l}</button>`;
+    const facSel=(k,opt)=>`<select class="js" data-jk="${k}"><option value="">${opt?'学部を選ぶ（任意）':'学部を選ぶ'}</option>${Object.keys(FAC).map(f=>`<option${d[k]===f?' selected':''}>${f}</option>`).join('')}<option${d[k]==='その他'?' selected':''}>その他</option></select>`;
+    const depSel=(fk,k)=>d[fk]&&FAC[d[fk]]?`<select class="js" data-jk="${k}"><option value="">学科を選ぶ（任意）</option>${FAC[d[fk]].map(x=>`<option${d[k]===x?' selected':''}>${x}</option>`).join('')}</select>`:'';
+    let h=introHTML()+`<div class="join"><div class="jl" style="font-weight:800;color:#1E2A22;font-size:15px">はじめに、あなたの所属を教えてください</div>`+
+      `<div class="jn2" style="margin:6px 0 10px">お名前や学籍番号は聞きません。</div>`+
+      `<div class="jq">あなたは？</div><div class="chs c3">${ch('type','stu','🎓 学生')}${ch('type','fac','🧑‍🏫 教員')}${ch('type','staff','🏢 職員')}${ch('type','alum','🎓 卒業生')}${ch('type','gen','🌏 一般')}</div>`;
+    if(d.type==='stu') h+=`<div class="jq">学部・学科</div><div class="sel">${facSel('fac')}${depSel('fac','dep')}</div>`;
+    if(d.type==='fac') h+=`<div class="jq">学部</div><div class="sel">${facSel('fac',1)}</div>`;
+    if(d.type==='alum') h+=`<div class="jq">在学していたときの学部</div><div class="sel">${facSel('fac',1)}</div>`;
+    if(d.type==='gen'){ const g=d.gens||[]; const mc=(v,l)=>`<button class="ch${g.includes(v)?' on':''}" data-gm="${v}">${g.includes(v)?'✓ ':''}${l}</button>`;
+      h+=`<div class="jq">あてはまるもの（いくつでも）</div><div class="chs c3">${mc('shelf','📚 シェア本棚オーナー')}${mc('partner','🤝 shakeパートナーシップ団体')}${mc('other','そのほかの一般の方')}</div>`; }
+    return h+`<button class="go">はじめる（約3分）</button><div class="jn2">あなたが意見を書いたときは、所属（例：「都市情報学部・学生」）だけが表示されます。意見ごとに「今回は匿名で」も選べます。賛成・反対・保留の回答は、誰が答えたかは表示されません。</div><div style="text-align:center;margin-top:6px"><button class="jsample" style="background:none;border:0;color:#8A948C;font-size:11.5px;text-decoration:underline;cursor:pointer">お試し（サンプルの回答で見てみる）</button></div></div>`; }
+  function affOf(d){ const fac=d.fac&&d.fac!=='その他'?d.fac:'';
+    if(d.type==='stu') return (fac||'名城大学')+(d.dep&&d.dep!=='（研究科）'?d.dep.replace('（旧）',''):'')+'・学生';
+    if(d.type==='fac') return (fac?fac+'・':'')+'教員';
+    if(d.type==='staff') return '職員';
+    if(d.type==='alum') return '卒業生'+(fac?'・'+fac:'');
+    if(d.type==='gen'){ const g=d.gens||[]; const L=[]; if(g.includes('shelf')) L.push('シェア本棚オーナー'); if(g.includes('partner')) L.push('shakeパートナーシップ団体'); if(g.includes('other')) L.push('一般'); return L.join('・')||'一般'; }
     return ''; }
   function bindJoin(root){ const go=root.querySelector('.join .go'); if(!go) return;
-    const keepName=()=>{ const jn=root.querySelector('.jn'); if(jn) lset(NKEY,jn.value.trim()); };
     root.querySelectorAll('.join input,.join select').forEach(el=>{ el.addEventListener('keydown',e=>e.stopPropagation()); el.addEventListener('pointerdown',e=>e.stopPropagation()); });
-    root.querySelectorAll('.join .ch').forEach(b=>b.onclick=e=>{ e.stopPropagation(); keepName(); const k=b.dataset.jk; JD[k]=b.dataset.jv;
-      if(k==='type'){ ['out','gens','sid','fac','dep','afac','adep','free'].forEach(x=>{ if(x!=='sid') delete JD[x]; }); } if(k==='out'){ delete JD.gens; } renderList(); });
-    root.querySelectorAll('.join [data-gm]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); keepName(); const v=b.dataset.gm; const g=new Set(JD.gens||[]); g.has(v)?g.delete(v):g.add(v); JD.gens=[...g]; if(!g.has('other')) delete JD.free; renderList(); });
-    root.querySelectorAll('.join select').forEach(el=>el.onchange=()=>{ keepName(); JD[el.dataset.jk]=el.value; if(el.dataset.jk==='fac') delete JD.dep; if(el.dataset.jk==='afac') delete JD.adep; renderList(); });
-    root.querySelectorAll('.join .jf').forEach(el=>el.oninput=()=>{ JD[el.dataset.jk]=el.value.trim(); });
-    go.onclick=async e=>{ e.stopPropagation(); const jn=root.querySelector('.jn'); const n=jn.value.trim(); const d=JD;
+    root.querySelectorAll('.join .ch').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.jk; JD[k]=b.dataset.jv;
+      if(k==='type'){ ['gens','fac','dep'].forEach(x=>delete JD[x]); } renderList(); });
+    root.querySelectorAll('.join [data-gm]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const v=b.dataset.gm; const g=new Set(JD.gens||[]); g.has(v)?g.delete(v):g.add(v); JD.gens=[...g]; renderList(); });
+    root.querySelectorAll('.join select').forEach(el=>el.onchange=()=>{ JD[el.dataset.jk]=el.value; if(el.dataset.jk==='fac') delete JD.dep; renderList(); });
+    const sm=root.querySelector('.join .jsample'); if(sm) sm.onclick=async e=>{ e.stopPropagation(); lset(NKEY,SAMPLE_NAME); lset(AKEY,SAMPLE_AFF); editName=false; joinView=false; afterJoin=null; pendingVote=null; await refresh(); };
+    go.onclick=async e=>{ e.stopPropagation(); const d=JD;
       const need=m=>{ alert(m); };
-      if(!n){ jn.focus(); jn.style.borderColor='#D0427A'; return; }
-      if(n===SAMPLE_NAME){ lset(NKEY,n); lset(AKEY,SAMPLE_AFF); editName=false; joinView=false; afterJoin=null; pendingVote=null; await refresh(); return; }
-      if(!d.type) return need('「名城大学の学生」か「名城生以外」かを選んでください。');
-      if(d.type==='stu'&&(!d.sid||!d.fac||(FAC[d.fac]&&!d.dep))) return need('学籍番号と、学部・学科を入れてください。');
-      if(d.type==='out'&&!d.out) return need('「卒業生」か「一般」かを選んでください。');
-      if(d.out==='alum'&&!d.afac) return need('在学していたときの学部を選んでください。');
-      if(d.out==='gen'&&!(d.gens&&d.gens.length)) return need('あてはまるものを1つ以上選んでください。');
+      if(!d.type) return need('「学生」「教員」「職員」「卒業生」「一般」から選んでください。');
+      if(d.type==='stu'&&!d.fac) return need('学部を選んでください。');
+      if(d.type==='gen'&&!(d.gens&&d.gens.length)) return need('あてはまるものを1つ以上選んでください。');
       const a=affOf(d);
-      const wasS=SAMPLE(); lset(NKEY,n); lset(AKEY,a); lset(DKEY,d); lset(INTROK,1); editName=false; joinView=false; if(wasS) refresh();
-      try{ api.send({action:'join',voter:VOTER,name:n,aff:a,detail:JSON.stringify(d)}); }catch(_){}
+      const wasS=SAMPLE(); lset(NKEY,a); lset(AKEY,a); lset(DKEY,d); lset(INTROK,1); editName=false; joinView=false; if(wasS) refresh();
+      try{ api.send({action:'join',voter:VOTER,name:a,aff:a,detail:JSON.stringify(d)}); }catch(_){}
       if(afterJoin){ pendingVote=afterJoin; afterJoin=null; }
       renderList(); renderThread(); }; }
   function openPanel(view){ panel.classList.add('on'); const c=document.getElementById('hcard'); if(c&&view!=='keepcard') c.classList.remove('on'); if(view==='join') joinView=true; refresh(); renderList(); }
@@ -7625,7 +7622,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
     box.querySelectorAll('textarea,input,select').forEach(el=>{ el.addEventListener('keydown',e=>e.stopPropagation()); el.addEventListener('pointerdown',e=>e.stopPropagation()); });
     const anc=box.querySelector('.anc'); if(anc) anc.onchange=()=>box.classList.toggle('anon-on',anc.checked);
     const chn=box.querySelector('.chn'); if(chn) chn.onclick=e=>{ e.stopPropagation(); openPanel('join'); };
-    const send=async(btn,text,anon)=>{ const p=profile(); const sendName=anon?'匿名':`${p.name}（${p.aff}）`;
+    const send=async(btn,text,anon)=>{ const p=profile(); const sendName=anon?'匿名':p.aff;
       const t=getTarget(); btn.disabled=true; btn.textContent='送信中…';
       try{ if(box.dataset.editId) await api.send({action:'edit',id:box.dataset.editId,voter:VOTER,text}); else await api.send({action:'add',item:t.key,itemName:t.name,name:sendName,text,voter:VOTER}); ta.value=''; if(onSent) onSent(); await refresh(); }
       catch(err){ alert('送れませんでした。時間をおいてもう一度お試しください。'); btn.disabled=false; btn.textContent='はい、これで出す'; } };
@@ -7637,7 +7634,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       cf=document.createElement('div'); cf.className='pvc p cfm';
       const vline=box.dataset.vote!=null?`<div style="font-size:13px;margin-bottom:4px">あなたの回答：<b>${+box.dataset.vote<0?'👎 反対':'🤔 保留'}</b></div>`:'';
       const {tags,body}=splitTags(text);
-      cf.innerHTML=`<div>${reason()?'この内容で答えていいですか？':'この内容で出していいですか？'}</div><div style="margin:6px 0;font-weight:700;color:#1E2A22">${tags.map(t=>`<em class="tg">${esc(t)}</em>`).join('')}${body?'「'+esc(body)+'」':''}</div>${vline}<div style="font-size:12px;color:#56615A">名前の表示：${anon?'匿名':esc(label())}</div><div class="aicf"></div><div class="rw"><button data-cf-ok="1">はい、これで出す</button><button data-cf-no="1">直す</button></div>`;
+      cf.innerHTML=`<div>${reason()?'この内容で答えていいですか？':'この内容で出していいですか？'}</div><div style="margin:6px 0;font-weight:700;color:#1E2A22">${tags.map(t=>`<em class="tg">${esc(t)}</em>`).join('')}${body?'「'+esc(body)+'」':''}</div>${vline}<div style="font-size:12px;color:#56615A">表示：${anon?'匿名':esc(label())}</div><div class="aicf"></div><div class="rw"><button data-cf-ok="1">はい、これで出す</button><button data-cf-no="1">直す</button></div>`;
       box.appendChild(cf); cf.scrollIntoView({block:'nearest',behavior:'smooth'});
       const okb=cf.querySelector('[data-cf-ok]');
       cf.querySelector('[data-cf-no]').onclick=ev=>{ ev.stopPropagation(); cf.remove(); ta.focus(); };
