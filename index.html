@@ -505,7 +505,7 @@
     <div class="glhead">
       <strong>みんなの配置案</strong>
       <span class="who">— <b id="gl-me">名前未設定</b>
-        <button class="btn small" id="gl-rename">名前を変える</button></span>
+        <button class="btn small" id="gl-rename">所属を変える</button></span>
       <span class="sp"></span>
       <button class="btn small" id="gl-help" title="使い方" aria-label="使い方">?</button>
       <button class="btn small primary" id="gl-submit">いまの配置を提案する</button>
@@ -4854,7 +4854,7 @@ slotsEl.addEventListener('click',async e=>{
     await Store.writeAll(slotCache); renderSlots();
     flash(`「${cur.name}」を上書きしました`);
   } else if(a==='ren'&&cur){
-    const name=prompt('名前を変える', cur.name); if(name===null) return;
+    const name=prompt('所属を変える', cur.name); if(name===null) return;
     cur.name=(name.trim()||cur.name).slice(0,40);
     await Store.writeAll(slotCache); renderSlots();
   } else if(a==='load'&&cur){
@@ -5358,7 +5358,7 @@ function showMe(){
   el.textContent = joined? (o? `${n}（${o}）` : n) : '見るだけモード';
   el.classList.toggle('guest', !joined);
   const b=document.getElementById('gl-rename');
-  b.textContent = joined? '名前を変える' : '参加する';
+  b.textContent = joined? '所属を変える' : '参加する';
   b.classList.toggle('primary', !joined);
 }
 function setMe(n,sid,belong,group){
@@ -6995,16 +6995,28 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   let VOTER=lget(VKEY,''); if(!VOTER){ VOTER='v'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); lset(VKEY,VOTER); }
 
   /* 配置案からの「たたき台」の意見（最初から賛成・反対で答えられるように。白川さんの配置案の要点） */
-  const SEEDS=[
-    ['全体の方針・考え方','ハイチェアを主役にせず、いろいろな高さの席を混ぜる方針がよい'],
-    ['全体の方針・考え方','家具は、できるだけキャスター付きで動かせるものにするのがよい'],
-    ['運用・ルール','ホワイトボードの置き場所は、決めておいたほうがよい'],
-    ['運用・ルール','片付けや並べ方のルールは、使う人どうしで話し合って決めていきたい'],
-    ['予算','新しく買う家具は「動かせること」と「使い方の幅」で選ぶのがよい']
-  ].map(([item,text],i)=>({id:i===3?'Q06':'Q'+String(i+1).padStart(2,'0'),item,itemName:item,name:'配置案より',text,at:'',seed:true,talk:i===3}));
+  const SEEDS=[['Q01', '全体の方針・考え方', 'ハイチェアを主役にせず、いろいろな高さの席を混ぜる方針がよい'],
+    ['Q02', '全体の方針・考え方', '家具は、できるだけキャスター付きで動かせるものにするのがよい'],
+    ['Q06', '運用・ルール', '片付けや並べ方のルールは、使う人どうしで話し合って決めていきたい'],
+    ['Q07', 'ほしい場所', '寝転んだり、靴を脱いでくつろげる場所（小上がりなど）がほしい'],
+    ['Q08', 'ほしい場所', '人目を気にせず、一人や少人数でいられる場所がほしい'],
+    ['Q09', 'ほしい場所', '窓の外を見ながら座れる席がほしい'],
+    ['Q10', '全体の方針・考え方', '通路から中の様子が見えるほうが、入りやすい'],
+    ['Q11', '全体の方針・考え方', 'イベントのときに60人くらいが座れる広さは残したい'],
+    ['Q12', '本と本棚', '本棚は動かさず、一か所にまとめて固定するのがよい'],
+    ['Q13', '見える化・案内', 'イベントや募集の情報は、入口近くの目につく場所に貼るのがよい'],
+    ['Q14', '見える化・案内', 'shakeでどんな団体や人が活動しているかが分かる掲示がほしい'],
+    ['Q15', '見える化・案内', '学外の人も入ってよいことが分かる案内がほしい'],
+    ['Q16', '見える化・案内', '張り紙は最小限にして、自由に使える雰囲気を残すのがよい'],
+    ['Q17', '設備', 'どの席からも電源を取りやすくしてほしい'],
+    ['Q18', '使い方', '団体が使う場所と、一人で使う場所は分けておくのがよい'],
+    ['Q19', '使い方', '小上がりでは飲み食いしないほうがよい'],
+    ['Q20', '全体の方針・考え方', 'きれいに整えすぎず、少し雑然としているくらいがよい']
+  ].map(([id,item,text])=>({id,item,itemName:item,name:['Q01','Q02','Q06'].includes(id)?'配置案より':'これまでの声より',text,at:'',seed:true,talk:id==='Q06'}));
   /* 「理由」＝反対・保留の理由や、片付け・管理の自由な声。賛成・反対・保留では答えない（10/17）。
      スプレッドシート「声」の「什器・場所」の先頭に【理由】と書くと、理由として扱う */
   const KEEP_TOPIC='片付け・管理のこと';
+  const FESTIVAL=true;   // 10/30〜 丸天産業の案が来るまで：家具ごとの案は出さず、方針と意見の文だけに賛成・反対・保留で答える
   const OLD_REASONS=new Set(['19597d30','df251c88','40081d9d']);   // 理由の仕組みを入れる前に出た3件（反対・保留の理由として書かれたもの）
   const isReason=c=>!c.base && (/^【理由】/.test(c.item||'') || c.item===KEEP_TOPIC || OLD_REASONS.has(c.id));
   const reasonKey=c=>String(c.item||'').replace(/^【理由】/,'');
@@ -7083,7 +7095,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   };
   async function refresh(){
     try{ await flush(); }catch(_){}
-    try{ const r=await api.list(); const CM=(r.comments||[]).filter(c=>c && !c.hidden && !c.parent); REASONS=CM.filter(isReason); ALL=baseList().concat(SEEDS,CM.filter(c=>!isReason(c))); VOTES=r.votes||{}; loaded=true;
+    try{ const r=await api.list(); const CM=(r.comments||[]).filter(c=>c && !c.hidden && !c.parent); REASONS=CM.filter(isReason); ALL=(FESTIVAL?[]:baseList()).concat(SEEDS,CM.filter(c=>!isReason(c))); VOTES=r.votes||{}; loaded=true;
       const M=mine(); Object.entries(M).forEach(([sid,v])=>{ (VOTES[sid]=VOTES[sid]||{})[VOTER]=v; });   // 自分の票は手元を優先
     }catch(e){ console.warn('comments',e); }
     analyze(); updateBadges(); renderList(); renderThread();
@@ -7578,16 +7590,16 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       `<p><b>共創空間</b>　「なんとかしたい」「でもどうすればいい？」と思えること（社会課題）の解決のため、年齢・分野・立場などの垣根を越えたプロジェクトを生み出すこと。</p>`+
       `<p><b>学びの空間</b>　授業や部活などの学習活動では得られない、多様な人たちとの出会いの中から生まれる「学び」をつくること。</p>`+
       `<p><b>使う人がつくる場</b>　shakeは「管理される場」ではなく「使う人がつくる場」。常駐スタッフはいません。予約不要で、レイアウト変更も自由です。だからこそ、片付けや並べ方も使う人どうしで決めていく前提で、配置案を見てください。</p></details>`+
-      `<div class="ask">新しい家具の置き方の案に、<b>賛成・反対・保留</b>で答えてください</div></div>`; }
+      `<div class="ask">これからのshakeについての文に、<b>賛成・反対・保留</b>で答えてください</div></div>`; }
 
   /* ---- 書きこみ欄（一文の意見）。出す前に「これでいいですか？」 ---- */
   function formInner(ph,reason){ const p=profile();
     if(reason) return `<textarea rows="2" maxlength="${MAXLEN}" placeholder="${esc(ph)}"></textarea><div class="cnt"><span></span><span class="cc">0/${MAXLEN}</span></div>`+
-      (p ? `<div class="rw"><span class="me">👤 <b class="nmv">${esc(p.name)}（${esc(p.aff)}）</b>　<label class="anon"><input type="checkbox" class="anc">匿名で</label></span><button class="snd">答える</button></div>`
-         : `<div class="rw"><span class="me" style="color:#A93226">まず名前と所属を入れてください</span><button class="snd" data-needjoin="1">名前を入れる</button></div>`);
+      (p ? `<div class="rw"><span class="me">👤 <b class="nmv">${esc(p.aff)}</b>　<label class="anon"><input type="checkbox" class="anc">匿名で</label></span><button class="snd">答える</button></div>`
+         : `<div class="rw"><span class="me" style="color:#A93226">まず所属を教えてください</span><button class="snd" data-needjoin="1">所属を入れる</button></div>`);
     return `<textarea rows="3" maxlength="${MAXLEN}" placeholder="${esc(ph)}"></textarea><div class="aic"></div><div class="cnt"><span>一つのことだけ。感想や不安は、各案で反対・保留を選ぶと書けます。</span><span class="cc">0/${MAXLEN}</span></div>`+
-      (p ? `<div class="rw"><span class="me">👤 <b class="nmv">${esc(p.name)}（${esc(p.aff)}）</b>として　<label class="anon"><input type="checkbox" class="anc">今回は匿名で</label>　<button class="chn">名前を変える</button></span><button class="snd">出す</button></div>`
-         : `<div class="rw"><span class="me" style="color:#A93226">まず名前と所属を入れてください</span><button class="snd" data-needjoin="1">名前を入れる</button></div>`); }
+      (p ? `<div class="rw"><span class="me">👤 <b class="nmv">${esc(p.aff)}</b>として　<label class="anon"><input type="checkbox" class="anc">今回は匿名で</label>　<button class="chn">所属を変える</button></span><button class="snd">出す</button></div>`
+         : `<div class="rw"><span class="me" style="color:#A93226">まず所属を教えてください</span><button class="snd" data-needjoin="1">所属を入れる</button></div>`); }
   /* AIの「答えやすい形か」チェック（Apps Script経由でGemini。キーはApps Scriptの中だけ）。
      待ち時間を感じさせない工夫：①書く手が止まったら先回りしてチェック ②確認画面は待たずにすぐ出す
      ③結果はあとから静かに差し込む ④7秒で返らなければ黙って省く（出すのは止めない） */
