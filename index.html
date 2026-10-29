@@ -7429,7 +7429,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       panel.querySelector('.x').onclick=()=>panel.classList.remove('on');
       panel.querySelector('.go1').onclick=e=>{ e.stopPropagation(); lset(INTROK,1); introView=false; renderList(); }; return; }
     if(!profile()||joinView){ panel.classList.remove('ans');
-      panel.innerHTML=`<div class="hd"><div class="tt">💬 みんなの声</div><div class="sub">配置案に「賛成・反対・保留」で答えてください（10/18 19:00まで）</div><button class="x" aria-label="閉じる">×</button></div><div class="bd">`+joinHTML()+(profile()?'<button class="skip" data-back="1">もどる</button>':'')+`</div>`;
+      panel.innerHTML=`<div class="hd"><div class="tt">💬 みんなの声</div><div class="sub">配置案に「賛成・反対・保留」で答えてください</div><button class="x" aria-label="閉じる">×</button></div><div class="bd">`+joinHTML()+(profile()?'<button class="skip" data-back="1">もどる</button>':'')+`</div>`;
       panel.querySelector('.x').onclick=()=>panel.classList.remove('on'); const bk=panel.querySelector('[data-back]'); if(bk) bk.onclick=e=>{ e.stopPropagation(); joinView=false; renderList(); };
       bindJoin(panel); setTimeout(()=>{ const i=panel.querySelector('.jn'); if(i&&!i.value) i.focus(); },50); return; }
     const keep=panel.querySelector('.cmf:not(.rsn):not(.ed) textarea')?panel.querySelector('.cmf:not(.rsn):not(.ed) textarea').value:'';
@@ -7461,7 +7461,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
         (L.length?L.map(c=>stmt(c,true)).join(''):`<div class="cmempty">${meScope==='own'?'まだ意見を出していません。':'ここにはまだ回答がありません。'}</div>`); }
     else { const L=ALL.slice().sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)); body=`<div class="lead">すべての意見（${ALL.length}件）</div>`+(L.length?L.map(c=>stmt(c,true)).join(''):'<div class="cmempty">まだ意見はありません。</div>')+
       (REASONS.length?`<div class="pv-h4" style="margin-top:14px">理由・自由な声（${REASONS.length}件）</div>`+REASONS.slice().sort((a,b)=>new Date(b.at||0)-new Date(a.at||0)).map(r=>{ const {tags,body}=splitTags(r.text); return `<div class="rb solo"><div class="rk">${esc(reasonKey(r))}</div><div class="rt">${tags.map(t=>`<em>${esc(t)}</em>`).join('')}${esc(body)}</div><div class="rby">${r.own?'あなた':esc(r.name||'匿名')}${r.at?'・'+ago(r.at):''}${r.own?` <button class="mini" data-del="${esc(r.id)}">取り下げる</button>`:''}</div></div>`; }).join(''):''); }
-    panel.innerHTML=`<div class="hd"><div class="tt">💬 みんなの声</div><div class="sub">ようこそ、<b style="color:#fff">${esc(profile().name)}</b>さん（${esc(profile().aff)}）<button class="chg" data-chg="1">変更</button><button class="chg" data-intro="1">shakeって？</button><br>配置案に「賛成・反対・保留」で答えてください（10/18 19:00まで）</div><button class="x" aria-label="閉じる">×</button>`+(SAMPLE()?`<div class="smpl">🧪 <b>サンプルモード</b>：架空の100人が答えた状態です。ここでの回答・意見は本番には送られません。<button data-smpl-off="1">本番にもどる</button></div>`:'')+
+    panel.innerHTML=`<div class="hd"><div class="tt">💬 みんなの声</div><div class="sub">ようこそ、<b style="color:#fff">${esc(profile().name)}</b>さん（${esc(profile().aff)}）<button class="chg" data-chg="1">変更</button><button class="chg" data-intro="1">shakeって？</button><br>配置案に「賛成・反対・保留」で答えてください</div><button class="x" aria-label="閉じる">×</button>`+(SAMPLE()?`<div class="smpl">🧪 <b>サンプルモード</b>：架空の100人が答えた状態です。ここでの回答・意見は本番には送られません。<button data-smpl-off="1">本番にもどる</button></div>`:'')+
       `<div class="stats"><div><b>${ALL.length}</b><small>案と意見</small></div><div><b>${people}</b><small>参加した人</small></div><div><b>${done}<span style="font-size:12px">/${ALL.length}</span></b><small>あなたの回答</small></div></div>`+
       `<div class="prog"><i style="width:${ALL.length?Math.round(done*100/ALL.length):0}%"></i></div></div>`+
       '<div class="tabs">'+T('answer','🗳','答える')+T('agree','🤝','合意')+T('split','⚖️','分かれ目')+T('groups','👥','グループ')+T('me','🙋','わたし')+T('all','📋','すべて')+'</div>'+
@@ -7581,7 +7581,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
       `<p><b>共創空間</b>　「なんとかしたい」「でもどうすればいい？」と思えること（社会課題）の解決のため、年齢・分野・立場などの垣根を越えたプロジェクトを生み出すこと。</p>`+
       `<p><b>学びの空間</b>　授業や部活などの学習活動では得られない、多様な人たちとの出会いの中から生まれる「学び」をつくること。</p>`+
       `<p><b>使う人がつくる場</b>　shakeは「管理される場」ではなく「使う人がつくる場」。常駐スタッフはいません。予約不要で、レイアウト変更も自由です。だからこそ、片付けや並べ方も使う人どうしで決めていく前提で、配置案を見てください。</p></details>`+
-      `<div class="ask">新しい家具の置き方の案に、<b>賛成・反対・保留</b>で答えてください<small>締切 10/18（日）19:00</small></div></div>`; }
+      `<div class="ask">新しい家具の置き方の案に、<b>賛成・反対・保留</b>で答えてください</div></div>`; }
 
   /* ---- 書きこみ欄（一文の意見）。出す前に「これでいいですか？」 ---- */
   function formInner(ph,reason){ const p=profile();
