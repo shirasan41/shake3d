@@ -128,7 +128,7 @@ const aff=()=>lget(AKEY,'');
 function editAff(back){ after=back; join(); }
 // 回答の完了・新しい提案を、運営のスマホにプッシュ通知（ntfy）
 const NTOPIC='shake-voice-cb657d08103f';
-function notify(title,msg){ if(/[?&]preview/.test(location.search)) return; try{ fetch('https://ntfy.sh/',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({topic:NTOPIC,title,message:msg,tags:['speech_balloon'],click:'https://shirasan41.github.io/shake3d/results.html'})}).catch(()=>{}); }catch(_){} }
+function notify(title,msg){ if(/[?&]preview/.test(location.search)) return; try{ fetch('https://ntfy.sh/',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({topic:NTOPIC,title,message:msg,tags:['speech_balloon'],click:'https://shirasan41.github.io/shake3d/admin.html'})}).catch(()=>{}); }catch(_){} }
 const affLine=()=>`<div class="affl"><span>あなたの所属</span><b>${esc(aff()||'未設定')}</b><button class="affE">変更</button></div>`;
 const NEXT=`<div class="nx"><b class="h">次は、11月6日ごろから</b>みなさんの声を反映した<b>配置案</b>をつくり、それに対して、もう一度声を集めます。そのときも、ぜひ声を聞かせてください。回答ページのQRコードは、またshakeに掲示します。</div>`;
 
