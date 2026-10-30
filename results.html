@@ -121,7 +121,7 @@ async function load(){
   const [l,s]=await Promise.all([fetch(API+'?action=list&voter=results&t='+Date.now()).then(r=>r.json()),fetch(API+'?action=summary&t='+Date.now()).then(r=>r.json()).catch(()=>null)]);
   const user=(l.comments||[]).filter(c=>c&&!c.hidden&&!c.parent&&c.item==='みんなの提案'&&!['095b32d5'].includes(c.id)).map((c,i)=>({id:c.id,cat:'みんなの提案',text:c.text,user:true,no:'P'+(i+1)}));
   ALL=ST.concat(user); const ids=new Set(ALL.map(c=>c.id));
-  V={}; (l.votes||[]).forEach(([u,id,v])=>{ if(ids.has(id)) (V[id]=V[id]||{})[u]=+v; });
+  V={}; (l.votes||[]).forEach(([u,id,v])=>{ if(ids.has(id)) (V[id]=V[id]||{})[u]=+v; }); (l.comments||[]).forEach(w=>{ if(w&&w.item==='__withdraw'&&V[w.text]) delete V[w.text][w.name]; });
   SUM=(s&&s.ok)?s:null; render();
   document.getElementById('upd').textContent='最終更新 '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
 }
