@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>声のひろば 集計</title>
+<style>
+:root{--bg:#F7F5F0;--card:#fff;--ink:#173B45;--sub:#5E6E70;--mut:#8A9496;--line:#E4DFD5;--ag:#2F6DB5;--dg:#D9822B;--ps:#B8BEC0;--or:#E8743B}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;font-size:14px;line-height:1.55}
+header{background:var(--ink);color:#fff;padding:18px 20px 22px}
+header .in,main{max-width:1080px;margin:0 auto}
+header h1{margin:0;font-size:20px}
+header p{margin:4px 0 0;color:#cfdadc;font-size:13px}
+.bar1{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.bar1 button{border:0;border-radius:20px;padding:6px 14px;font:inherit;font-weight:700;cursor:pointer;background:#fff;color:var(--ink)}
+.bar1 span{color:#cfdadc;font-size:12px}
+main{padding:0 16px 40px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:-12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.kpi b{display:block;font-size:28px;line-height:1.1}
+.kpi span{color:var(--sub);font-size:12.5px}
+h2{font-size:16px;margin:26px 0 4px}
+.lead{color:var(--sub);font-size:12.5px;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--sub);align-items:center;flex-wrap:wrap}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-2px}
+.ctl{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.ctl button{border:1px solid var(--line);background:#fff;border-radius:16px;padding:4px 12px;font:inherit;font-size:12.5px;cursor:pointer;color:var(--ink)}
+.ctl button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+/* diverging rows */
+.row{display:grid;grid-template-columns:minmax(220px,38%) 1fr 64px 44px;gap:10px;align-items:center;padding:7px 0;border-top:1px solid #F0ECE4}
+.row:first-child{border-top:0}
+.row .t{font-size:13px;line-height:1.4}
+.row .t em{font-style:normal;color:var(--mut);font-size:11.5px;margin-right:4px}
+.div{position:relative;height:18px}
+.div .mid{position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:#9AA3A4}
+.div .seg{position:absolute;top:0;height:18px}
+.div .d{right:50%;background:var(--dg);border-radius:4px 0 0 4px;margin-right:1px}
+.div .a{left:50%;background:var(--ag);border-radius:0 4px 4px 0;margin-left:1px}
+.div .lab{position:absolute;top:0;font-size:11.5px;font-weight:700;line-height:18px;color:var(--ink);white-space:nowrap}
+.pbar{height:10px;background:#EEF0F0;border-radius:5px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--ps)}
+.ps{font-size:11px;color:var(--sub);text-align:right}
+.n{font-size:12px;color:var(--sub);text-align:right}
+.few{font-size:12px;color:var(--mut)}
+.axis{display:grid;grid-template-columns:minmax(220px,38%) 1fr 64px 44px;gap:10px;font-size:11px;color:var(--mut);margin-bottom:2px}
+.axis div:nth-child(2){display:flex;justify-content:space-between}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+svg text{font-family:inherit}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:#fff;font-size:12px;padding:7px 10px;border-radius:8px;max-width:280px;z-index:9;opacity:0;transition:opacity .1s}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:6px 6px;border-top:1px solid #F0ECE4;text-align:left}
+th{color:var(--sub);font-weight:700;font-size:11.5px;white-space:nowrap}
+td.c{text-align:center;font-weight:700;border-radius:4px}
+.props li{margin:6px 0}
+.note{font-size:12px;color:var(--mut);margin-top:24px}
+@media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.row,.axis{grid-template-columns:1fr 70px;}.row .div{grid-column:1/-1;order:3}.row .pbar,.axis div:nth-child(3),.axis div:nth-child(4){display:none}.row .ps{order:2}.axis div:nth-child(2){grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <h1>声のひろば 集計 ― shake Re:born</h1>
+  <p>学祭（2026年10月30日〜）から集めている「新しいshakeへの提案」への賛成・反対・保留の集まり具合です。名前や理由の本文は表示しません。</p>
+  <div class="bar1"><button id="rf">↻ 更新</button><span id="upd">読み込み中…</span></div>
+</div></header>
+<main>
+  <div class="kpis">
+    <div class="kpi"><b id="k1">–</b><span>答えた人</span></div>
+    <div class="kpi"><b id="k2">–</b><span>回答の数（のべ）</span></div>
+    <div class="kpi"><b id="k3">–</b><span>1人あたりの回答数</span></div>
+    <div class="kpi"><b id="k4">–</b><span>参加者が出した提案</span></div>
+  </div>
+
+  <h2>提案ごとの賛否</h2>
+  <p class="lead">真ん中の線から右が賛成、左が反対。灰色の細い棒は保留（わからない）の割合です。回答が3人未満の提案は割合を出していません。</p>
+  <div class="card">
+    <div class="legend"><span><i style="background:var(--ag)"></i>賛成</span><span><i style="background:var(--dg)"></i>反対</span><span><i style="background:var(--ps)"></i>保留</span></div>
+    <div class="ctl" id="sortc"></div>
+    <div class="axis"><div></div><div><span>← 反対 100%</span><span>0</span><span>賛成 100% →</span></div><div style="text-align:right">保留</div><div style="text-align:right">人数</div></div>
+    <div id="rows"></div>
+  </div>
+
+  <div class="two">
+    <div>
+      <h2>合意マップ</h2>
+      <p class="lead">右下ほど「みんな賛成」、左上ほど「みんな反対」、真ん中あたりは「意見が割れている」提案です。円の大きさは回答人数。番号は上の一覧と同じです。</p>
+      <div class="card"><svg id="map" viewBox="0 0 420 340" style="width:100%"></svg></div>
+    </div>
+    <div>
+      <h2>所属ごとの賛成率</h2>
+      <p class="lead">同じ提案でも、立場によって受け止め方が違うかを見ます。色が濃いほど賛成が多い。3人未満は「–」。</p>
+      <div class="card" style="overflow:auto"><table id="heat"></table></div>
+    </div>
+  </div>
+
+  <h2>答え方の似た人のまとまり</h2>
+  <p class="lead">回答のパターンが似ている人どうしを2つのグループに分け、グループで賛否が大きく違う提案を出しています（本家Polisの「意見グループ」に近い見方です）。6人以上が4件以上答えると表示されます。</p>
+  <div class="card" id="groups"></div>
+
+  <h2>参加者が出した提案</h2>
+  <div class="card"><ol class="props" id="props"></ol></div>
+
+  <p class="note">データは声のひろば（https://shirasan41.github.io/shake3d/voice.html）の回答から、このページを開いたときに読み込んでいます。回答者が書いた「ひとこと理由」は、ここには表示しません。</p>
+</main>
+<div class="tip" id="tip"></div>
+<script>
+(function(){
+const API='https://script.google.com/macros/s/AKfycbyRuORVVgsWallk8rlNljpedJeqhnmB2PLUznZvqtWrK4YqQaDNm9GBNXC6d_3GbU3q/exec';
+const ST=[['V01','入りやすさ','通路やカフェ側から、shakeの中の様子が見えるほうがよい'],['V02','入りやすさ','入口に、学外の人も入っていいことが分かる案内がほしい'],['V21','入りやすさ','入口の近くに、ふらっと立ち寄って腰かけられる場所があるとよい'],['V03','入りやすさ','shakeでどんな人や団体が活動しているかが、分かるとよい'],['V05','くつろぐ','人目を気にせず、こもって過ごせる一角がほしい'],['V06','くつろぐ','団体で使う場所と、ひとりで使う場所は、エリアを分けておくのがよい'],['V07','くつろぐ','靴を脱いだり、床に座ったりして、くつろげる場所がほしい'],['V08','くつろぐ','窓の外を見ながら座れる席がほしい'],['V09','席・家具','高い椅子だけでなく、足が床につく低い椅子の席を増やすのがよい'],['V10','席・家具','家具は、使い方に合わせて動かせるものを中心にするのがよい'],['V11','席・家具','家具の置き方は、イベントのときより、ふだんの居心地を優先するのがよい'],['V13','席・家具','ホワイトボードは、今より数を減らすのがよい'],['V19','席・家具','オンライン会議や通話ができる、声がもれにくい席がほしい'],['V20','席・家具','大きな画面（モニター）につないで話し合える席がほしい'],['V14','本と本棚','shakeを、本を読んで過ごせる場所にしていきたい'],['V16','雰囲気','きれいに整えすぎず、少し雑然としているくらいがよい'],['V17','雰囲気','壁や柱に、写真や作品を飾ってにぎやかにするのがよい']].map(([id,cat,text],i)=>({id,cat,text,no:i+1}));
+const MIN=3, esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let ALL=[], V={}, SUM=null, sort='agree';
+const tip=document.getElementById('tip');
+function showTip(e,h){ tip.innerHTML=h; tip.style.opacity=1; const x=Math.min(e.clientX+14,innerWidth-290); tip.style.left=x+'px'; tip.style.top=(e.clientY+14)+'px'; }
+function hideTip(){ tip.style.opacity=0; }
+function agg(id,members){ const o=V[id]||{}; let a=0,d=0,p=0; for(const [u,v] of Object.entries(o)){ if(members&&!members.has(u)) continue; v>0?a++:v<0?d++:p++; } const n=a+d+p; return {a,d,p,n,ar:n?a/n:0,dr:n?d/n:0,pr:n?p/n:0}; }
+const pc=x=>Math.round(x*100);
+async function load(){
+  document.getElementById('upd').textContent='読み込み中…';
+  const [l,s]=await Promise.all([fetch(API+'?action=list&voter=results&t='+Date.now()).then(r=>r.json()),fetch(API+'?action=summary&t='+Date.now()).then(r=>r.json()).catch(()=>null)]);
+  const user=(l.comments||[]).filter(c=>c&&!c.hidden&&!c.parent&&c.item==='みんなの提案').map((c,i)=>({id:c.id,cat:'みんなの提案',text:c.text,user:true,no:'P'+(i+1)}));
+  ALL=ST.concat(user); const ids=new Set(ALL.map(c=>c.id));
+  V={}; (l.votes||[]).forEach(([u,id,v])=>{ if(ids.has(id)) (V[id]=V[id]||{})[u]=+v; });
+  SUM=(s&&s.ok)?s:null; render();
+  document.getElementById('upd').textContent='最終更新 '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+}
+function render(){
+  const voters=new Set(); let total=0; Object.values(V).forEach(o=>Object.keys(o).forEach(u=>{voters.add(u);total++;}));
+  k1.textContent=voters.size; k2.textContent=total; k3.textContent=voters.size?(total/voters.size).toFixed(1):'–'; k4.textContent=ALL.filter(c=>c.user).length;
+  // sort control
+  const SO=[['agree','賛成が多い順'],['split','意見が割れている順'],['pass','保留が多い順'],['order','掲載順']];
+  sortc.innerHTML=SO.map(([k,l])=>`<button class="${sort===k?'on':''}" data-s="${k}">${l}</button>`).join('');
+  sortc.querySelectorAll('button').forEach(b=>b.onclick=()=>{ sort=b.dataset.s; render(); });
+  const R=ALL.map(c=>({c,t:agg(c.id)}));
+  const key={agree:x=>x.t.n>=MIN?x.t.ar-x.t.dr:-9,split:x=>x.t.n>=MIN?Math.min(x.t.ar,x.t.dr):-9,pass:x=>x.t.n>=MIN?x.t.pr:-9,order:x=>0}[sort];
+  const L=sort==='order'?R:R.slice().sort((a,b)=>key(b)-key(a));
+  rows.innerHTML=L.map(({c,t})=>{
+    const lab=`<em>${c.user?'みんなの提案':c.no}</em>${esc(c.text)}`;
+    if(t.n<MIN) return `<div class="row"><div class="t">${lab}</div><div class="few">回答 ${t.n}人（3人以上で表示）</div><div></div><div class="n">${t.n}人</div></div>`;
+    return `<div class="row" data-id="${c.id}"><div class="t">${lab}</div><div class="div"><span class="mid"></span>
+      <span class="seg d" style="width:calc(${pc(t.dr)/2}% - 1px)"></span><span class="seg a" style="width:calc(${pc(t.ar)/2}% - 1px)"></span>
+      <span class="lab" style="right:calc(50% + ${pc(t.dr)/2}% + 4px)">${pc(t.dr)}%</span><span class="lab" style="left:calc(50% + ${pc(t.ar)/2}% + 4px)">${pc(t.ar)}%</span></div>
+      <div><div class="pbar"><i style="width:${pc(t.pr)}%"></i></div><div class="ps">${pc(t.pr)}%</div></div><div class="n">${t.n}人</div></div>`; }).join('');
+  rows.querySelectorAll('.row[data-id]').forEach(el=>{ const c=ALL.find(x=>x.id===el.dataset.id), t=agg(c.id);
+    el.onmousemove=e=>showTip(e,`<b>${esc(c.text)}</b><br>賛成 ${t.a}人（${pc(t.ar)}%）／反対 ${t.d}人（${pc(t.dr)}%）／保留 ${t.p}人（${pc(t.pr)}%）`); el.onmouseleave=hideTip; });
+  drawMap(R); drawHeat(); drawGroups(); drawProps(R);
+}
+function drawMap(R){
+  const W=420,H=340,m={l:42,r:14,t:14,b:36}, X=v=>m.l+v*(W-m.l-m.r), Y=v=>H-m.b-v*(H-m.t-m.b);
+  let s='';
+  [0,.25,.5,.75,1].forEach(v=>{ s+=`<line x1="${X(v)}" y1="${Y(0)}" x2="${X(v)}" y2="${Y(1)}" stroke="#EFEBE3"/><line x1="${X(0)}" y1="${Y(v)}" x2="${X(1)}" y2="${Y(v)}" stroke="#EFEBE3"/>`;
+    s+=`<text x="${X(v)}" y="${H-m.b+16}" font-size="10" fill="#8A9496" text-anchor="middle">${v*100}%</text><text x="${m.l-6}" y="${Y(v)+3}" font-size="10" fill="#8A9496" text-anchor="end">${v*100}%</text>`; });
+  s+=`<line x1="${X(0)}" y1="${Y(1)}" x2="${X(1)}" y2="${Y(0)}" stroke="#D5D0C6" stroke-dasharray="3 3"/>`;
+  s+=`<text x="${X(.5)}" y="${H-4}" font-size="11" fill="#5E6E70" text-anchor="middle">賛成の割合 →</text><text x="12" y="${Y(.5)}" font-size="11" fill="#5E6E70" text-anchor="middle" transform="rotate(-90 12 ${Y(.5)})">反対の割合 →</text>`;
+  s+=`<text x="${X(.97)}" y="${Y(.04)}" font-size="11" fill="#2F6DB5" text-anchor="end" font-weight="700">みんな賛成</text><text x="${X(.03)}" y="${Y(.95)}" font-size="11" fill="#B4661C" font-weight="700">みんな反対</text><text x="${X(.36)}" y="${Y(.42)}" font-size="11" fill="#5E6E70" font-weight="700">意見が割れる</text>`;
+  const P=R.filter(x=>x.t.n>=MIN), mx=Math.max(1,...P.map(x=>x.t.n));
+  P.forEach(({c,t})=>{ const r=6+10*Math.sqrt(t.n/mx), col=t.ar>=t.dr?'#2F6DB5':'#D9822B';
+    s+=`<g class="pt" data-id="${c.id}"><circle cx="${X(t.ar)}" cy="${Y(t.dr)}" r="${r}" fill="${col}" fill-opacity=".8" stroke="#fff" stroke-width="2"/><text x="${X(t.ar)}" y="${Y(t.dr)+3.5}" font-size="9.5" fill="#fff" text-anchor="middle" font-weight="700">${c.user?'P':c.no}</text><circle cx="${X(t.ar)}" cy="${Y(t.dr)}" r="${r+6}" fill="transparent"/></g>`; });
+  if(!P.length) s+=`<text x="${X(.5)}" y="${Y(.6)}" font-size="12" fill="#8A9496" text-anchor="middle">回答が集まると、ここに提案が並びます</text>`;
+  map.innerHTML=s;
+  map.querySelectorAll('.pt').forEach(g=>{ const c=ALL.find(x=>x.id===g.dataset.id), t=agg(c.id);
+    g.onmousemove=e=>showTip(e,`<b>${c.user?'みんなの提案':c.no+'.'} ${esc(c.text)}</b><br>賛成 ${pc(t.ar)}%／反対 ${pc(t.dr)}%／保留 ${pc(t.pr)}%（${t.n}人）`); g.onmouseleave=hideTip; });
+}
+function drawHeat(){
+  if(!SUM||!SUM.bySid){ heat.innerHTML='<tr><td class="few">所属別の集計は準備中です</td></tr>'; return; }
+  const cats=['学生','卒業生','一般','その他'];
+  const col=r=>{ const l=[ '#EAF1FA','#C9DCF2','#9DC0E8','#6A9DD6','#2F6DB5','#1F4E86']; return l[Math.min(5,Math.floor(r*6))]; };
+  let h=`<tr><th>提案</th>${cats.map(k=>`<th style="text-align:center">${k==='一般'?'学外':k}</th>`).join('')}</tr>`;
+  ST.forEach(c=>{ const b=SUM.bySid[c.id]||{};
+    h+=`<tr><td>${c.no}. ${esc(c.text.length>22?c.text.slice(0,22)+'…':c.text)}</td>`+cats.map(k=>{ const x=b[k]; if(!x) return '<td class="c" style="color:#B8BEC0">–</td>'; const n=x[0]+x[1]+x[2]; if(n<MIN) return `<td class="c" style="color:#B8BEC0" title="${n}人">–</td>`; const r=x[0]/n; return `<td class="c" style="background:${col(r)};color:${r>.6?'#fff':'#173B45'}" title="賛成${x[0]}・反対${x[1]}・保留${x[2]}">${pc(r)}%</td>`; }).join('')+'</tr>'; });
+  heat.innerHTML=h;
+}
+function drawGroups(){
+  const ids=ST.map(c=>c.id), users=[...new Set(Object.values(V).flatMap(o=>Object.keys(o)))].filter(u=>ids.filter(id=>V[id]&&u in V[id]).length>=4);
+  if(users.length<6){ groups.innerHTML=`<div class="few">いま条件を満たす人は ${users.length}人です。6人以上になると表示されます。</div>`; return; }
+  const M=users.map(u=>ids.map(id=>(V[id]&&u in V[id])?V[id][u]:0));
+  // 2次元に縮める（主成分分析の簡易版）
+  const mean=ids.map((_,j)=>M.reduce((s,r)=>s+r[j],0)/M.length), X=M.map(r=>r.map((v,j)=>v-mean[j]));
+  const pcv=(X,orth)=>{ let v=ids.map(()=>Math.random()-.5); for(let it=0;it<60;it++){ let w=ids.map(()=>0); X.forEach(r=>{ const d=r.reduce((s,x,j)=>s+x*v[j],0); r.forEach((x,j)=>w[j]+=d*x); }); if(orth){ const d=w.reduce((s,x,j)=>s+x*orth[j],0); w=w.map((x,j)=>x-d*orth[j]); } const n=Math.hypot(...w)||1; v=w.map(x=>x/n); } return v; };
+  const v1=pcv(X), v2=pcv(X,v1), P=X.map(r=>[r.reduce((s,x,j)=>s+x*v1[j],0),r.reduce((s,x,j)=>s+x*v2[j],0)]);
+  // 2つのまとまりに分ける
+  let c=[P[0],P[P.length-1]], lab=[];
+  for(let it=0;it<30;it++){ lab=P.map(p=>Math.hypot(p[0]-c[0][0],p[1]-c[0][1])<=Math.hypot(p[0]-c[1][0],p[1]-c[1][1])?0:1); c=[0,1].map(k=>{ const q=P.filter((_,i)=>lab[i]===k); return q.length?[q.reduce((s,p)=>s+p[0],0)/q.length,q.reduce((s,p)=>s+p[1],0)/q.length]:c[k]; }); }
+  const G=[0,1].map(k=>new Set(users.filter((_,i)=>lab[i]===k)));
+  const xs=P.map(p=>p[0]), ys=P.map(p=>p[1]), x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const GC=['#2F6DB5','#D9822B'], GN=['グループA','グループB'];
+  let svg=`<svg viewBox="0 0 300 180" style="width:100%;max-width:360px;background:#FBFAF7;border-radius:10px">`+P.map((p,i)=>`<circle cx="${16+(p[0]-x0)/((x1-x0)||1)*268}" cy="${16+(p[1]-y0)/((y1-y0)||1)*148}" r="6" fill="${GC[lab[i]]}" fill-opacity=".75" stroke="#fff" stroke-width="2"/>`).join('')+'</svg>';
+  const diff=ST.map(c=>{ const a=agg(c.id,G[0]), b=agg(c.id,G[1]); return {c,a,b,d:(a.n>=2&&b.n>=2)?a.ar-b.ar:0}; }).sort((p,q)=>Math.abs(q.d)-Math.abs(p.d)).slice(0,5);
+  groups.innerHTML=`<div style="display:grid;grid-template-columns:minmax(0,360px) 1fr;gap:16px;align-items:start" class="gwrap">${svg}<div>
+    <div class="legend" style="margin-bottom:8px">${GN.map((n,k)=>`<span><i style="background:${GC[k]}"></i>${n}（${G[k].size}人）</span>`).join('')}</div>
+    <div style="font-weight:700;font-size:13px;margin-bottom:4px">2つのグループで賛成率がとくに違う提案</div>
+    <table>${diff.map(x=>`<tr><td>${x.c.no}. ${esc(x.c.text)}</td><td style="white-space:nowrap;color:${GC[0]};font-weight:700">A ${pc(x.a.ar)}%</td><td style="white-space:nowrap;color:#B4661C;font-weight:700">B ${pc(x.b.ar)}%</td></tr>`).join('')}</table>
+    <div class="few" style="margin-top:6px">点は回答した人。近い点ほど答え方が似ています。</div></div></div>`;
+}
+function drawProps(R){
+  const U=R.filter(x=>x.c.user);
+  props.innerHTML=U.length?U.map(({c,t})=>`<li>${esc(c.text)} <span class="few">― ${t.n<MIN?`回答 ${t.n}人`:`賛成 ${pc(t.ar)}%・反対 ${pc(t.dr)}%・保留 ${pc(t.pr)}%（${t.n}人）`}</span></li>`).join(''):'<li class="few" style="list-style:none">まだありません</li>';
+}
+document.getElementById('rf').onclick=load;
+load().catch(e=>{ document.getElementById('upd').textContent='読み込めませんでした。更新を押してください'; });
+setInterval(()=>{ if(!document.hidden) load().catch(()=>{}); },120000);
+})();
+</script>
+</body>
+</html>
