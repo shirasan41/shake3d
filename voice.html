@@ -126,6 +126,9 @@ let ALL=SEEDS.slice(), VOTES={}, loaded=false, view='intro', cur=null, JD=lget(D
 const mine=()=>lget(MYV,{});
 const aff=()=>lget(AKEY,'');
 function editAff(back){ after=back; join(); }
+// 回答の完了・新しい提案を、運営のスマホにプッシュ通知（ntfy）
+const NTOPIC='shake-voice-cb657d08103f';
+function notify(title,msg){ if(/[?&]preview/.test(location.search)) return; try{ fetch('https://ntfy.sh/',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({topic:NTOPIC,title,message:msg,tags:['speech_balloon'],click:'https://shirasan41.github.io/shake3d/results.html'})}).catch(()=>{}); }catch(_){} }
 const affLine=()=>`<div class="affl"><span>あなたの所属</span><b>${esc(aff()||'未設定')}</b><button class="affE">変更</button></div>`;
 const NEXT=`<div class="nx"><b class="h">次は、11月6日ごろから</b>みなさんの声を反映した<b>配置案</b>をつくり、それに対して、もう一度声を集めます。そのときも、ぜひ声を聞かせてください。回答ページのQRコードは、またshakeに掲示します。</div>`;
 
@@ -300,13 +303,14 @@ function write(){ if(!aff()){ after=write; return join(); }
         return; } }
     b.disabled=true; b.textContent='送信中…';
     try{ const anon=el.querySelector('#an').checked; await send({action:'add',item:USER_ITEM,itemName:USER_ITEM,name:anon?'匿名':aff(),text:tx,voter:VOTER});
-      close(); await refresh(); progress(); thanks(); }
+      close(); notify('声のひろば：新しい提案',(anon?'匿名':aff())+'「'+tx+'」'); await refresh(); progress(); thanks(); }
     catch(_){ b.disabled=false; b.textContent='提案を出す'; toast('送れませんでした。もう一度お試しください'); } }; }
 
 function thanks(){ const el=document.createElement('div'); el.className='sheet';
   el.innerHTML=`<div class="in fade"><h2 style="margin-top:0">提案ありがとうございます！</h2><p class="lead" style="font-size:14.5px">あなたの提案は、ほかの参加者に届き、賛成・反対・保留で答えてもらえます。</p>${NEXT}<button class="btn or" id="tk">続ける</button></div>`;
   document.body.appendChild(el); const c=()=>el.remove(); el.querySelector('#tk').onclick=c; el.onclick=e=>{ if(e.target===el) c(); }; }
 function done(){ view='done'; $('#vbar').hidden=true; navShow(false); const M=mine();
+  { const nA=ALL.filter(c=>c.id in M).length; if(nA&&lget('shake-voice-notified',-1)!==nA){ lset('shake-voice-notified',nA); notify('声のひろば：回答が届きました',(aff()||'所属未設定')+'／'+ALL.length+'件中'+nA+'件に回答'); } }
   const rows=ALL.map(c=>({c,t:agg(c.id)})).filter(x=>x.t.n);
   const agree=rows.filter(x=>x.t.n>=MINN).sort((a,b)=>b.t.a/b.t.n-a.t.a/a.t.n).slice(0,3);
   const split=rows.filter(x=>x.t.n>=MINN).map(x=>({...x,s:Math.min(x.t.a,x.t.d)/x.t.n})).sort((a,b)=>b.s-a.s).filter(x=>x.s>.15).slice(0,3);
