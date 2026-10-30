@@ -110,7 +110,7 @@ window.VOICE_SEEDS=[["V01", "入りやすさ・案内", "通路やカフェ側�
 
 (function(){
 const API='https://script.google.com/macros/s/AKfycbyRuORVVgsWallk8rlNljpedJeqhnmB2PLUznZvqtWrK4YqQaDNm9GBNXC6d_3GbU3q/exec';
-const VKEY='shake3d-polis-voter', NKEY='shake3d-comment-name', AKEY='shake3d-comment-aff', DKEY='shake3d-comment-detail', MYV='shake3d-polis-myvotes', SKIPK='shake-voice-skip', RSK='shake-voice-reasons', PKEY='shake3d-polis-pending';
+const VKEY='shake3d-polis-voter', NKEY='shake3d-comment-name', AKEY='shake3d-comment-aff', DKEY='shake3d-comment-detail', MYV='shake3d-polis-myvotes', SKIPK='shake-voice-skip', RSK='shake-voice-reasons', PKEY='shake3d-polis-pending', WKEY='shake-voice-withdraw', RMK='shake-voice-rm', WD_ITEM='__withdraw';
 const MAXLEN=140, USER_ITEM='みんなの提案';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -132,11 +132,22 @@ const NEXT=`<div class="nx"><b class="h">次は、11月6日ごろから</b>み�
 /* ---------- API ---------- */
 async function list(){ for(let k=0;k<3;k++){ try{ const r=await fetch(API+'?action=list&voter='+encodeURIComponent(VOTER)+'&t='+Date.now()); return JSON.parse(await r.text()); }catch(_){ await new Promise(z=>setTimeout(z,800*(k+1))); } } throw new Error('list'); }
 async function send(o){ for(let k=0;k<3;k++){ try{ const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)}); return JSON.parse(await r.text()); }catch(e){ if(k===2) throw e; await new Promise(z=>setTimeout(z,900*(k+1))); } } }
-async function flush(){ const Q=lget(PKEY,{}); for(const sid of Object.keys(Q)){ try{ const r=await send({action:'vote',id:sid,voter:VOTER,vote:Q[sid]}); if(r&&r.ok){ const Q2=lget(PKEY,{}); if(Q2[sid]===Q[sid]){ delete Q2[sid]; lset(PKEY,Q2); } } }catch(_){ return; } } }
+async function flush(){ const Q=lget(PKEY,{}); for(const sid of Object.keys(Q)){ try{ const r=await send({action:'vote',id:sid,voter:VOTER,vote:Q[sid]}); if(r&&r.ok){ const Q2=lget(PKEY,{}); if(Q2[sid]===Q[sid]){ delete Q2[sid]; lset(PKEY,Q2); } } }catch(_){ return; } } 
+  await flushW(); }
+// 回答の取り消し：「取り消し」の印を記録し、集計からその回答を外す
+const INF={};
+function rmQ(id){ const R=lget(RMK,[]); if(!R.includes(id)){ R.push(id); lset(RMK,R); } }
+async function flushW(){ const W=lget(WKEY,{});
+  for(const sid of Object.keys(W)){ if(W[sid]!=='q'||INF[sid]) continue; INF[sid]=1;
+    try{ const r=await send({action:'add',item:WD_ITEM,itemName:WD_ITEM,name:VOTER,text:sid,voter:VOTER}); const W2=lget(WKEY,{});
+      if(r&&r.ok&&r.id){ if(W2[sid]==='q'){ W2[sid]=r.id; lset(WKEY,W2); } else rmQ(r.id); } }catch(_){}
+    delete INF[sid]; }
+  for(const id of lget(RMK,[])){ try{ const r=await send({action:'remove',id,voter:VOTER}); if(r) lset(RMK,lget(RMK,[]).filter(x=>x!==id)); }catch(_){ return; } } }
 async function refresh(){ try{ await flush(); }catch(_){}
   try{ const j=await list(); const V={}; (j.votes||[]).forEach(([u,s,v])=>{ (V[s]=V[s]||{})[u]=+v; });
     const user=(j.comments||[]).filter(c=>c&&!c.hidden&&!c.parent&&c.item===USER_ITEM&&!['095b32d5'].includes(c.id)).map(c=>({id:c.id,cat:'みんなの提案',text:c.text,by:dispName(c.name),at:c.at,user:true,own:!!c.own}));
-    ALL=SEEDS.concat(user); VOTES=V; loaded=true; }catch(e){ console.warn(e); }
+    (j.comments||[]).forEach(w=>{ if(w&&w.item===WD_ITEM&&V[w.text]) delete V[w.text][w.name]; }); ALL=SEEDS.concat(user); VOTES=V; loaded=true; }catch(e){ console.warn(e); }
+  Object.keys(lget(WKEY,{})).forEach(s=>{ if(VOTES[s]) delete VOTES[s][VOTER]; });
   const M=mine(); Object.entries(M).forEach(([s,v])=>{ (VOTES[s]=VOTES[s]||{})[VOTER]=v; }); }
 function agg(sid){ const V=VOTES[sid]||{}; let a=0,d=0,p=0; Object.values(V).forEach(v=>{ if(v>0)a++; else if(v<0)d++; else p++; }); return {a,d,p,n:a+d+p}; }
 const pc=(x,n)=>n?Math.round(x/n*100):0;
@@ -219,17 +230,22 @@ function card(c){ view='card'; cur=c; $('#vbar').hidden=false; navShow(true); co
   $('#affT').textContent=aff()||'未設定';
   $('#vbar').querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('sel',mv!==undefined&&+b.dataset.v===mv)); $('#vbar').classList.toggle('has',mv!==undefined);
   const img=c.seed&&IMG[c.img||c.id];
-  show(`<div class="meta"><span class="tag${c.user?' u':''}">${esc(c.cat)}</span><span>${c.user?esc(c.by)+' さんの提案':'これまでの声から'}</span><span style="margin-left:auto">${IDX+1} / ${order().length}</span></div>${mv!==undefined?`<div class="note" style="margin:0 0 6px">✓ 回答ずみ（あなた：${mv>0?'賛成':mv<0?'反対':'保留'}）。押し直すと変えられます</div>`:''}
+  show(`<div class="meta"><span class="tag${c.user?' u':''}">${esc(c.cat)}</span><span>${c.user?esc(c.by)+' さんの提案':'これまでの声から'}</span><span style="margin-left:auto">${IDX+1} / ${order().length}</span></div>${mv!==undefined?`<div class="note" style="margin:0 0 6px">✓ 回答ずみ（あなた：${mv>0?'賛成':mv<0?'反対':'保留'}）。ほかのボタンで答えを変えられます。同じボタンをもう一度押すと、未回答に戻ります</div>`:''}
    <div class="stmt">${esc(c.text)}</div>
    ${c.seed?`<div class="story"><div class="h">なぜ、この提案？</div><p>${esc(c.story)}</p>${img?`<figure><img src="${img}" alt="3Dモデルでの配置の一例"><figcaption>配置の一例（3Dモデル）</figcaption></figure>`:''}</div>`
      :`<div class="story"><div class="h">みんなの提案</div><p>参加した人が書いた提案です。あなたはどう思いますか？</p></div>`}
    <div style="height:200px"></div>`); }
 
 async function vote(v){ const c=cur; if(!c) return;
+  if(view==='card'&&mine()[c.id]===v) return withdraw(c);
+  { const W=lget(WKEY,{}); if(c.id in W){ if(W[c.id]!=='q') rmQ(W[c.id]); delete W[c.id]; lset(WKEY,W); } }
   const M=mine(); M[c.id]=v; lset(MYV,M); (VOTES[c.id]=VOTES[c.id]||{})[VOTER]=v;
   const Q=lget(PKEY,{}); Q[c.id]=v; lset(PKEY,Q); flush();
   afterVote(c,v); }
 
+function withdraw(c){ const M=mine(); delete M[c.id]; lset(MYV,M); if(VOTES[c.id]) delete VOTES[c.id][VOTER];
+  const Q=lget(PKEY,{}); delete Q[c.id]; lset(PKEY,Q); const W=lget(WKEY,{}); if(!(c.id in W)){ W[c.id]='q'; lset(WKEY,W); } flush();
+  toast('回答を取り消しました'); card(c); }
 function afterVote(c,v){ view='after'; $('#vbar').hidden=true; navShow(true); const t=agg(c.id);
   const lab=v>0?['賛成','var(--ag)']:v<0?['反対','var(--dg)']:['保留','var(--ps)'];
   const ask=v>0?'賛成の理由や、こうするともっといい、があれば':v<0?'反対の理由や、こうすればいい、があれば':'迷った理由や、気になることがあれば';
