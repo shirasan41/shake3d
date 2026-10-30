@@ -126,7 +126,7 @@ async function send(o){ for(let k=0;k<3;k++){ try{ const r=await fetch(API,{meth
 async function flush(){ const Q=lget(PKEY,{}); for(const sid of Object.keys(Q)){ try{ const r=await send({action:'vote',id:sid,voter:VOTER,vote:Q[sid]}); if(r&&r.ok){ const Q2=lget(PKEY,{}); if(Q2[sid]===Q[sid]){ delete Q2[sid]; lset(PKEY,Q2); } } }catch(_){ return; } } }
 async function refresh(){ try{ await flush(); }catch(_){}
   try{ const j=await list(); const V={}; (j.votes||[]).forEach(([u,s,v])=>{ (V[s]=V[s]||{})[u]=+v; });
-    const user=(j.comments||[]).filter(c=>c&&!c.hidden&&!c.parent&&c.item===USER_ITEM).map(c=>({id:c.id,cat:'みんなの提案',text:c.text,by:dispName(c.name),at:c.at,user:true,own:!!c.own}));
+    const user=(j.comments||[]).filter(c=>c&&!c.hidden&&!c.parent&&c.item===USER_ITEM&&!['095b32d5'].includes(c.id)).map(c=>({id:c.id,cat:'みんなの提案',text:c.text,by:dispName(c.name),at:c.at,user:true,own:!!c.own}));
     ALL=SEEDS.concat(user); VOTES=V; loaded=true; }catch(e){ console.warn(e); }
   const M=mine(); Object.entries(M).forEach(([s,v])=>{ (VOTES[s]=VOTES[s]||{})[VOTER]=v; }); }
 function agg(sid){ const V=VOTES[sid]||{}; let a=0,d=0,p=0; Object.values(V).forEach(v=>{ if(v>0)a++; else if(v<0)d++; else p++; }); return {a,d,p,n:a+d+p}; }
