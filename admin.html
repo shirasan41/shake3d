@@ -89,8 +89,8 @@ const reasonsOf=c=>RS.filter(r=>c.base?rkey(r)===c.item:(c.id==='Q06'&&r.item===
 const barH=t=>`<div class="bar"><i class="a" style="width:${pc(t.a,t.n)}%"></i><i class="d" style="width:${pc(t.d,t.n)}%"></i><i class="p" style="width:${pc(t.p,t.n)}%"></i></div>`;
 async function load(){ document.getElementById('upd').textContent='読み込み中…';
   try{ const [l,s]=await Promise.all([fetch(API+'?action=list&voter=admin&t='+Date.now()).then(r=>r.json()), fetch(API+'?action=summary&t='+Date.now()).then(r=>r.json()).catch(()=>null)]);
-    const CM=(l.comments||[]).filter(c=>c&&!c.hidden&&!c.parent); RS=CM.filter(isR);
-    VOTES={}; (l.votes||[]).forEach(([u,sid,v])=>{ (VOTES[sid]=VOTES[sid]||{})[u]=+v; });
+    const CM=(l.comments||[]).filter(c=>c&&!c.hidden&&!c.parent&&c.item!=='__withdraw'); RS=CM.filter(isR);
+    VOTES={}; (l.votes||[]).forEach(([u,sid,v])=>{ (VOTES[sid]=VOTES[sid]||{})[u]=+v; }); (l.comments||[]).forEach(w=>{ if(w&&w.item==='__withdraw'&&VOTES[w.text]) delete VOTES[w.text][w.name]; });
     ST=BASE.map(b=>Object.assign({base:true},b)).concat(SEEDS.map(([id,item,text])=>({id,item,text,seed:true})).filter(c=>c.id!=='Q04'||agg('Q04').n),CM.filter(c=>!isR(c)));
     SUM=(s&&s.ok&&s.bySid)?s:null; analyze(); render();
     document.getElementById('upd').textContent='最終更新 '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+(SUM?'':'（所属別の集計は準備中）');
