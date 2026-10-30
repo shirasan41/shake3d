@@ -7097,7 +7097,7 @@ const HANDS_VENUES=HANDS_VENUES_B, HANDS_PEOPLE=HANDS_PEOPLE_B;
   };
   async function refresh(){
     try{ await flush(); }catch(_){}
-    try{ const r=await api.list(); const CM=(r.comments||[]).filter(c=>c && !c.hidden && !c.parent); REASONS=CM.filter(isReason); ALL=(FESTIVAL?[]:baseList()).concat(SEEDS,CM.filter(c=>!isReason(c))); VOTES=r.votes||{}; loaded=true;
+    try{ const r=await api.list(); const CM=(r.comments||[]).filter(c=>c && !c.hidden && !c.parent && c.item!=='__withdraw'); REASONS=CM.filter(isReason); ALL=(FESTIVAL?[]:baseList()).concat(SEEDS,CM.filter(c=>!isReason(c))); VOTES=r.votes||{}; loaded=true;
       const M=mine(); Object.entries(M).forEach(([sid,v])=>{ (VOTES[sid]=VOTES[sid]||{})[VOTER]=v; });   // 自分の票は手元を優先
     }catch(e){ console.warn('comments',e); }
     analyze(); updateBadges(); renderList(); renderThread();
