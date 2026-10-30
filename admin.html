@@ -60,7 +60,7 @@ const KEEP='片付け・管理のこと', OLD=new Set(['19597d30','df251c88','40
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const isR=c=>/^【理由】/.test(c.item||'')||c.item===KEEP||OLD.has(c.id), rkey=c=>String(c.item||'').replace(/^【理由】/,'');
 const tags=t=>{ const m=/^［([^］]*)］\s*/.exec(t||''); return m?{t:m[1].split('・').filter(Boolean),b:t.slice(m[0].length)}:{t:[],b:t||''}; };
-let ST=[], VOTES={}, RS=[], SUM=null, scope='all', sort='walk', who='all', open=new Set();
+let ST=[], VOTES={}, RS=[], SUM=null, scope='voice', sort='walk', who='all', open=new Set();
 function agg(sid,mem){ const V=VOTES[sid]||{}; let a=0,d=0,p=0; for(const [u,v] of Object.entries(V)){ if(mem&&!mem.has(u)) continue; if(v>0)a++; else if(v<0)d++; else p++; } return {a,d,p,n:a+d+p}; }
 function aggW(sid){ if(who==='all'||!SUM) return agg(sid); const x=(SUM.bySid[sid]||{})[who]||[0,0,0]; return {a:x[0],d:x[1],p:x[2],n:x[0]+x[1]+x[2]}; }
 const pc=(x,n)=>n?Math.round(x*100/n):0;
@@ -82,7 +82,7 @@ function analyze(){ AN={groups:[],ok:false,P:0}; SEED=12345; const sids=ST.map(c
 function repness(sid,g){ const t=agg(sid,g.members); const rest=new Set(); AN.groups.forEach(h=>{ if(h!==g) h.members.forEach(u=>rest.add(u)); }); const o=agg(sid,rest);
   const pa=(t.a+1)/(t.n+2), pd=(t.d+1)/(t.n+2), ra=pa/((o.a+1)/(o.n+2)), rd=pd/((o.d+1)/(o.n+2)); return ra*pa>=rd*pd?{s:ra*pa,dir:1,r:ra,p:pa}:{s:rd*pd,dir:-1,r:rd,p:pd}; }
 const div=t=>t.n<4?0:Math.min(t.a,t.d)/t.n;
-const kind=c=>c.base?(c.zone?'zone':/新しく/.test(c.tag)?'new':'old'):'opn';
+const kind=c=>(/^V\d/.test(c.id)||c.item==='みんなの提案')?'voice':c.base?(c.zone?'zone':/新しく/.test(c.tag)?'new':'old'):'opn';
 const tagHTML=c=>c.base?(c.zone?'<span class="tg">場所</span>':/新しく/.test(c.tag)?'<span class="tg n">新しく買う</span>':'<span class="tg o">今ある</span>'):'<span class="tg q">'+(c.seed?'方針':'意見')+'</span>';
 const title=c=>c.base?c.item:c.text;
 const reasonsOf=c=>RS.filter(r=>c.base?rkey(r)===c.item:(c.id==='Q06'&&r.item===KEEP));
@@ -103,7 +103,7 @@ function render(){
   const top=(f,s,lab,col)=>{ const L=pool.map(([c,t])=>[c,t,f(t)]).filter(x=>x[2]>0).sort((a,b)=>b[2]-a[2]).slice(0,5);
     return `<div class="box"><h3><i style="background:${col}"></i>${lab}</h3>`+(L.length?L.map(([c,t,v])=>`<div class="mini" data-go="${esc(c.id)}"><span class="nm">${tagHTML(c)}${esc(title(c))}</span><span class="v" style="color:${col}">${s(t,v)}</span></div>`).join(''):'<div class="empty">まだありません</div>')+'</div>'; };
   document.getElementById('hl').innerHTML=top(t=>t.a/t.n>=.6?t.a/t.n+t.n/1000:0,(t)=>`賛成${pc(t.a,t.n)}%（${t.n}人）`,'みんなが賛成しやすい','var(--g)')+top(t=>t.d/t.n>=.3?t.d/t.n+t.n/1000:0,(t)=>`反対${pc(t.d,t.n)}%（${t.n}人）`,'反対が多い','var(--r)')+top(t=>div(t)>=.2?div(t):0,(t)=>`賛${pc(t.a,t.n)}／反${pc(t.d,t.n)}`,'意見が分かれている','var(--o)')+top(t=>t.p/t.n>=.3?t.p/t.n+t.n/1000:0,(t)=>`保留${pc(t.p,t.n)}%`,'保留が多い（迷い・説明不足？）','#7A857C');
-  const S=[['all','ぜんぶ'],['zone','場所'],['new','新しく買う'],['old','今ある'],['opn','方針・意見']];
+  const S=[['voice','声のひろば'],['all','ぜんぶ'],['zone','場所'],['new','新しく買う'],['old','今ある'],['opn','方針・意見']];
   const SO=[['walk','配置の順'],['n','回答が多い順'],['a','賛成が多い順'],['d','反対が多い順'],['p','保留が多い順'],['div','分かれている順'],['r','理由が多い順']];
   const W=[['all','全員'],['学生','学生'],['卒業生','卒業生'],['一般','一般']];
   document.getElementById('ctl').innerHTML=S.map(([k,l])=>`<button class="chip${scope===k?' on':''}" data-sc="${k}">${l}</button>`).join('')+`<span class="lb">並べ方</span><select id="so">${SO.map(([k,l])=>`<option value="${k}"${sort===k?' selected':''}>${l}</option>`).join('')}</select>`+(SUM?`<span class="lb">だれの回答</span><select id="who">${W.map(([k,l])=>`<option value="${k}"${who===k?' selected':''}>${l}</option>`).join('')}</select>`:'');
