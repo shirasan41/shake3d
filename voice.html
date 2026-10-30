@@ -161,6 +161,7 @@ function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); 
 function intro(){ view='intro'; $('#vbar').hidden=true; navShow(false);
   show(`<h1>新しいshakeに、<br>あなたの声を。</h1>
   <p class="lead">「shake」は来年で開設10年。2027年4月に新しくなります。これまでに集まった声から生まれた提案に、答えてください。</p>
+  <div class="story" style="margin:16px 0"><div class="h">はじめての方へ　shake（シェイク）って、どんな場所？</div>${IMG.Q06?`<figure><img src="${IMG.Q06}" alt="shakeの全体（3Dモデル）"><figcaption>shakeの全体（3Dモデル）</figcaption></figure>`:''}<p style="margin-top:12px">名城大学 ナゴヤドーム前キャンパス 西館2階にある「社会連携ゾーン shake」は、学生も、教職員も、地域や企業の人も使える共創スペースです。</p><ul style="margin:0 16px 14px;padding-left:1.2em;font-size:14.5px;line-height:1.7"><li>毎日 9:00〜21:00、予約なしで、だれでもふらっと使えます</li><li>交流、ミーティング、勉強会、ひとりで読書など、使い方は自由です</li><li>常駐のスタッフはいません。使う人どうしで場をつくっています</li><li>学生団体の活動の拠点にもなっています</li></ul></div>
   <div class="box"><ul class="steps">
    <li><b class="n">1</b><span>提案と、その<b>背景</b>を読む</span></li>
    <li><b class="n">2</b><span><b>賛成・反対・保留</b>のボタンで答える</span></li>
