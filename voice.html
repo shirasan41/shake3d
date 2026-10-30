@@ -51,9 +51,15 @@ select{width:100%;font:inherit;font-size:16px;padding:12px;border-radius:12px;bo
 .vb button:active{transform:translateY(3px);box-shadow:none}
 .vb .a{background:var(--ag)}.vb .d{background:var(--dg)}.vb .p{background:var(--ps)}
 .vb small{display:block;font-size:11px;font-weight:700;opacity:.9}
-.sub2{display:flex;justify-content:space-between;margin-top:8px;font-size:13px}
+.sub2{margin-top:8px;font-size:13px}
 .sub2 button{background:none;border:0;color:var(--sub);font-weight:700;padding:4px 2px;text-decoration:underline}
-.sub2 .wr{color:var(--or)}
+.sub2 .wr{display:block;width:100%;background:#fff;border:2px solid var(--or);color:var(--or);border-radius:14px;padding:11px 8px;font-size:16px;font-weight:900;text-decoration:none}
+.sub3{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px}
+#affB{max-width:62%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.affl{background:var(--soft);border-radius:12px;padding:10px 12px;margin:10px 0;font-size:13.5px;display:flex;align-items:center;gap:8px}
+.affl b{flex:1}.affl button{border:1.5px solid var(--ink);background:#fff;border-radius:20px;padding:4px 12px;font-size:12.5px;font-weight:800;white-space:nowrap}
+.nx{background:#FFF4E5;border:1.5px solid var(--or);border-radius:14px;padding:12px 14px;margin:14px 0;font-size:14px;line-height:1.7}
+.nx b.h{display:block;color:var(--or);font-size:14.5px;margin-bottom:2px}
 /* after vote */
 .res{margin:6px 0 14px}
 .bar{display:flex;height:12px;border-radius:8px;overflow:hidden;background:var(--line)}
@@ -93,7 +99,7 @@ a{color:var(--ink)}
 <div class="wrap" id="app"></div>
 <div class="votes" id="vbar" hidden><div class="in">
   <div class="vb"><button class="a" data-v="1">賛成</button><button class="d" data-v="-1">反対</button><button class="p" data-v="0">保留<small>わからない</small></button></div>
-  <div class="sub2"><button id="fin">回答を終える</button><button class="wr" id="wr">✏️ 自分の提案を書く</button></div>
+  <div class="sub2"><button class="wr" id="wr">✏️ 自分の提案を書く</button><div class="sub3"><button id="fin">回答を終える</button><button id="affB">所属：<span id="affT"></span> ✎</button></div></div>
 </div></div>
 <button class="nav l" id="prv" hidden aria-label="前の提案へ">◀︎</button><button class="nav r" id="nxt" hidden aria-label="次の提案へ">▶︎</button>
 <div class="toast" id="toast"></div>
@@ -119,6 +125,9 @@ const dispName=s=>{ if(!s) return '匿名'; const m=String(s).match(/（([^（�
 let ALL=SEEDS.slice(), VOTES={}, loaded=false, view='intro', cur=null, JD=lget(DKEY,{})||{}, after=null;
 const mine=()=>lget(MYV,{});
 const aff=()=>lget(AKEY,'');
+function editAff(back){ after=back; join(); }
+const affLine=()=>`<div class="affl"><span>あなたの所属</span><b>${esc(aff()||'未設定')}</b><button class="affE">変更</button></div>`;
+const NEXT=`<div class="nx"><b class="h">次は、11月6日ごろから</b>みなさんの声を反映した<b>配置案</b>をつくり、それに対して、もう一度声を集めます。そのときも、ぜひ声を聞かせてください。回答ページのQRコードは、またshakeに掲示します。</div>`;
 
 /* ---------- API ---------- */
 async function list(){ for(let k=0;k<3;k++){ try{ const r=await fetch(API+'?action=list&voter='+encodeURIComponent(VOTER)+'&t='+Date.now()); return JSON.parse(await r.text()); }catch(_){ await new Promise(z=>setTimeout(z,800*(k+1))); } } throw new Error('list'); }
@@ -145,9 +154,11 @@ function finish(){ const U=unanswered(); if(!U.length) return done();
   el.innerHTML=`<div class="in fade"><h2 style="margin-top:0">まだ答えていない提案が、${U.length}件あります</h2>
    <div style="max-height:34vh;overflow:auto;margin:8px 0 14px">${U.slice(0,30).map(c=>`<div class="ri" style="padding:9px 12px;margin:6px 0;font-size:14px;font-weight:700">${esc(c.text)}</div>`).join('')}</div>
    <p class="lead" style="font-size:14px">これで回答を終えますか？　答えていない提案は、あとからでも答えられます。</p>
+   ${affLine()}<p class="note" style="margin:0">回答は、この所属で送っています。ちがっていたら「変更」から直せます。</p>
    <div class="row2" style="margin-top:12px"><button class="btn ghost" id="fe">これで終える</button><button class="btn or" id="fb">答えに戻る</button></div></div>`;
   document.body.appendChild(el);
   el.querySelector('#fe').onclick=()=>{ el.remove(); done(); };
+  el.querySelector('.affE').onclick=()=>{ el.remove(); editAff(finish); };
   el.querySelector('#fb').onclick=()=>{ el.remove(); const L=order(); go(L.indexOf(U[0])); };
   el.onclick=e=>{ if(e.target===el) el.remove(); }; }
 function progress(){ const M=mine(); const done=ALL.filter(c=>c.id in M).length; const tot=ALL.length;
@@ -166,7 +177,7 @@ function intro(){ view='intro'; $('#vbar').hidden=true; navShow(false);
    <li><b class="n">1</b><span>提案と、その<b>背景</b>を読む</span></li>
    <li><b class="n">2</b><span><b>賛成・反対・保留</b>のボタンで答える</span></li>
    <li><b class="n">3</b><span>言いたいことがあれば、<b>あなたの提案</b>を書く。ほかの人がそれに答えます</span></li></ul>
-   <div class="tl"><div class="now">10〜11月<br>声を集める</div><div>12月<br>声を反映した<br>配置案をつくる</div><div>2027年4月<br>新しいshakeへ</div></div></div>
+   <div class="tl"><div class="now">10〜11月<br>声を集める</div><div>11月6日ごろ〜<br>配置案に、<br>もう一度声を</div><div>2027年4月<br>新しいshakeへ</div></div></div>
   <button class="btn or" id="go">はじめる（約3分）</button>
   <p class="note">学生・教職員のみなさんも、学外のみなさんも大歓迎です。どの提案から答えても、途中でやめても大丈夫。</p>`);
   $('#go').onclick=()=>{ aff()?go(firstOpen()):join(); }; }
@@ -182,7 +193,7 @@ function join(){ view='join'; $('#vbar').hidden=true; navShow(false); const d=JD
   if(d.type==='alum') h+=`<div class="q">在学していたときの学部</div>${fac(1)}`;
   if(d.type==='gen'){ const g=d.gens||[]; const mc=(v,l)=>`<button class="ch${g.includes(v)?' on':''}" data-g="${v}">${g.includes(v)?'✓ ':''}${l}</button>`;
     h+=`<div class="q">あてはまるもの（いくつでも）</div><div class="chs">${mc('shelf','📚 シェア本棚オーナー')}${mc('partner','🤝 shakeパートナーシップ団体')}${mc('other','そのほかの方')}</div>`; }
-  h+=`<div style="margin-top:22px"><button class="btn or" id="ok">次へ</button></div>
+  h+=`<div style="margin-top:22px"><button class="btn or" id="ok">${after?'この所属で保存する':'次へ'}</button></div>
    <p class="note">🔒 賛成・反対・保留の回答は、だれが答えたかは表示されません。あなたが提案を書いたときだけ、所属（例：「都市情報学部・学生」）が表示されます（提案ごとに匿名にもできます）。</p>`;
   show(h);
   app.querySelectorAll('[data-k][data-v]').forEach(b=>b.onclick=()=>{ JD[b.dataset.k]=b.dataset.v; if(b.dataset.k==='type'){ delete JD.fac; delete JD.dep; delete JD.gens; } join(); });
@@ -205,13 +216,14 @@ function affOf(d){ const fac=d.fac||'';
 function next(){ go(IDX+1); }
 
 function card(c){ view='card'; cur=c; $('#vbar').hidden=false; navShow(true); const mv=mine()[c.id];
+  $('#affT').textContent=aff()||'未設定';
   $('#vbar').querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('sel',mv!==undefined&&+b.dataset.v===mv)); $('#vbar').classList.toggle('has',mv!==undefined);
   const img=c.seed&&IMG[c.img||c.id];
   show(`<div class="meta"><span class="tag${c.user?' u':''}">${esc(c.cat)}</span><span>${c.user?esc(c.by)+' さんの提案':'これまでの声から'}</span><span style="margin-left:auto">${IDX+1} / ${order().length}</span></div>${mv!==undefined?`<div class="note" style="margin:0 0 6px">✓ 回答ずみ（あなた：${mv>0?'賛成':mv<0?'反対':'保留'}）。押し直すと変えられます</div>`:''}
    <div class="stmt">${esc(c.text)}</div>
    ${c.seed?`<div class="story"><div class="h">なぜ、この提案？</div><p>${esc(c.story)}</p>${img?`<figure><img src="${img}" alt="3Dモデルでの配置の一例"><figcaption>配置の一例（3Dモデル）</figcaption></figure>`:''}</div>`
      :`<div class="story"><div class="h">みんなの提案</div><p>参加した人が書いた提案です。あなたはどう思いますか？</p></div>`}
-   <div style="height:150px"></div>`); }
+   <div style="height:200px"></div>`); }
 
 async function vote(v){ const c=cur; if(!c) return;
   const M=mine(); M[c.id]=v; lset(MYV,M); (VOTES[c.id]=VOTES[c.id]||{})[VOTER]=v;
@@ -272,30 +284,35 @@ function write(){ if(!aff()){ after=write; return join(); }
         return; } }
     b.disabled=true; b.textContent='送信中…';
     try{ const anon=el.querySelector('#an').checked; await send({action:'add',item:USER_ITEM,itemName:USER_ITEM,name:anon?'匿名':aff(),text:tx,voter:VOTER});
-      close(); toast('提案を出しました！'); await refresh(); progress(); }
+      close(); await refresh(); progress(); thanks(); }
     catch(_){ b.disabled=false; b.textContent='提案を出す'; toast('送れませんでした。もう一度お試しください'); } }; }
 
+function thanks(){ const el=document.createElement('div'); el.className='sheet';
+  el.innerHTML=`<div class="in fade"><h2 style="margin-top:0">提案ありがとうございます！</h2><p class="lead" style="font-size:14.5px">あなたの提案は、ほかの参加者に届き、賛成・反対・保留で答えてもらえます。</p>${NEXT}<button class="btn or" id="tk">続ける</button></div>`;
+  document.body.appendChild(el); const c=()=>el.remove(); el.querySelector('#tk').onclick=c; el.onclick=e=>{ if(e.target===el) c(); }; }
 function done(){ view='done'; $('#vbar').hidden=true; navShow(false); const M=mine();
   const rows=ALL.map(c=>({c,t:agg(c.id)})).filter(x=>x.t.n);
   const agree=rows.filter(x=>x.t.n>=MINN).sort((a,b)=>b.t.a/b.t.n-a.t.a/a.t.n).slice(0,3);
   const split=rows.filter(x=>x.t.n>=MINN).map(x=>({...x,s:Math.min(x.t.a,x.t.d)/x.t.n})).sort((a,b)=>b.s-a.s).filter(x=>x.s>.15).slice(0,3);
   const my=v=>v===undefined?'':`<span class="my" style="background:${v>0?'var(--ag)':v<0?'var(--dg)':'var(--ps)'}">あなた：${v>0?'賛成':v<0?'反対':'保留'}</span>`;
   const item=x=>`<div class="ri"><div class="t">${esc(x.c.text)}${my(M[x.c.id])}</div>${barHTML(x.t)}</div>`;
-  show(`<h1>ありがとう！</h1><p class="lead">${unanswered().length?'回答ありがとうございました。':'いまある提案に、すべて答えました。'}みんなの答えは、12月に<b>声を反映した配置案</b>をつくるときに使います。</p>
-   <button class="btn or" id="w2" style="margin-top:16px">✏️ 自分の提案を書く</button>
+  show(`<h1>ありがとう！</h1><p class="lead">${unanswered().length?'回答ありがとうございました。':'いまある提案に、すべて答えました。'}みんなの答えは、<b>声を反映した配置案</b>をつくるときに使います。</p>
+   ${NEXT}${affLine()}
+   <button class="btn or" id="w2" style="margin-top:6px">✏️ 自分の提案を書く</button>
    ${agree.length?`<h2>多くの人が賛成している提案</h2>${agree.map(item).join('')}`:''}
    ${split.length?`<h2>意見が分かれている提案</h2>${split.map(item).join('')}`:''}
    <h2>すべての提案</h2>${ALL.map(c=>({c,t:agg(c.id)})).map(item).join('')}
    <div style="margin:24px 0 8px;display:grid;gap:10px">${unanswered().length?`<button class="btn ghost" id="rsk">答えていない提案に答える（${unanswered().length}件）</button>`:''}<button class="btn ghost" id="rv">最初の提案から見直す</button>
    <a class="btn ghost" href="./?hands">3Dモデルで、shakeの配置の一例を見る</a></div>
    <p class="note">新しい提案が出たら、またこのページで答えられます。</p>`);
-  $('#w2').onclick=write; const r=$('#rsk'); if(r) r.onclick=()=>go(firstOpen()); $('#rv').onclick=()=>go(0); }
+  $('#w2').onclick=write; app.querySelector('.affE').onclick=()=>editAff(done); const r=$('#rsk'); if(r) r.onclick=()=>go(firstOpen()); $('#rv').onclick=()=>go(0); }
 
 $('#vbar').querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>vote(+b.dataset.v));
 $('#fin').onclick=finish;
 $('#prv').onclick=()=>go(IDX-1); $('#nxt').onclick=()=>go(IDX+1);
 function navShow(on){ $('#prv').hidden=!on; $('#nxt').hidden=!on; if(on){ $('#prv').style.visibility=IDX>0?'visible':'hidden'; } }
 $('#wr').onclick=write;
+$('#affB').onclick=()=>editAff(()=>go(IDX));
 $('#mineBtn').onclick=()=>{ const L=ALL.filter(c=>c.user&&c.own); const el=document.createElement('div'); el.className='sheet';
   const draw=()=>{ const L=ALL.filter(c=>c.user&&c.own); el.innerHTML=`<div class="in fade"><button class="x" aria-label="閉じる">×</button><h2 style="margin-top:0">あなたが出した提案</h2>`+
     (L.length?L.map(c=>`<div class="ri"><div class="t">${esc(c.text)}</div>${barHTML(agg(c.id))}<div style="text-align:right;margin-top:8px"><button class="btn ghost" data-rm="${esc(c.id)}" style="display:inline-block;width:auto;font-size:13px;padding:6px 14px">取り下げる</button></div></div>`).join(''):'<p class="lead">この端末から出した提案は、まだありません。</p>')+
