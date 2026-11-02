@@ -342,7 +342,15 @@ $('#mineBtn').onclick=()=>{ const L=ALL.filter(c=>c.user&&c.own); const el=docum
       try{ await send({action:'remove',id:b.dataset.rm,voter:VOTER}); ALL=ALL.filter(x=>x.id!==b.dataset.rm); toast('取り下げました'); draw(); progress(); }catch(_){ toast('取り下げられませんでした'); b.disabled=false; b.textContent='取り下げる'; } }); };
   el.onclick=e=>{ if(e.target===el) el.remove(); }; draw(); document.body.appendChild(el); };
 
-intro(); refresh().then(()=>{ if(view==='intro'||view==='done') progress(); if(view==='done') done(); });
+// メンテナンス中（?preview を付けると通常どおり動く）
+const MAINT=true;
+function maint(){ view='maint'; $('#vbar').hidden=true; navShow(false); $('#mineBtn').hidden=true;
+  app.innerHTML=`<div class="fade" style="text-align:center;padding-top:36px"><div style="font-size:52px">🛠️</div><h1 style="font-size:24px">ただいま<br>メンテナンス中です</h1>
+   <p class="lead">より多くの方の声を集められるよう、「声のひろば」を新しくしています。<br>準備ができしだい、再開します。</p>
+   <div class="box" style="text-align:left;margin-top:18px"><p style="margin:0;font-size:14px;line-height:1.8">学祭で答えてくださったみなさん、ありがとうございました。いただいた声は、新しいshakeの配置案づくりに大切に使います。</p></div>
+   <p class="note" style="margin-top:18px">名城大学 社会連携ゾーン shake</p></div>`; }
+if(MAINT&&!/[?&]preview/.test(location.search)) maint();
+else { intro(); refresh().then(()=>{ if(view==='intro'||view==='done') progress(); if(view==='done') done(); }); }
 })();
 </script>
 </body>
