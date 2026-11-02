@@ -92,6 +92,14 @@ a{color:var(--ink)}
 @media(min-width:600px){.nav.l{left:calc(50% - 300px)}.nav.r{right:calc(50% - 300px)}}
 .vb button.sel{outline:4px solid var(--ink);outline-offset:2px}.votes.has .vb button:not(.sel){opacity:.55}
 .wrap{padding-left:max(16px,40px);padding-right:max(16px,40px)}
+.pt{background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px}.pt b{display:block;color:var(--or);font-size:14.5px}.pt span{font-size:14px;line-height:1.6}
+.consent{background:#EAF3EE;color:#1F5A3B;border-radius:12px;padding:12px 14px;font-size:13px;font-weight:700;line-height:1.7;margin:14px 0}
+.opt{font-size:11px;color:var(--sub);font-weight:700;border:1px solid var(--line);border-radius:10px;padding:0 6px;margin-left:4px}
+.sc{display:grid;gap:6px}.sc button{display:flex;align-items:center;gap:10px;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;font-size:14.5px;font-weight:700}
+.sc button i{font-style:normal;color:var(--line)}.sc button.on{border-color:var(--ink);background:var(--ink);color:#fff}.sc button.on i{color:var(--or)}
+.ax{display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;color:var(--sub);margin-bottom:6px}.ax span{max-width:46%}.ax span:last-child{text-align:right}
+.axb{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.axb button{height:46px;border:1.5px solid var(--line);background:#fff;border-radius:12px;font-size:11px;font-weight:800;color:var(--sub)}.axb button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.stp{display:flex;gap:6px;margin-top:18px}.stp i{flex:1;height:5px;border-radius:5px;background:var(--line)}.stp i.on{background:var(--or)}
 </style>
 </head>
 <body>
@@ -99,7 +107,7 @@ a{color:var(--ink)}
 <div class="wrap" id="app"></div>
 <div class="votes" id="vbar" hidden><div class="in">
   <div class="vb"><button class="a" data-v="1">賛成</button><button class="d" data-v="-1">反対</button><button class="p" data-v="0">保留<small>わからない</small></button></div>
-  <div class="sub2"><button class="wr" id="wr">✏️ 自分の提案を書く</button><div class="sub3"><button id="fin">回答を終える</button><button id="affB">所属：<span id="affT"></span> ✎</button></div></div>
+  <div class="sub2"><button class="wr" id="wr">✏️ 自分の提案を書く</button><div class="sub3"><button id="fin">回答を終える</button><button id="affB">回答者情報 ✎</button></div></div>
 </div></div>
 <button class="nav l" id="prv" hidden aria-label="前の提案へ">◀︎</button><button class="nav r" id="nxt" hidden aria-label="次の提案へ">▶︎</button>
 <div class="toast" id="toast"></div>
@@ -108,147 +116,166 @@ window.VOICE_IMG={"Q01": "data:image/webp;base64,UklGRlxtAABXRUJQVlA4IFBtAAAQpQG
 /* 提案ごとの背景ストーリー（3Dモデルに届いた声、shake handsの話し合いなどから） */
 window.VOICE_SEEDS=[["V01", "入りやすさ・案内", "通路やカフェ側から、shakeの中の様子が見えるほうがよい", "shakeを使っている学生たちの話し合いで、まず「入口の開かれた感じをなくしたくない」という声で意見がそろいました。「カフェ側から見て、中で何をしているのか分からない」という声もあります。入口に高いカウンターを置くと「関所のようになる」という声も届いています。一方で、「人目を気にせずこもれる場所がほしい」という声もあり、見通しのよさとはぶつかるかもしれません。", "Q10"], ["V02", "入りやすさ・案内", "入口に、学外の人も入っていいことが分かる案内がほしい", "shakeは、学外の方も自由に使える場所です。でも、学外の方からは「入っていいのか分からなかった」という声が多く届いています。カフェ側から入ってくる人も多いので、入口に「どうぞ」と伝える案内があるといい、という案も出ています。", "Q15"], ["V21", "入りやすさ・案内", "入口の近くに、ふらっと立ち寄って腰かけられる場所があるとよい", "学生たちの話し合いで、「入口のあたりに、人が立ち止まって過ごせる場所を増やしたい。公園やキャンプ場のようなイメージ」という声が出ました。一方で、「入口の開かれた感じをなくしたくない」「通り道はふさがないように」という声もあります。", "Q10"], ["V03", "入りやすさ・案内", "shakeでどんな人や団体が活動しているかが、分かるとよい", "「どんな人が活動しているのかが見えるのは、とてもいいと思う」という声が届いています。外から見ると、shakeは「何をしている場所なのか分かりにくい」とも言われています。一方で「細かい情報を貼っても、近くまで来ないと読めない」という声もあります。", "Q13"], ["V05", "リラックス・くつろぐ", "人目を気にせず、こもって過ごせる一角がほしい", "現在のshakeは大きなモニターの裏で、椅子を組んで隠れ家のような一角をつくって過ごす学生がよくいます。また「本を読むなら、少し囲まれた場所がいい」「こもりたいけれど、話しかけられるのはうれしい」という声もあります。完全に閉じた個室はつくらない、という方向で話が進んではいるものの、一定の層のニーズはあります。", "Q08"], ["V06", "リラックス・くつろぐ", "団体で使う場所と、ひとりで使う場所は、エリアを分けておくのがよい", "4年間shakeで昼ごはんを食べてきた学生が、団体のミーティングをしたい学生から「場所をあけてください」と言われ、「ここでひとりで作業しちゃダメなんだ」と感じた、という話がありました。一方で「はっきり分けると、かえって分断が生まれるかもしれない」という声もあります。", "Q18"], ["V07", "リラックス・くつろぐ", "靴を脱いだり、床に座ったりして、くつろげる場所がほしい", "「ござがほしい」「床に座れる場所がほしい」「窓辺には畳が似合いそう」という声があります。床から一段高い「小上がり」には「目線が変わって素敵」という声と、「だらしなく見えそう」「そもそも必要？」という声の両方が届いています。", "Q07"], ["V08", "リラックス・くつろぐ", "窓の外を見ながら座れる席がほしい", "窓に向かって座れる席がほしい、という声が学生から出ています。一方で、窓際は「エアコンが届きにくく、とても暑い日がある」という声もあります（なおエアコンの性能はなかなか改善が難しいという施設面の課題があります）。", "Q09"], ["V09", "席・家具", "高い椅子だけでなく、足が床につく低い椅子の席を増やすのがよい", "今のshakeは、高いテーブルと高い椅子が中心です。「座ると足が床につかず、落ち着かない」という声がいくつも届いています。ほかの大学の施設を見学した学生からも「椅子が座りやすく、長く話し合っても疲れない」と報告がありました。一方で、高い机は立ち寄ってさっと作業しやすく、コラボレーションを促す共創施設を目指すならば、長く人を留まらせる発想そのものが不要であるという意見もあります。", "Q01"], ["V10", "席・家具", "家具は、使い方に合わせて動かせるものを中心にするのがよい", "shakeは、つくられたときから「だれもが自由に使える場所」として考えられており、イベント、ミーティング、ひとりの作業と、時間ごとに使い方が変わります。家具が動かせれば、そのつど使う人自身が場をつくり変えられます。一方で「動かせると散らかって見える」「動かしたら元に戻らない」という心配の声も届いています。", "Q02"], ["V11", "席・家具", "家具の置き方は、イベントのときより、ふだんの使い方を優先するのがよい", "shakeは、できたばかりのころは年に400件を超えるイベントでにぎわう場所でした。今も講演会やワークショップなど、60人くらいが集まるイベントが開かれ、はじめての人がshakeを知るきっかけにもなっています。一方で、最近は、ふだんから使う人や、ここを拠点に活動する団体の「いつもの居場所」としての役割も大きくなっています。家具を増やしてふだんの居心地をよくするほど、イベントのときには広く使いにくくなります。逆に、イベントに合わせて家具を減らすと、ふだんは少しさみしい空間になるかもしれません。", "Q11"], ["V13", "席・家具", "ホワイトボードは、今より数を減らすのがよい", "今のshakeには、動かせるホワイトボードがたくさんあります。学生たちの話し合いでは「数が多すぎる。全部必要なのか」「どこにしまうのがいいのか」という声が出ました。ホワイトボードで簡単に仕切りがつくれてしまうので、周りから見えないたまり場になりやすい、という声もあります。一方で、「入口のあたりでよく使う」という声や、「仕切りにして、こもって過ごせる場所をつくれる」という使い方も出ています。", "Q06"], ["V19", "席・家具", "オンライン会議や通話ができる、声がもれにくい席がほしい", "shakeは開かれた空間なので、「オンライン会議をすると、まわりの声が入ってしまう」「自分の声がまわりにもれるのが気になる」という声が出ています。", "Q08"], ["V20", "席・家具", "大きな画面（モニター）につないで話し合える席がほしい", "「電子黒板やモニターが足りない」という声が届いています。ほかの大学の施設を見学した学生からも、「モニターが使える席があった」と報告がありました。", "Q01"], ["V14", "本と本棚", "shakeを、本を読んで過ごせる場所にもしていきたい", "shakeにはたくさんの本棚がありますが、今は本を読みに来ている人は多くありません。shakeの本は貸し出しができないので、読むならその場で読むことになります。「本棚のそばで、本を読める場所にしたい」という声がある一方で、「ここは交流や出会いのための場所」「本棚は積極的に減らしていくべき」という声もあります。", "Q12"], ["V16", "雰囲気", "きれいに整えすぎず、人の気配がする雑然さがあるくらいがよい", "「きれいに並べすぎず、少しごちゃっとしたところがあるほうが、人は居つく」という声が出ています。一方で「今のshakeは、いつも少し散らかって見える」という声も届いています。", "Q20"], ["V17", "雰囲気", "中央カウンターの利活用を促進したい", "中央カウンターの後ろには、大きな白い壁があります。「白一色で殺風景なので、変化のある飾り付けをしてにぎやかにしたい」という声が出ています。", "Q16"]];
 
+window.VOICE_API2='https://script.google.com/macros/s/AKfycbxs00PojZpORdA__5rF2YdqMR2aI8Rl_-WPrNpq3KxhjGbnNP0lJqVrPRckIxWCmcxP/exec';
 (function(){
-const API='https://script.google.com/macros/s/AKfycbyRuORVVgsWallk8rlNljpedJeqhnmB2PLUznZvqtWrK4YqQaDNm9GBNXC6d_3GbU3q/exec';
-const VKEY='shake3d-polis-voter', NKEY='shake3d-comment-name', AKEY='shake3d-comment-aff', DKEY='shake3d-comment-detail', MYV='shake3d-polis-myvotes', SKIPK='shake-voice-skip', RSK='shake-voice-reasons', PKEY='shake3d-polis-pending', WKEY='shake-voice-withdraw', RMK='shake-voice-rm', WD_ITEM='__withdraw';
-const MAXLEN=140, USER_ITEM='みんなの提案';
+/* ===== 声のひろば v2（講義・統計分析対応） ===== */
+const API2=window.VOICE_API2||'';   // 新しい保存先（shake.meijo の Apps Script）
+const API_CHECK='https://script.google.com/macros/s/AKfycbyRuORVVgsWallk8rlNljpedJeqhnmB2PLUznZvqtWrK4YqQaDNm9GBNXC6d_3GbU3q/exec'; // 提案文のAIチェックだけ旧サーバーを使う
+const K={rid:'shake-voice2-rid',prof:'shake-voice2-prof',my:'shake-voice2-my',pend:'shake-voice2-pending',ord:'shake-voice2-order',notified:'shake-voice2-notified'};
+const MAXLEN=140, MINN=5;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const lget=(k,d)=>{ try{ const v=JSON.parse(localStorage.getItem(k)||'null'); return v==null?d:v; }catch(_){ return d; } };
 const lset=(k,v)=>{ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(_){} };
-let VOTER=lget(VKEY,''); if(!VOTER){ VOTER='v'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); lset(VKEY,VOTER); }
+let RID=lget(K.rid,''); if(!/^[a-z0-9]{6,32}$/.test(RID)){ RID='r'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-5); lset(K.rid,RID); }
+const qs=new URLSearchParams(location.search);
+const WAVE=(qs.get('c')||'web').replace(/[^\w\-ぁ-んァ-ヶ一-龠ー]/g,'').slice(0,30)||'web';
 const SEEDS=(window.VOICE_SEEDS||[]).map(([id,cat,text,story,img])=>({id,cat,text,story,img,seed:true}));
 const IMG=window.VOICE_IMG||{};
-const FAC={'法学部':['法学科'],'経営学部':['経営学科','国際経営学科'],'経済学部':['経済学科','産業社会学科'],'外国語学部':['国際英語学科','国際キャリア学科'],'人間学部':['人間学科'],'都市情報学部':['都市情報学科'],'情報工学部':['情報工学科'],'理工学部':['数学科','電気電子工学科','応用化学科','材料機能工学科','機械工学科','交通機械工学科','メカトロニクス工学科','社会基盤デザイン工学科','環境創造工学科','建築学科'],'農学部':['生物資源学科','応用生物化学科','生物環境科学科'],'薬学部':['薬学科'],'大学院':[]};
-const dispName=s=>{ if(!s) return '匿名'; const m=String(s).match(/（([^（）]*)）\s*$/); return m?m[1]:s; };
+const FAC=['法学部','経営学部','経済学部','外国語学部','人間学部','都市情報学部','情報工学部','理工学部','農学部','薬学部','大学院'];
 
-let ALL=SEEDS.slice(), VOTES={}, loaded=false, view='intro', cur=null, JD=lget(DKEY,{})||{}, after=null;
-const mine=()=>lget(MYV,{});
-const aff=()=>lget(AKEY,'');
-function editAff(back){ after=back; join(); }
-// 回答の完了・新しい提案を、運営のスマホにプッシュ通知（ntfy）
-const NTOPIC='shake-voice-cb657d08103f';
-function notify(title,msg){ if(/[?&]preview/.test(location.search)) return; try{ fetch('https://ntfy.sh/',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({topic:NTOPIC,title,message:msg,tags:['speech_balloon'],click:'https://shirasan41.github.io/shake3d/admin.html'})}).catch(()=>{}); }catch(_){} }
-const affLine=()=>`<div class="affl"><span>あなたの所属</span><b>${esc(aff()||'未設定')}</b><button class="affE">変更</button></div>`;
-const NEXT=`<div class="nx"><b class="h">次は、11月6日ごろから</b>みなさんの声を反映した<b>配置案</b>をつくり、それに対して、もう一度声を集めます。そのときも、ぜひ声を聞かせてください。回答ページのQRコードは、またshakeに掲示します。</div>`;
+/* ---------- 回答者アンケートの項目 ---------- */
+const A5=[['5','とてもそう思う'],['4','そう思う'],['3','どちらともいえない'],['2','あまりそう思わない'],['1','そう思わない']];
+const FREQ=['ほぼ毎日','週2〜3回','週1回','月1〜3回','年数回','行ったことがない'];
+const isStu=d=>d.type==='学生', isIn=d=>['学生','教員','職員'].includes(d.type);
+const used=d=>d.freq&&d.freq!=='行ったことがない', rare=d=>d.freq==='年数回'||d.freq==='行ったことがない';
+const PAGES=[
+ {t:'あなたについて',items:[
+  {k:'type',q:'あなたは？',ty:'one',req:1,o:['学生','教員','職員','卒業生','学外の方']},
+  {k:'fac',q:'学部',ty:'sel',req:1,o:FAC,show:isStu},
+  {k:'year',q:'学年',ty:'one',req:1,o:['1年','2年','3年','4年','大学院'],show:isStu},
+  {k:'fac',q:'学部（任意）',ty:'sel',o:FAC,show:d=>d.type==='教員'||d.type==='卒業生'},
+  {k:'gen',q:'あてはまるもの（いくつでも）',ty:'multi',req:1,o:['シェア本棚オーナー','shakeパートナーシップ団体','地域の方','企業・団体の方','そのほか'],show:d=>d.type==='学外の方'},
+  {k:'campus',q:'ふだん通っているキャンパス',ty:'one',req:1,o:['ナゴヤドーム前','天白','八事'],show:isIn},
+  {k:'club',q:'サークルや学生団体に入っていますか？',ty:'one',req:1,o:['shake handsの団体に入っている','ほかのサークル・団体に入っている','入っていない'],show:isStu}]},
+ {t:'shakeとの関わり',items:[
+  {k:'know',q:'shakeのことを、どのくらい知っていましたか？',ty:'one',req:1,o:['よく知っている','名前と場所は知っている','名前だけ知っていた','知らなかった']},
+  {k:'freq',q:'shakeを、どのくらい使っていますか？',ty:'one',req:1,o:FREQ},
+  {k:'purpose',q:'何をしに行きますか？（いくつでも）',ty:'multi',req:1,o:['自習・作業','友人と話す','団体の活動・ミーティング','イベント参加','食事','休憩・ひと息','通り道'],show:used},
+  {k:'with',q:'だれと行くことが多いですか？',ty:'one',req:1,o:['ひとり','2〜3人','団体（4人以上）'],show:used},
+  {k:'time',q:'よく使う時間帯は？（いくつでも）',ty:'multi',req:1,o:['授業の合間','昼休み','放課後','夜（18時以降）','休日'],show:used},
+  {k:'stay',q:'1回にいる時間は？（任意）',ty:'one',o:['30分未満','30分〜1時間','1〜3時間','3時間以上'],show:used},
+  {k:'event',q:'shakeのイベントに参加したことはありますか？（任意）',ty:'one',o:['ある','ない']}]},
+ {t:'ふだんの過ごし方',items:[
+  {k:'notwhy',q:'あまり使わない理由は？（いくつでも）',ty:'multi',req:1,o:['知らなかった','場所が遠い・行く用事がない','入りにくい雰囲気','席が空いていない','知り合いがいない','ほかに居場所がある','何をする場所か分からない'],show:rare},
+  {k:'wouldgo',q:'どんな場所なら、行ってみたいですか？（いくつでも）',ty:'multi',req:1,o:['静かに作業・勉強できる','友人と気軽に話せる','飲食できる','くつろげる・寝転べる','おもしろいイベントがある','知り合いや先輩がいる','気軽に入れる雰囲気','学外の人と出会える'],show:rare},
+  {k:'places',q:'学内で空き時間をよく過ごす場所は？（いくつでも）',ty:'multi',req:1,o:['図書館','食堂','カフェ','空き教室・ラウンジ','shake','学外（家・お店など）'],show:isIn},
+  {k:'solo',q:'空き時間の過ごし方は、どちらに近いですか？',ty:'axis',req:1,o:['ひとりで静かに過ごしたい','人と話したい']},
+  {k:'meet',q:'「知らない人や学外の人と知り合える場所がほしい」',ty:'scale',req:1,o:A5}]},
+ {t:'いまのshakeの印象',show:used,items:[
+  {k:'e_enter',q:'入りやすい',ty:'scale',req:1,o:A5},
+  {k:'e_comfort',q:'居心地がよい',ty:'scale',req:1,o:A5},
+  {k:'e_belong',q:'自分も使ってよい場所だと感じる',ty:'scale',req:1,o:A5},
+  {k:'e_work',q:'作業や勉強がしやすい（任意）',ty:'scale',o:A5},
+  {k:'e_talk',q:'人と話しやすい（任意）',ty:'scale',o:A5}]}
+];
+const INTENT={k:'intent',q:'新しいshakeになったら、今より使いたい（行ってみたい）と思いますか？',ty:'scale',req:1,o:A5};
 
-/* ---------- API ---------- */
-async function list(){ for(let k=0;k<3;k++){ try{ const r=await fetch(API+'?action=list&voter='+encodeURIComponent(VOTER)+'&t='+Date.now()); return JSON.parse(await r.text()); }catch(_){ await new Promise(z=>setTimeout(z,800*(k+1))); } } throw new Error('list'); }
-async function send(o){ for(let k=0;k<3;k++){ try{ const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)}); return JSON.parse(await r.text()); }catch(e){ if(k===2) throw e; await new Promise(z=>setTimeout(z,900*(k+1))); } } }
-async function flush(){ const Q=lget(PKEY,{}); for(const sid of Object.keys(Q)){ try{ const r=await send({action:'vote',id:sid,voter:VOTER,vote:Q[sid]}); if(r&&r.ok){ const Q2=lget(PKEY,{}); if(Q2[sid]===Q[sid]){ delete Q2[sid]; lset(PKEY,Q2); } } }catch(_){ return; } } 
-  await flushW(); }
-// 回答の取り消し：「取り消し」の印を記録し、集計からその回答を外す
-const INF={};
-function rmQ(id){ const R=lget(RMK,[]); if(!R.includes(id)){ R.push(id); lset(RMK,R); } }
-async function flushW(){ const W=lget(WKEY,{});
-  for(const sid of Object.keys(W)){ if(W[sid]!=='q'||INF[sid]) continue; INF[sid]=1;
-    try{ const r=await send({action:'add',item:WD_ITEM,itemName:WD_ITEM,name:VOTER,text:sid,voter:VOTER}); const W2=lget(WKEY,{});
-      if(r&&r.ok&&r.id){ if(W2[sid]==='q'){ W2[sid]=r.id; lset(WKEY,W2); } else rmQ(r.id); } }catch(_){}
-    delete INF[sid]; }
-  for(const id of lget(RMK,[])){ try{ const r=await send({action:'remove',id,voter:VOTER}); if(r) lset(RMK,lget(RMK,[]).filter(x=>x!==id)); }catch(_){ return; } } }
+/* ---------- 状態 ---------- */
+let PD=lget(K.prof,{})||{};
+let ALL=SEEDS.slice(), VOTES={}, view='intro', cur=null, IDX=0, after=null;
+const mine=()=>lget(K.my,{});
+const profDone=()=>!!lget(K.prof+'-ok',false);
+function affOf(d){ if(d.type==='学生') return (d.fac||'名城大学')+'・'+(d.year||'')+'学生'; if(d.type==='教員') return (d.fac?d.fac+'・':'')+'教員'; if(d.type==='職員') return '職員'; if(d.type==='卒業生') return '卒業生'; return (d.gen||[]).filter(x=>x!=='そのほか')[0]||'学外の方'; }
+const aff=()=>affOf(PD);
+
+/* ---------- 通信 ---------- */
+async function get(q){ for(let k=0;k<3;k++){ try{ const r=await fetch(API2+'?'+q+'&t='+Date.now()); return JSON.parse(await r.text()); }catch(_){ await new Promise(z=>setTimeout(z,800*(k+1))); } } throw new Error('get'); }
+async function send(o){ o.rid=RID; o.wave=WAVE; for(let k=0;k<3;k++){ try{ const r=await fetch(API2,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)}); return JSON.parse(await r.text()); }catch(e){ if(k===2) throw e; await new Promise(z=>setTimeout(z,900*(k+1))); } } }
+let flushing=false;
+async function flush(){ if(flushing) return; flushing=true;
+  try{ const Q=lget(K.pend,{}); for(const sid of Object.keys(Q)){ const v=Q[sid].v;
+      try{ const r=await send({action:'vote',sid,v}); if(r&&r.ok){ const Q2=lget(K.pend,{}); if(Q2[sid]&&Q2[sid].v===v){ delete Q2[sid]; lset(K.pend,Q2); } } }catch(_){ break; } } }
+  finally{ flushing=false; } }
+function queue(sid,v){ const Q=lget(K.pend,{}); Q[sid]={v}; lset(K.pend,Q); flush(); }
 async function refresh(){ try{ await flush(); }catch(_){}
-  try{ const j=await list(); const V={}; (j.votes||[]).forEach(([u,s,v])=>{ (V[s]=V[s]||{})[u]=+v; });
-    const user=(j.comments||[]).filter(c=>c&&!c.hidden&&!c.parent&&c.item===USER_ITEM&&!['095b32d5'].includes(c.id)).map(c=>({id:c.id,cat:'みんなの提案',text:c.text,by:dispName(c.name),at:c.at,user:true,own:!!c.own}));
-    (j.comments||[]).forEach(w=>{ if(w&&w.item===WD_ITEM&&V[w.text]) delete V[w.text][w.name]; }); ALL=SEEDS.concat(user); VOTES=V; loaded=true; }catch(e){ console.warn(e); }
-  Object.keys(lget(WKEY,{})).forEach(s=>{ if(VOTES[s]) delete VOTES[s][VOTER]; });
-  const M=mine(); Object.entries(M).forEach(([s,v])=>{ (VOTES[s]=VOTES[s]||{})[VOTER]=v; }); }
+  try{ const j=await get('action=list&rid='+RID); const V={}; (j.votes||[]).forEach(([u,s,v])=>{ (V[s]=V[s]||{})[u]=+v; });
+    const user=(j.proposals||[]).map(c=>({id:c.id,cat:'みんなの提案',text:c.text,by:c.by||'匿名',at:c.at,user:true,own:!!c.own}));
+    ALL=SEEDS.concat(user); VOTES=V; }catch(e){ console.warn(e); }
+  if(VOTES) Object.keys(VOTES).forEach(s=>{ delete VOTES[s][RID]; });
+  Object.entries(mine()).forEach(([s,v])=>{ (VOTES[s]=VOTES[s]||{})[RID]=v; }); }
 function agg(sid){ const V=VOTES[sid]||{}; let a=0,d=0,p=0; Object.values(V).forEach(v=>{ if(v>0)a++; else if(v<0)d++; else p++; }); return {a,d,p,n:a+d+p}; }
 const pc=(x,n)=>n?Math.round(x/n*100):0;
+const NTOPIC='shake-voice-cb657d08103f';
+function notify(title,msg){ if(qs.has('preview')) return; try{ fetch('https://ntfy.sh/',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({topic:NTOPIC,title,message:msg,tags:['speech_balloon'],click:'https://shirasan41.github.io/shake3d/admin.html'})}).catch(()=>{}); }catch(_){} }
 
-/* ---------- 順番 ---------- */
-let IDX=0;
-function order(){ // たたき台の3件ごとに、みんなの提案を1件ずつ混ぜる（出た順）
-  const seeds=ALL.filter(c=>c.seed), users=ALL.filter(c=>c.user).sort((a,b)=>String(a.at).localeCompare(String(b.at)));
-  const out=[]; let ui=0; seeds.forEach((s,i)=>{ out.push(s); if(i%3===2&&ui<users.length) out.push(users[ui++]); }); while(ui<users.length) out.push(users[ui++]); return out; }
+/* ---------- 順番：17件は人ごとにランダム、みんなの提案はそのあと ---------- */
+function seeded(n){ let s=0; for(const ch of RID) s=(s*31+ch.charCodeAt(0))>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function seedOrder(){ let o=lget(K.ord,null); const ids=SEEDS.map(c=>c.id);
+  if(!o||o.length!==ids.length||!ids.every(i=>o.includes(i))){ const r=seeded(); o=ids.slice(); for(let i=o.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [o[i],o[j]]=[o[j],o[i]]; } lset(K.ord,o); }
+  return o; }
+function order(){ const o=seedOrder(); const S=o.map(id=>ALL.find(c=>c.id===id)).filter(Boolean);
+  const U=ALL.filter(c=>c.user).sort((a,b)=>String(a.at).localeCompare(String(b.at))); return S.concat(U); }
+const seedLeft=()=>{ const M=mine(); return SEEDS.filter(c=>!(c.id in M)); };
 function unanswered(){ const M=mine(); return order().filter(c=>!(c.id in M)); }
 function go(i){ const L=order(); if(i<0) i=0; if(i>=L.length) return finish(); IDX=i; card(L[i]); }
 function firstOpen(){ const L=order(), M=mine(); const i=L.findIndex(c=>!(c.id in M)); return i<0?0:i; }
-function finish(){ const U=unanswered(); if(!U.length) return done();
-  const el=document.createElement('div'); el.className='sheet';
-  el.innerHTML=`<div class="in fade"><h2 style="margin-top:0">まだ答えていない提案が、${U.length}件あります</h2>
-   <div style="max-height:34vh;overflow:auto;margin:8px 0 14px">${U.slice(0,30).map(c=>`<div class="ri" style="padding:9px 12px;margin:6px 0;font-size:14px;font-weight:700">${esc(c.text)}</div>`).join('')}</div>
-   <p class="lead" style="font-size:14px">これで回答を終えますか？　答えていない提案は、あとからでも答えられます。</p>
-   ${affLine()}<p class="note" style="margin:0">回答は、この所属で送っています。ちがっていたら「変更」から直せます。</p>
-   <div class="row2" style="margin-top:12px"><button class="btn ghost" id="fe">これで終える</button><button class="btn or" id="fb">答えに戻る</button></div></div>`;
-  document.body.appendChild(el);
-  el.querySelector('#fe').onclick=()=>{ el.remove(); done(); };
-  el.querySelector('.affE').onclick=()=>{ el.remove(); editAff(finish); };
-  el.querySelector('#fb').onclick=()=>{ el.remove(); const L=order(); go(L.indexOf(U[0])); };
-  el.onclick=e=>{ if(e.target===el) el.remove(); }; }
-function progress(){ const M=mine(); const done=ALL.filter(c=>c.id in M).length; const tot=ALL.length;
-  $('#pg').style.width=(tot?Math.round(done/tot*100):0)+'%'; $('#pc').textContent=view==='intro'||view==='join'?'':done+' / '+tot; }
+function progress(){ const M=mine(); const L=order(); const n=L.filter(c=>c.id in M).length;
+  $('#pg').style.width=(L.length?Math.round(n/L.length*100):0)+'%'; $('#pc').textContent=['card','after'].includes(view)?n+' / '+L.length:''; }
 
-/* ---------- 画面 ---------- */
+/* ---------- 画面の共通 ---------- */
 const app=$('#app');
 function show(h){ app.innerHTML='<div class="fade">'+h+'</div>'; window.scrollTo(0,0); progress(); }
-function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(toast.t); toast.t=setTimeout(()=>e.classList.remove('on'),1800); }
+function toast(t){ const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(toast.t); toast.t=setTimeout(()=>e.classList.remove('on'),2000); }
+function bars(on){ $('#vbar').hidden=!on; navShow(on); }
 
-function intro(){ view='intro'; $('#vbar').hidden=true; navShow(false);
+function intro(){ view='intro'; bars(false);
   show(`<h1>新しいshakeに、<br>あなたの声を。</h1>
-  <p class="lead">「shake」は来年で開設10年。2027年4月に新しくなります。これまでに集まった声から生まれた提案に、答えてください。</p>
-  <div class="story" style="margin:16px 0"><div class="h">はじめての方へ　shake（シェイク）って、どんな場所？</div>${IMG.Q06?`<figure><img src="${IMG.Q06}" alt="shakeの全体（3Dモデル）"><figcaption>shakeの全体（3Dモデル）</figcaption></figure>`:''}<p style="margin-top:12px">名城大学 ナゴヤドーム前キャンパス 西館2階にある「社会連携ゾーン shake」は、学生も、教職員も、地域や企業の人も使える共創スペースです。</p><div style="margin:0 16px 14px"><div style="font-weight:800;font-size:14px;margin-top:4px">shakeが大事にしていること</div><div style="background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px"><b style="display:block;color:var(--or);font-size:14.5px">だれでも、ふらっと</b><span style="font-size:14px;line-height:1.6">学内外に開かれたオープンなスペースです。企業、自治体、NPO、地域の人も使えます。</span></div><div style="background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px"><b style="display:block;color:var(--or);font-size:14.5px">共創と学び</b><span style="font-size:14px;line-height:1.6">立場や分野の垣根をこえたプロジェクトと、出会いから生まれる学びの場です。名前の「shake」には、カクテルのように人やアイデアを混ぜ合わせて、新しいものを生み出す、という意味がこめられています。</span></div><div style="background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:8px"><b style="display:block;color:var(--or);font-size:14.5px">使う人がつくる場</b><span style="font-size:14px;line-height:1.6">常駐のスタッフはいません。レイアウトも片付けも、使う人どうしで決めていきます。</span></div><p style="margin:10px 0 0;font-size:13.5px;color:var(--sub);line-height:1.7">毎日 9:00〜21:00（イベントで使っているときを除く）、予約なしで使えます。交流、ミーティング、勉強会、ひとりで読書など、使い方は自由。学生団体の活動の拠点にもなっています。</p></div></div>
+  <p class="lead">名城大学の「shake」は来年で開設10年。2027年4月に新しくなります。これまでに集まった声から生まれた提案に、答えてください。</p>
+  <div class="story" style="margin:16px 0"><div class="h">はじめての方へ　shake（シェイク）って、どんな場所？</div>${IMG.Q06?`<figure><img src="${IMG.Q06}" alt="shakeの全体（3Dモデル）"><figcaption>shakeの全体（3Dモデル）</figcaption></figure>`:''}<p style="margin-top:12px">ナゴヤドーム前キャンパス 西館2階にある「社会連携ゾーン shake」は、学生も、教職員も、地域や企業の人も使える共創スペースです。</p><div style="margin:0 16px 14px"><div style="font-weight:800;font-size:14px;margin-top:4px">shakeが大事にしていること</div>
+   <div class="pt"><b>だれでも、ふらっと</b><span>学内外に開かれたオープンなスペースです。企業、自治体、NPO、地域の人も使えます。</span></div>
+   <div class="pt"><b>共創と学び</b><span>立場や分野の垣根をこえたプロジェクトと、出会いから生まれる学びの場です。名前の「shake」には、カクテルのように人やアイデアを混ぜ合わせて、新しいものを生み出す、という意味がこめられています。</span></div>
+   <div class="pt"><b>使う人がつくる場</b><span>常駐のスタッフはいません。レイアウトも片付けも、使う人どうしで決めていきます。</span></div>
+   <p style="margin:10px 0 0;font-size:13.5px;color:var(--sub);line-height:1.7">毎日 9:00〜21:00（イベントで使っているときを除く）、予約なしで使えます。</p></div></div>
   <div class="box"><ul class="steps">
-   <li><b class="n">1</b><span>提案と、その<b>背景</b>を読む</span></li>
-   <li><b class="n">2</b><span><b>賛成・反対・保留</b>のボタンで答える</span></li>
-   <li><b class="n">3</b><span>言いたいことがあれば、<b>あなたの提案</b>を書く。ほかの人がそれに答えます</span></li></ul>
-   <div class="tl"><div class="now">10〜11月<br>声を集める</div><div>11月6日ごろ〜<br>配置案に、<br>もう一度声を</div><div>2027年4月<br>新しいshakeへ</div></div></div>
-  <button class="btn or" id="go">はじめる（約3分）</button>
-  <p class="note">学生・教職員のみなさんも、学外のみなさんも大歓迎です。どの提案から答えても、途中でやめても大丈夫。</p>`);
-  $('#go').onclick=()=>{ aff()?go(firstOpen()):join(); }; }
+   <li><b class="n">1</b><span>あなたのことと、shakeとの関わりについて、かんたんな質問に答える（約2分）</span></li>
+   <li><b class="n">2</b><span>17の提案を読んで、<b>賛成・反対・保留</b>で答える（約4分）</span></li>
+   <li><b class="n">3</b><span>言いたいことがあれば、<b>あなたの提案</b>も書ける</span></li></ul></div>
+  <div class="box" style="background:#FFF8EE;border-color:#F3D9B8"><b style="font-size:14.5px">shakeを使ったことがなくても、大丈夫です</b><p style="margin:6px 0 0;font-size:14px;line-height:1.7">「こうなっていたら行ってみたい」「これはいらない」という目線で答えてください。使っていない人の声も、新しいshakeをつくる大事な手がかりです。</p></div>
+  <div class="consent">🔒 回答は匿名です。お名前や学籍番号は聞きません。回答は任意で、成績などには一切関係ありません。集まった回答は統計的にまとめ、新しいshakeの配置案づくりと、その報告に使います。</div>
+  <button class="btn or" id="go">同意して、はじめる（約6分）</button>`);
+  $('#go').onclick=()=>{ profDone()?go(firstOpen()):survey(0); }; }
 
-function join(){ view='join'; $('#vbar').hidden=true; navShow(false); const d=JD;
-  const ch=(k,v,l)=>`<button class="ch${d[k]===v?' on':''}" data-k="${k}" data-v="${v}">${l}</button>`;
-  const fac=(opt)=>`<select data-k="fac"><option value="">${opt?'学部を選ぶ（任意）':'学部を選ぶ'}</option>${Object.keys(FAC).map(f=>`<option${d.fac===f?' selected':''}>${f}</option>`).join('')}</select>`;
-  const dep=()=>d.fac&&FAC[d.fac]&&FAC[d.fac].length>1?`<select data-k="dep"><option value="">学科を選ぶ（任意）</option>${FAC[d.fac].map(x=>`<option${d.dep===x?' selected':''}>${x}</option>`).join('')}</select>`:'';
-  let h=`<h1 style="font-size:22px">あなたの所属を<br>教えてください</h1><p class="lead">お名前や学籍番号は聞きません。</p>
-   <div class="q">あなたは？</div><div class="chs">${ch('type','stu','🎓 学生')}${ch('type','fac','🧑‍🏫 教員')}${ch('type','staff','🏢 職員')}${ch('type','alum','🎓 卒業生')}${ch('type','gen','🌏 学外の方')}</div>`;
-  if(d.type==='stu') h+=`<div class="q">学部・学科</div>${fac()}${dep()}`;
-  if(d.type==='fac') h+=`<div class="q">学部</div>${fac(1)}`;
-  if(d.type==='alum') h+=`<div class="q">在学していたときの学部</div>${fac(1)}`;
-  if(d.type==='gen'){ const g=d.gens||[]; const mc=(v,l)=>`<button class="ch${g.includes(v)?' on':''}" data-g="${v}">${g.includes(v)?'✓ ':''}${l}</button>`;
-    h+=`<div class="q">あてはまるもの（いくつでも）</div><div class="chs">${mc('shelf','📚 シェア本棚オーナー')}${mc('partner','🤝 shakeパートナーシップ団体')}${mc('other','そのほかの方')}</div>`; }
-  h+=`<div style="margin-top:22px"><button class="btn or" id="ok">${after?'この所属で保存する':'次へ'}</button></div>
-   <p class="note">🔒 賛成・反対・保留の回答は、だれが答えたかは表示されません。あなたが提案を書いたときだけ、所属（例：「都市情報学部・学生」）が表示されます（提案ごとに匿名にもできます）。</p>`;
-  show(h);
-  app.querySelectorAll('[data-k][data-v]').forEach(b=>b.onclick=()=>{ JD[b.dataset.k]=b.dataset.v; if(b.dataset.k==='type'){ delete JD.fac; delete JD.dep; delete JD.gens; } join(); });
-  app.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{ const s=new Set(JD.gens||[]); s.has(b.dataset.g)?s.delete(b.dataset.g):s.add(b.dataset.g); JD.gens=[...s]; join(); });
-  app.querySelectorAll('select').forEach(s=>s.onchange=()=>{ JD[s.dataset.k]=s.value; if(s.dataset.k==='fac') delete JD.dep; join(); });
-  $('#ok').onclick=()=>{ const d=JD;
-    if(!d.type) return toast('「あなたは？」を選んでください');
-    if(d.type==='stu'&&!d.fac) return toast('学部を選んでください');
-    if(d.type==='gen'&&!(d.gens&&d.gens.length)) return toast('あてはまるものを選んでください');
-    const a=affOf(d); lset(NKEY,a); lset(AKEY,a); lset(DKEY,d);
-    try{ send({action:'join',voter:VOTER,name:a,aff:a,detail:JSON.stringify(d)}); }catch(_){}
-    if(after){ const f=after; after=null; f(); } else go(firstOpen()); }; }
-function affOf(d){ const fac=d.fac||'';
-  if(d.type==='stu') return (fac||'名城大学')+(d.dep&&FAC[fac]&&FAC[fac].length>1?d.dep:'')+'・学生';
-  if(d.type==='fac') return (fac?fac+'・':'')+'教員';
-  if(d.type==='staff') return '職員';
-  if(d.type==='alum') return '卒業生'+(fac?'・'+fac:'');
-  const g=d.gens||[]; const L=[]; if(g.includes('shelf')) L.push('シェア本棚オーナー'); if(g.includes('partner')) L.push('shakeパートナーシップ団体'); if(g.includes('other')) L.push('学外'); return L.join('・')||'学外'; }
+/* ---------- 回答者アンケート ---------- */
+const pagesFor=d=>PAGES.filter(p=>!p.show||p.show(d));
+function itemHTML(it,d){ const v=d[it.k]; const req=it.req?'':' <span class="opt">任意</span>';
+  if(it.ty==='one') return `<div class="q">${esc(it.q)}</div><div class="chs">${it.o.map(o=>`<button class="ch${v===o?' on':''}" data-k="${it.k}" data-v="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
+  if(it.ty==='multi'){ const a=v||[]; return `<div class="q">${esc(it.q)}</div><div class="chs">${it.o.map(o=>`<button class="ch${a.includes(o)?' on':''}" data-k="${it.k}" data-m="${esc(o)}">${a.includes(o)?'✓ ':''}${esc(o)}</button>`).join('')}</div>`; }
+  if(it.ty==='sel') return `<div class="q">${esc(it.q)}</div><select data-k="${it.k}"><option value="">選んでください</option>${it.o.map(o=>`<option${v===o?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
+  if(it.ty==='scale') return `<div class="q">${esc(it.q)}</div><div class="sc">${it.o.map(([n,l])=>`<button class="${v===n?'on':''}" data-k="${it.k}" data-v="${n}"><i>${'●'.repeat(1)}</i>${esc(l)}</button>`).join('')}</div>`;
+  if(it.ty==='axis') return `<div class="q">${esc(it.q)}</div><div class="ax"><span>${esc(it.o[0])}</span><span>${esc(it.o[1])}</span></div><div class="axb">${[1,2,3,4,5].map(n=>`<button class="${v===String(n)?'on':''}" data-k="${it.k}" data-v="${n}">${n===3?'中間':''}</button>`).join('')}</div>`;
+  return ''; }
+function survey(pi){ view='survey'; bars(false); const P=pagesFor(PD); if(pi>=P.length) return saveProf();
+  const p=P[pi]; const its=p.items.filter(it=>!it.show||it.show(PD));
+  show(`<div class="stp">${P.map((_,i)=>`<i class="${i<=pi?'on':''}"></i>`).join('')}</div>
+   <h1 style="font-size:22px;margin-top:14px">${esc(p.t)}</h1>${pi===0?'<p class="lead">お名前や学籍番号は聞きません。</p>':''}
+   ${its.map(it=>itemHTML(it,PD)).join('')}
+   <div class="row2" style="margin-top:26px">${pi>0?'<button class="btn ghost" id="bk">戻る</button>':'<span></span>'}<button class="btn or" id="ok">${pi===P.length-1?(after?'保存する':'提案に答える'):'次へ'}</button></div>`);
+  const redraw=()=>{ const y=window.scrollY; survey(pi); window.scrollTo(0,y); };
+  app.querySelectorAll('[data-k][data-v]').forEach(b=>b.onclick=()=>{ PD[b.dataset.k]=b.dataset.v; if(b.dataset.k==='type'){ ['fac','year','gen','campus','club','places'].forEach(k=>delete PD[k]); } if(b.dataset.k==='freq'&&!used(PD)){ ['purpose','with','time','stay'].forEach(k=>delete PD[k]); } lset(K.prof,PD); redraw(); });
+  app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ const s=new Set(PD[b.dataset.k]||[]); s.has(b.dataset.m)?s.delete(b.dataset.m):s.add(b.dataset.m); PD[b.dataset.k]=[...s]; lset(K.prof,PD); redraw(); });
+  app.querySelectorAll('select').forEach(s=>s.onchange=()=>{ PD[s.dataset.k]=s.value; lset(K.prof,PD); });
+  const bk=$('#bk'); if(bk) bk.onclick=()=>survey(pi-1);
+  $('#ok').onclick=()=>{ const miss=its.find(it=>it.req&&!(Array.isArray(PD[it.k])?PD[it.k].length:PD[it.k]));
+    if(miss){ toast('「'+miss.q.replace(/（.*?）/g,'')+'」に答えてください'); return; } survey(pi+1); }; }
+function profPayload(){ const o={}; const keys=new Set(); PAGES.forEach(p=>p.items.forEach(it=>keys.add(it.k))); keys.add('intent');
+  keys.forEach(k=>{ o[k]=PD[k]==null?'':PD[k]; }); o.aff=aff(); return o; }
+function saveProf(){ lset(K.prof,PD); lset(K.prof+'-ok',true); send({action:'profile',prof:profPayload()}).catch(()=>{});
+  if(after){ const f=after; after=null; toast('保存しました'); f(); } else go(firstOpen()); }
+function editProf(back){ after=back; survey(0); }
 
-function next(){ go(IDX+1); }
-
-function card(c){ view='card'; cur=c; $('#vbar').hidden=false; navShow(true); const mv=mine()[c.id];
-  $('#affT').textContent=aff()||'未設定';
+/* ---------- 提案カード ---------- */
+function card(c){ view='card'; cur=c; bars(true); const mv=mine()[c.id];
   $('#vbar').querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('sel',mv!==undefined&&+b.dataset.v===mv)); $('#vbar').classList.toggle('has',mv!==undefined);
-  const img=c.seed&&IMG[c.img||c.id];
-  show(`<div class="meta"><span class="tag${c.user?' u':''}">${esc(c.cat)}</span><span>${c.user?esc(c.by)+' さんの提案':'これまでの声から'}</span><span style="margin-left:auto">${IDX+1} / ${order().length}</span></div>${mv!==undefined?`<div class="note" style="margin:0 0 6px">✓ 回答ずみ（あなた：${mv>0?'賛成':mv<0?'反対':'保留'}）。ほかのボタンで答えを変えられます。同じボタンをもう一度押すと、未回答に戻ります</div>`:''}
+  const img=c.seed&&IMG[c.img||c.id]; const L=order();
+  show(`<div class="meta"><span class="tag${c.user?' u':''}">${esc(c.cat)}</span><span>${c.user?esc(c.by)+' さんの提案':'これまでの声から'}</span><span style="margin-left:auto">${IDX+1} / ${L.length}</span></div>${mv!==undefined?`<div class="note" style="margin:0 0 6px">✓ 回答ずみ（あなた：${mv>0?'賛成':mv<0?'反対':'保留'}）。ほかのボタンで答えを変えられます。同じボタンをもう一度押すと、未回答に戻ります</div>`:''}
    <div class="stmt">${esc(c.text)}</div>
    ${c.seed?`<div class="story"><div class="h">なぜ、この提案？</div><p>${esc(c.story)}</p>${img?`<figure><img src="${img}" alt="3Dモデルでの配置の一例"><figcaption>配置の一例（3Dモデル）</figcaption></figure>`:''}</div>`
      :`<div class="story"><div class="h">みんなの提案</div><p>参加した人が書いた提案です。あなたはどう思いますか？</p></div>`}
    <div style="height:200px"></div>`); }
-
-async function vote(v){ const c=cur; if(!c) return;
-  if(view==='card'&&mine()[c.id]===v) return withdraw(c);
-  { const W=lget(WKEY,{}); if(c.id in W){ if(W[c.id]!=='q') rmQ(W[c.id]); delete W[c.id]; lset(WKEY,W); } }
-  const M=mine(); M[c.id]=v; lset(MYV,M); (VOTES[c.id]=VOTES[c.id]||{})[VOTER]=v;
-  const Q=lget(PKEY,{}); Q[c.id]=v; lset(PKEY,Q); flush();
-  afterVote(c,v); }
-
-function withdraw(c){ const M=mine(); delete M[c.id]; lset(MYV,M); if(VOTES[c.id]) delete VOTES[c.id][VOTER];
-  const Q=lget(PKEY,{}); delete Q[c.id]; lset(PKEY,Q); const W=lget(WKEY,{}); if(!(c.id in W)){ W[c.id]='q'; lset(WKEY,W); } flush();
-  toast('回答を取り消しました'); card(c); }
+function vote(v){ const c=cur; if(!c) return; const M=mine();
+  if(view==='card'&&M[c.id]===v){ delete M[c.id]; lset(K.my,M); if(VOTES[c.id]) delete VOTES[c.id][RID]; queue(c.id,null); toast('回答を取り消しました'); return card(c); }
+  M[c.id]=v; lset(K.my,M); (VOTES[c.id]=VOTES[c.id]||{})[RID]=v; queue(c.id,v); afterVote(c,v); }
 function afterVote(c,v){ view='after'; $('#vbar').hidden=true; navShow(true); const t=agg(c.id);
   const lab=v>0?['賛成','var(--ag)']:v<0?['反対','var(--dg)']:['保留','var(--ps)'];
   const ask=v>0?'賛成の理由や、こうするともっといい、があれば':v<0?'反対の理由や、こうすればいい、があれば':'迷った理由や、気になることがあれば';
@@ -261,20 +288,52 @@ function afterVote(c,v){ view='after'; $('#vbar').hidden=true; navShow(true); co
    <div class="row2"><button class="btn ghost" id="nx">とばす</button><button class="btn or" id="sr">理由を送って次へ</button></div>
    <p class="note" style="text-align:center"><a href="#" id="chg">答えを変える</a></p>`);
   const ta=$('#rs'); ta.oninput=()=>{ $('#rc').textContent=ta.value.length; };
-  $('#nx').onclick=next;
-  $('#sr').onclick=()=>{ const tx=ta.value.trim(); if(!tx){ next(); return; } sendReason(c,v,tx); toast('ありがとう！理由を送りました'); next(); };
+  $('#nx').onclick=()=>go(IDX+1);
+  $('#sr').onclick=()=>{ const tx=ta.value.trim(); if(tx) { send({action:'reason',sid:c.id,v,text:tx.slice(0,MAXLEN)}).catch(()=>{}); toast('ありがとう！理由を送りました'); } go(IDX+1); };
   $('#chg').onclick=e=>{ e.preventDefault(); card(c); }; }
-
-function sendReason(c,v,tx){ const R=lget(RSK,[]); const rec={sid:c.id,vote:v,text:tx.slice(0,MAXLEN),at:new Date().toISOString()}; R.push(rec); lset(RSK,R);
-  // 理由は「参加者」の記録として送る（公開の一覧には出ない）
-  try{ send({action:'join',voter:VOTER+'~r~'+c.id+'~'+Date.now().toString(36),name:'【理由】'+c.id,aff:aff(),detail:JSON.stringify(Object.assign({type:'reason',voter:VOTER,statement:c.text},rec))}); }catch(_){} }
-
-const MINN=5;   // 5人以上が答えるまで、割合は見せない（少人数で結果が偏って見えるのと、だれが答えたか推測されるのを防ぐ）
 function barHTML(t){ if(t.n<MINN) return '<div class="bl" style="justify-content:flex-start">🕒 答えが'+MINN+'人以上集まると、結果が見えるようになります</div>';
   return `<div class="bar"><i style="width:${pc(t.a,t.n)}%;background:var(--ag)"></i><i style="width:${pc(t.d,t.n)}%;background:var(--dg)"></i><i style="width:${pc(t.p,t.n)}%;background:var(--ps)"></i></div>
    <div class="bl"><span class="a">賛成 ${pc(t.a,t.n)}%</span><span class="d">反対 ${pc(t.d,t.n)}%</span><span>保留 ${pc(t.p,t.n)}%</span></div>`; }
 
-function write(){ if(!aff()){ after=write; return join(); }
+/* ---------- 終わり方 ---------- */
+const affLine=()=>`<div class="affl"><span>回答者情報</span><b>${esc(aff())}・${esc(PD.freq||'')}</b><button class="affE">変更</button></div>`;
+function finish(){ const U=unanswered(); const S=seedLeft(); if(!U.length) return ending();
+  const el=document.createElement('div'); el.className='sheet';
+  el.innerHTML=`<div class="in fade"><h2 style="margin-top:0">まだ答えていない提案が、${U.length}件あります</h2>
+   <div style="max-height:30vh;overflow:auto;margin:8px 0 14px">${U.slice(0,30).map(c=>`<div class="ri" style="padding:9px 12px;margin:6px 0;font-size:14px;font-weight:700">${esc(c.text)}</div>`).join('')}</div>
+   <p class="lead" style="font-size:14px">${S.length?'<b>17の提案には、できるだけすべて答えてください。</b>わからないときは「保留」で大丈夫です。':'これで回答を終えますか？'}</p>
+   ${affLine()}<p class="note" style="margin:0">回答は、この情報といっしょに送っています。ちがっていたら「変更」から直せます。</p>
+   <div class="row2" style="margin-top:12px"><button class="btn ghost" id="fe">これで終える</button><button class="btn or" id="fb">答えに戻る</button></div></div>`;
+  document.body.appendChild(el);
+  el.querySelector('#fe').onclick=()=>{ el.remove(); ending(); };
+  el.querySelector('.affE').onclick=()=>{ el.remove(); editProf(finish); };
+  el.querySelector('#fb').onclick=()=>{ el.remove(); go(order().indexOf(U[0])); };
+  el.onclick=e=>{ if(e.target===el) el.remove(); }; }
+function ending(){ if(PD.intent) return done(); intentScreen(); }
+function intentScreen(){ view='intent'; bars(false);
+  show(`<h1 style="font-size:22px">さいごに、ひとつだけ</h1>${itemHTML(INTENT,PD)}<div style="margin-top:24px"><button class="btn or" id="ok">回答を終える</button></div>`);
+  app.querySelectorAll('[data-k][data-v]').forEach(b=>b.onclick=()=>{ PD.intent=b.dataset.v; lset(K.prof,PD); intentScreen(); });
+  $('#ok').onclick=()=>{ if(!PD.intent) return toast('どれかを選んでください'); done(); }; }
+function done(){ view='done'; bars(false); const M=mine();
+  send({action:'profile',prof:profPayload()}).catch(()=>{});
+  const nA=ALL.filter(c=>c.id in M).length; if(nA&&lget(K.notified,-1)!==nA){ lset(K.notified,nA); notify('声のひろば：回答が届きました',aff()+'・'+(PD.freq||'')+'／'+ALL.length+'件中'+nA+'件に回答'+(WAVE!=='web'?'（'+WAVE+'）':'')); }
+  const rows=ALL.map(c=>({c,t:agg(c.id)})).filter(x=>x.t.n);
+  const agree=rows.filter(x=>x.t.n>=MINN).sort((a,b)=>b.t.a/b.t.n-a.t.a/a.t.n).slice(0,3);
+  const split=rows.filter(x=>x.t.n>=MINN).map(x=>({...x,s:Math.min(x.t.a,x.t.d)/x.t.n})).sort((a,b)=>b.s-a.s).filter(x=>x.s>.15).slice(0,3);
+  const my=v=>v===undefined?'':`<span class="my" style="background:${v>0?'var(--ag)':v<0?'var(--dg)':'var(--ps)'}">あなた：${v>0?'賛成':v<0?'反対':'保留'}</span>`;
+  const item=x=>`<div class="ri"><div class="t">${esc(x.c.text)}${my(M[x.c.id])}</div>${barHTML(x.t)}</div>`;
+  show(`<h1>ありがとうございました！</h1><p class="lead">みなさんの答えは、新しいshakeの<b>配置案</b>をつくるときに使います。</p>
+   ${affLine()}
+   <button class="btn or" id="w2" style="margin-top:6px">✏️ 自分の提案を書く</button>
+   ${agree.length?`<h2>多くの人が賛成している提案</h2>${agree.map(item).join('')}`:''}
+   ${split.length?`<h2>意見が分かれている提案</h2>${split.map(item).join('')}`:''}
+   <h2>すべての提案</h2>${order().map(c=>({c,t:agg(c.id)})).map(item).join('')}
+   <div style="margin:24px 0 8px;display:grid;gap:10px">${unanswered().length?`<button class="btn ghost" id="rsk">答えていない提案に答える（${unanswered().length}件）</button>`:''}<button class="btn ghost" id="rv">最初の提案から見直す</button></div>
+   <p class="note">新しい提案が出たら、またこのページで答えられます。</p>`);
+  $('#w2').onclick=write; app.querySelector('.affE').onclick=()=>editProf(done); const r=$('#rsk'); if(r) r.onclick=()=>go(firstOpen()); $('#rv').onclick=()=>go(0); }
+
+/* ---------- 提案を書く ---------- */
+function write(){ if(!profDone()){ after=write; return survey(0); }
   const el=document.createElement('div'); el.className='sheet';
   el.innerHTML=`<div class="in fade"><button class="x" aria-label="閉じる">×</button><h2 style="margin-top:0">あなたの提案を書く</h2>
    <p class="lead" style="font-size:14px">ほかの人が<b>賛成・反対・保留</b>で答えられるように、<b>一つのことを、一文で</b>書いてください。</p>
@@ -291,7 +350,7 @@ function write(){ if(!aff()){ after=write; return join(); }
   el.querySelector('#ps').onclick=async()=>{ const tx=ta.value.trim(); if(tx.length<6) return toast('もう少し書いてください');
     const b=el.querySelector('#ps');
     if(checked!==tx){ b.disabled=true; b.textContent='読みやすさを確認中…'; checked=tx; let r=null;
-      try{ const ctl=new AbortController(); const tm=setTimeout(()=>ctl.abort(),7000); const x=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'check',text:tx,item:USER_ITEM}),signal:ctl.signal}); clearTimeout(tm); r=JSON.parse(await x.text()); }catch(_){}
+      try{ const ctl=new AbortController(); const tm=setTimeout(()=>ctl.abort(),7000); const x=await fetch(API_CHECK,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'check',text:tx,item:'みんなの提案'}),signal:ctl.signal}); clearTimeout(tm); r=JSON.parse(await x.text()); }catch(_){}
       b.disabled=false; b.textContent='提案を出す';
       if(r&&r.ok===false){ const box=el.querySelector('#aic'); const sug=(r.suggest||'').trim();
         box.innerHTML=`<div class="sg"><b>🤖 AIより：${esc(r.why||'このままだと、賛成・反対で答えにくいかもしれません')}</b>`+
@@ -302,55 +361,35 @@ function write(){ if(!aff()){ after=write; return join(); }
         box.querySelector('#kp').onclick=()=>{ box.innerHTML=''; el.querySelector('#ps').click(); };
         return; } }
     b.disabled=true; b.textContent='送信中…';
-    try{ const anon=el.querySelector('#an').checked; await send({action:'add',item:USER_ITEM,itemName:USER_ITEM,name:anon?'匿名':aff(),text:tx,voter:VOTER});
-      close(); notify('声のひろば：新しい提案',(anon?'匿名':aff())+'「'+tx+'」'); await refresh(); progress(); thanks(); }
+    try{ const anon=el.querySelector('#an').checked; const r=await send({action:'add',text:tx,by:anon?'匿名':aff()}); if(!r||!r.ok) throw 0;
+      close(); notify('声のひろば：新しい提案',(anon?'匿名':aff())+'「'+tx+'」'); await refresh(); progress(); toast('提案を出しました！ありがとうございます'); }
     catch(_){ b.disabled=false; b.textContent='提案を出す'; toast('送れませんでした。もう一度お試しください'); } }; }
 
-function thanks(){ const el=document.createElement('div'); el.className='sheet';
-  el.innerHTML=`<div class="in fade"><h2 style="margin-top:0">提案ありがとうございます！</h2><p class="lead" style="font-size:14.5px">あなたの提案は、ほかの参加者に届き、賛成・反対・保留で答えてもらえます。</p>${NEXT}<button class="btn or" id="tk">続ける</button></div>`;
-  document.body.appendChild(el); const c=()=>el.remove(); el.querySelector('#tk').onclick=c; el.onclick=e=>{ if(e.target===el) c(); }; }
-function done(){ view='done'; $('#vbar').hidden=true; navShow(false); const M=mine();
-  { const nA=ALL.filter(c=>c.id in M).length; if(nA&&lget('shake-voice-notified',-1)!==nA){ lset('shake-voice-notified',nA); notify('声のひろば：回答が届きました',(aff()||'所属未設定')+'／'+ALL.length+'件中'+nA+'件に回答'); } }
-  const rows=ALL.map(c=>({c,t:agg(c.id)})).filter(x=>x.t.n);
-  const agree=rows.filter(x=>x.t.n>=MINN).sort((a,b)=>b.t.a/b.t.n-a.t.a/a.t.n).slice(0,3);
-  const split=rows.filter(x=>x.t.n>=MINN).map(x=>({...x,s:Math.min(x.t.a,x.t.d)/x.t.n})).sort((a,b)=>b.s-a.s).filter(x=>x.s>.15).slice(0,3);
-  const my=v=>v===undefined?'':`<span class="my" style="background:${v>0?'var(--ag)':v<0?'var(--dg)':'var(--ps)'}">あなた：${v>0?'賛成':v<0?'反対':'保留'}</span>`;
-  const item=x=>`<div class="ri"><div class="t">${esc(x.c.text)}${my(M[x.c.id])}</div>${barHTML(x.t)}</div>`;
-  show(`<h1>ありがとう！</h1><p class="lead">${unanswered().length?'回答ありがとうございました。':'いまある提案に、すべて答えました。'}みんなの答えは、<b>声を反映した配置案</b>をつくるときに使います。</p>
-   ${NEXT}${affLine()}
-   <button class="btn or" id="w2" style="margin-top:6px">✏️ 自分の提案を書く</button>
-   ${agree.length?`<h2>多くの人が賛成している提案</h2>${agree.map(item).join('')}`:''}
-   ${split.length?`<h2>意見が分かれている提案</h2>${split.map(item).join('')}`:''}
-   <h2>すべての提案</h2>${ALL.map(c=>({c,t:agg(c.id)})).map(item).join('')}
-   <div style="margin:24px 0 8px;display:grid;gap:10px">${unanswered().length?`<button class="btn ghost" id="rsk">答えていない提案に答える（${unanswered().length}件）</button>`:''}<button class="btn ghost" id="rv">最初の提案から見直す</button>
-   <a class="btn ghost" href="./?hands">3Dモデルで、shakeの配置の一例を見る</a></div>
-   <p class="note">新しい提案が出たら、またこのページで答えられます。</p>`);
-  $('#w2').onclick=write; app.querySelector('.affE').onclick=()=>editAff(done); const r=$('#rsk'); if(r) r.onclick=()=>go(firstOpen()); $('#rv').onclick=()=>go(0); }
-
+/* ---------- 操作 ---------- */
 $('#vbar').querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>vote(+b.dataset.v));
 $('#fin').onclick=finish;
 $('#prv').onclick=()=>go(IDX-1); $('#nxt').onclick=()=>go(IDX+1);
 function navShow(on){ $('#prv').hidden=!on; $('#nxt').hidden=!on; if(on){ $('#prv').style.visibility=IDX>0?'visible':'hidden'; } }
 $('#wr').onclick=write;
-$('#affB').onclick=()=>editAff(()=>go(IDX));
-$('#mineBtn').onclick=()=>{ const L=ALL.filter(c=>c.user&&c.own); const el=document.createElement('div'); el.className='sheet';
+$('#affB').onclick=()=>editProf(()=>go(IDX));
+$('#mineBtn').onclick=()=>{ const el=document.createElement('div'); el.className='sheet';
   const draw=()=>{ const L=ALL.filter(c=>c.user&&c.own); el.innerHTML=`<div class="in fade"><button class="x" aria-label="閉じる">×</button><h2 style="margin-top:0">あなたが出した提案</h2>`+
     (L.length?L.map(c=>`<div class="ri"><div class="t">${esc(c.text)}</div>${barHTML(agg(c.id))}<div style="text-align:right;margin-top:8px"><button class="btn ghost" data-rm="${esc(c.id)}" style="display:inline-block;width:auto;font-size:13px;padding:6px 14px">取り下げる</button></div></div>`).join(''):'<p class="lead">この端末から出した提案は、まだありません。</p>')+
     `<button class="btn or" id="w3" style="margin-top:12px">✏️ 提案を書く</button></div>`;
     el.querySelector('.x').onclick=()=>el.remove(); el.querySelector('#w3').onclick=()=>{ el.remove(); write(); };
-    el.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{ if(!confirm('この提案を取り下げますか？')) return; b.disabled=true; b.textContent='取り下げ中…';
-      try{ await send({action:'remove',id:b.dataset.rm,voter:VOTER}); ALL=ALL.filter(x=>x.id!==b.dataset.rm); toast('取り下げました'); draw(); progress(); }catch(_){ toast('取り下げられませんでした'); b.disabled=false; b.textContent='取り下げる'; } }); };
+    el.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{ b.disabled=true; b.textContent='取り下げ中…';
+      try{ await send({action:'remove',id:b.dataset.rm}); ALL=ALL.filter(x=>x.id!==b.dataset.rm); toast('取り下げました'); draw(); progress(); }catch(_){ toast('取り下げられませんでした'); b.disabled=false; b.textContent='取り下げる'; } }); };
   el.onclick=e=>{ if(e.target===el) el.remove(); }; draw(); document.body.appendChild(el); };
 
-// メンテナンス中（?preview を付けると通常どおり動く）
-const MAINT=true;
-function maint(){ view='maint'; $('#vbar').hidden=true; navShow(false); $('#mineBtn').hidden=true;
+/* ---------- 開始 ---------- */
+const MAINT=window.VOICE_MAINT!==false;
+function maint(){ view='maint'; bars(false); $('#mineBtn').hidden=true;
   app.innerHTML=`<div class="fade" style="text-align:center;padding-top:36px"><div style="font-size:52px">🛠️</div><h1 style="font-size:24px">ただいま<br>メンテナンス中です</h1>
    <p class="lead">より多くの方の声を集められるよう、「声のひろば」を新しくしています。<br>準備ができしだい、再開します。</p>
    <div class="box" style="text-align:left;margin-top:18px"><p style="margin:0;font-size:14px;line-height:1.8">学祭で答えてくださったみなさん、ありがとうございました。いただいた声は、新しいshakeの配置案づくりに大切に使います。</p></div>
    <p class="note" style="margin-top:18px">名城大学 社会連携ゾーン shake</p></div>`; }
-if(MAINT&&!/[?&]preview/.test(location.search)) maint();
-else { intro(); refresh().then(()=>{ if(view==='intro'||view==='done') progress(); if(view==='done') done(); }); }
+if((MAINT&&!qs.has('preview'))||!API2) maint();
+else { intro(); refresh().then(()=>{ if(view==='done') done(); else progress(); }); }
 })();
 </script>
 </body>
